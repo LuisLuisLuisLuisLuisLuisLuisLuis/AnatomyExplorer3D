@@ -28,6 +28,7 @@ import Project.window.PopUp.About;
 import Project.window.PopUp.Help;
 import Project.window.PopUp.InfoChart;
 import Project.window.PopUp.LittlePopUp;
+import Project.window.Slicing.MeshSlicer_Aware;
 import Project.window.SupportingUI.TextSearch.SearchTree;
 import Project.window.ThreeDPaneHandling.*;
 import Project.SelectionModel.*;
@@ -52,7 +53,9 @@ import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.CullFace;
 import javafx.scene.shape.MeshView;
+import javafx.scene.shape.TriangleMesh;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Translate;
@@ -671,6 +674,24 @@ public class WindowPresenter {
             } else threeDSelectionGroup.removeSelectionContainer(hasTreeSelectionGroupContainer);
         });
         //-----------------------------
+
+
+
+        //------------------cutting-------------------------
+        controller.getCutButt().setOnAction(e -> {
+            for (Node meshView : innerGroup.getChildren()) {
+                if (!(meshView instanceof MeshView)) continue;
+                if (!(((MeshView) meshView).getMesh() instanceof TriangleMesh)) continue;
+                System.err.println("Faces size: " + ((TriangleMesh) ((MeshView) meshView).getMesh()).getFaces().size());
+                System.out.println("Vertexformat: " + ((TriangleMesh) ((MeshView) meshView).getMesh()).getVertexFormat());
+                ((MeshView) meshView).setMesh(MeshSlicer_Aware.slicePositiveSide((TriangleMesh) ((MeshView) meshView).getMesh(), 0,0,1,1000));
+                ((MeshView) meshView).setCullFace(CullFace.NONE);    // VERY IMPORTANT! because now we can see inside the mesh, i.e. we can see the other side of the faces too -> both sides need to be rendered -> FRONT/BACK wont suffice
+                System.err.println("Faces size: " + ((TriangleMesh) ((MeshView) meshView).getMesh()).getFaces().size());
+            }
+        });
+
+        innerGroup.getChildren().addListener((ListChangeListener<? super Node>) i -> controller.getBotLabelDrawCount().setText(innerGroup.getChildren().size() + " items drawn."));
+
 
 
 

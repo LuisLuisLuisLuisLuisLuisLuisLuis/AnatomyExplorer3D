@@ -10,6 +10,10 @@ import javafx.scene.layout.VBox;
 public class MainWindowController {
 
     @FXML
+    private Label botLabelDrawCount;
+    @FXML
+    private Button cutButt;
+    @FXML
     private Button drawEverythingButton;
     @FXML
     private TextField fileIDTextfield;
@@ -416,4 +420,8 @@ public class MainWindowController {
     public TextField getFileIDTextfield() {return fileIDTextfield;}
 
     public Button getDrawEverythingButton() {return drawEverythingButton;}
+
+    public Button getCutButt(){return cutButt;}
+
+    public Label getBotLabelDrawCount() {return botLabelDrawCount;}
 }

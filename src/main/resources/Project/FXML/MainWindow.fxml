@@ -169,6 +169,7 @@
                                  <bottom>
                                     <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                                       <items>
+                                          <Button fx:id="cutButt" mnemonicParsing="false" text="Cut" />
                                           <Button fx:id="showInTreeButton" mnemonicParsing="false" text="Show in Tree" />
                                           <Button fx:id="selectAll3DButton" mnemonicParsing="false" text="Select All" />
                                           <Button fx:id="unselectAll3DButton" mnemonicParsing="false" text="Unselect All" />
@@ -190,8 +191,9 @@
                            <bottom>
                               <HBox alignment="CENTER_LEFT" prefHeight="22.0" prefWidth="583.0" BorderPane.alignment="CENTER">
                                  <children>
+                                    <Label fx:id="botLabelDrawCount" text="0 items drawn." />
                                     <Label fx:id="botLabel_3D" text="0 items selected." />
-                                    <TextField fx:id="fileIDTextfield" editable="false" prefHeight="26.0" prefWidth="204.0" HBox.hgrow="ALWAYS" />
+                                    <TextField fx:id="fileIDTextfield" editable="false" prefHeight="26.0" prefWidth="111.0" HBox.hgrow="ALWAYS" />
                                  </children>
                               </HBox>
                            </bottom>
@@ -209,7 +211,7 @@
                       <Menu mnemonicParsing="false" text="File">
                         <items>
                               <MenuItem fx:id="menuSaveTree" mnemonicParsing="false" text="Save Trees" />
-                          <MenuItem fx:id="menuClose" mnemonicParsing="false" text="Close" />
+                            <MenuItem fx:id="menuClose" mnemonicParsing="false" text="Close" />
                               <MenuItem fx:id="menuClearView" mnemonicParsing="false" text="Clear View" />
                               <MenuItem fx:id="menuResetView" mnemonicParsing="false" text="Reset View" />
                         </items>
@@ -218,6 +220,8 @@
                           <items>
                               <CheckMenuItem fx:id="darkModeMenuItem" mnemonicParsing="false" text="Dark Mode" />
                               <CheckMenuItem fx:id="fullScreenCheck" mnemonicParsing="false" text="Fullscreen" />
+                              <MenuItem fx:id="menuAddAxes" mnemonicParsing="false" text="Add Axes"></MenuItem>
+                              <MenuItem fx:id="menuRmAxes" mnemonicParsing="false" text="Add Axes"></MenuItem>
                           </items>
                         </Menu>
                       <Menu mnemonicParsing="false" text="Help">
