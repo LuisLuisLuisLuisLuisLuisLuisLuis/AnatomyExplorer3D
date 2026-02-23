@@ -28,7 +28,7 @@ import Project.window.PopUp.About;
 import Project.window.PopUp.Help;
 import Project.window.PopUp.InfoChart;
 import Project.window.PopUp.LittlePopUp;
-import Project.window.Slicing.MeshSlicer_Aware;
+import Project.window.Slicing.Plane;
 import Project.window.SupportingUI.TextSearch.SearchTree;
 import Project.window.ThreeDPaneHandling.*;
 import Project.SelectionModel.*;
@@ -52,9 +52,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.CullFace;
 import javafx.scene.shape.MeshView;
-import javafx.scene.shape.TriangleMesh;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Translate;
@@ -62,6 +60,7 @@ import javafx.scene.transform.Translate;
 import java.io.File;
 import java.net.URL;
 import java.util.*;
+import java.util.function.Function;
 
 
 /**
@@ -93,7 +92,7 @@ public class WindowPresenter {
     private final Group innerGroup;     //holds the meshViews
 
     private final CamMover camMover = new CamMover(camera); // controls camera movement
-    private final Group3DRotation contentGroupRotater;      // implements rotation of the 3D view via rotation of a group
+    private final Group3DRotation contentGroupRotator;      // implements rotation of the 3D view via rotation of a group
     private final Group3DRotation slicePlaneGroupRotator;   // rotates the slicing plane
     private final SetupMouseRotate3D setupMouseRotate3D;    // uses groupRotater to rotate a group using mouse drag
     private boolean isRotating = false; //is the user rotating the 3D view via mouse drag right now? if so, disable click-selecting meshViews
@@ -133,13 +132,13 @@ public class WindowPresenter {
         contentGroup = outerGroups.get(1);
         this.innerGroup = new Group();
 
+
         // Rotation
-        this.contentGroupRotater = new Group3DRotation(contentGroup);
+        this.contentGroupRotator = new Group3DRotation(contentGroup);
         this.slicePlaneGroupRotator = new Group3DRotation(slicePlaneGroup);
-        setupMouseRotate3D = new SetupMouseRotate3D(controller.getThreeDPane(), contentGroup, innerGroup);
+        setupMouseRotate3D = new SetupMouseRotate3D(controller.getThreeDPane(), new Group[]{contentGroup, slicePlaneGroup});
 
 
-        //self centering property upon drawing new meshViews
         innerGroup.getChildren().addListener((InvalidationListener) e -> {
             centerGroupToItself(innerGroup);
         });
@@ -688,17 +687,62 @@ public class WindowPresenter {
 
 
         //------------------cutting-------------------------
+        controller.getCutButt().setUserData(false);
         controller.getCutButt().setOnAction(e -> {
-            for (Node meshView : innerGroup.getChildren()) {
-                if (!(meshView instanceof MeshView)) continue;
-                if (!(((MeshView) meshView).getMesh() instanceof TriangleMesh)) continue;
-                System.err.println("Faces size: " + ((TriangleMesh) ((MeshView) meshView).getMesh()).getFaces().size());
-                System.out.println("Vertexformat: " + ((TriangleMesh) ((MeshView) meshView).getMesh()).getVertexFormat());
-                ((MeshView) meshView).setMesh(MeshSlicer_Aware.slicePositiveSide((TriangleMesh) ((MeshView) meshView).getMesh(), 0,0,1,1000));
-                ((MeshView) meshView).setCullFace(CullFace.NONE);    // VERY IMPORTANT! because now we can see inside the mesh, i.e. we can see the other side of the faces too -> both sides need to be rendered -> FRONT/BACK wont suffice
-                System.err.println("Faces size: " + ((TriangleMesh) ((MeshView) meshView).getMesh()).getFaces().size());
+            boolean isCutting = (boolean) controller.getCutButt().getUserData();
+            if (isCutting) {
+                //TODO: cancel
+                controller.getCutButt().setUserData(false);
+                controller.getCutButt().setText("Cut");
+                controller.getCutSelectionButton().setDisable(true);
+                throw new RuntimeException("Cancel slicing not yet implemented");
+
+            } else {
+                controller.getCutSelectionButton().setDisable(false);
+                controller.getCutButt().setText("Cancel");
+                controller.getCutButt().setUserData(true);
+                slicePlaneGroup.getChildren().add(Plane.makeSlicePlane());
             }
         });
+
+        //cutSelectionButton will store the last clicked MenuItem under UserData.
+        //Thats what fires when the button is clicked. 'All' is the default behaviour.
+        controller.getCutSelectionButton().setUserData(controller.getCutSelectionButton().getItems().getFirst());
+        controller.getCutSelectionButton().setOnAction(e -> {
+            ((MenuItem)controller.getCutSelectionButton().getUserData()).fire();    //fire the menuItem stored in UserData
+        });
+
+        // Set the default action and text after the user cut something
+        Function<MenuItem, Boolean> postCutEvent = new Function<MenuItem, Boolean>() {
+            @Override
+            public Boolean apply(MenuItem menuItem) {
+                controller.getCutSelectionButton().setUserData(menuItem);
+                controller.getCutSelectionButton().setText(menuItem.getText());
+                controller.getCutSelectionButton().setDisable(true);
+                controller.getCutButt().setUserData(false);
+                controller.getCutButt().setText("Cut");
+                return true;
+            }
+        };
+
+        //actions for the menuitems
+        controller.getCutAllMenuItem().setOnAction(e -> {
+            LinkedList<MeshView> meshViews = new LinkedList<>();
+            for (Node node : innerGroup.getChildren()) if (node instanceof MeshView) meshViews.add((MeshView) node);
+            executeCommand(new SliceCommand(meshViews));
+            postCutEvent.apply(controller.getCutAllMenuItem());
+        });
+        controller.getCutSelectedMenuItem().setOnAction(e -> {
+            System.out.println("cut selected");
+            LinkedList<MeshView> meshViews = new LinkedList<>();
+            for (Node node : hasInnerGroupSelectedItems.getSelection()) if (node instanceof MeshView) meshViews.add((MeshView) node);
+            executeCommand(new SliceCommand(meshViews));
+            postCutEvent.apply(controller.getCutSelectedMenuItem());
+        });
+
+
+        //---------------------------end cutting-------------------------
+
 
         innerGroup.getChildren().addListener((ListChangeListener<? super Node>) i -> controller.getBotLabelDrawCount().setText(innerGroup.getChildren().size() + " items drawn."));
 
@@ -708,6 +752,7 @@ public class WindowPresenter {
 
 //-----------------end of constructor----------------
     }
+
 
     //updates the label in the bottom left
     private void updateTreeBotLabel() {
@@ -799,19 +844,19 @@ public class WindowPresenter {
 
         if (keyCode == KeyCode.LEFT) {
             if (!rotating) camMover.moveX(zoomStep);
-            else contentGroupRotater.applyGlobalRotation(new Point3D(0, 1, 0), rotationStep);
+            else contentGroupRotator.applyGlobalRotation(new Point3D(0, 1, 0), rotationStep);
 
         } else if (keyCode == KeyCode.RIGHT) {
             if (!rotating) camMover.moveX(-zoomStep);
-            else contentGroupRotater.applyGlobalRotation(new Point3D(0,1, 0), -rotationStep);
+            else contentGroupRotator.applyGlobalRotation(new Point3D(0,1, 0), -rotationStep);
 
         } else if (keyCode == KeyCode.UP) {
             if (!rotating) camMover.moveY(zoomStep);
-            else contentGroupRotater.applyGlobalRotation(new Point3D(1, 0, 0), -rotationStep);
+            else contentGroupRotator.applyGlobalRotation(new Point3D(1, 0, 0), -rotationStep);
 
         } else if (keyCode == KeyCode.DOWN) {
             if (!rotating) camMover.moveY(-zoomStep);
-            else contentGroupRotater.applyGlobalRotation(new Point3D(1,0,0), rotationStep);
+            else contentGroupRotator.applyGlobalRotation(new Point3D(1,0,0), rotationStep);
 
         } else if (keyCode == KeyCode.PLUS && !rotating) camMover.moveZ(zoomStep);
         else if (keyCode == KeyCode.MINUS && !rotating) camMover.moveZ(-zoomStep);

@@ -1,25 +1,12 @@
 package Project.window.ThreeDPaneHandling;
 
-import Project.window.WindowPresenter;
-import javafx.animation.Animation;
-import javafx.animation.Interpolator;
-import javafx.animation.RotateTransition;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableDoubleValue;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
-import javafx.util.Duration;
+
+import java.util.ArrayList;
 
 /*
 Enables rotation of a Group by mouse click-and-drag on a Pane.
@@ -36,7 +23,7 @@ public class SetupMouseRotate3D {
 
     private Runnable listener;
 
-    private ContinuousRotator continuousRotator;
+    private ArrayList<ContinuousRotator> continuousRotators;
 
     public double deltaX() {
         return xPrev - xSave;
@@ -45,8 +32,8 @@ public class SetupMouseRotate3D {
         return yPrev - ySave;
     }
 
-    public SetupMouseRotate3D(Pane pane, Group contentGroup, Group innerGroup) {
-        setup(pane, contentGroup);
+    public SetupMouseRotate3D(Pane pane, Group[] groups) {
+        setup(pane, groups);
     }
 
     //be able to notify someone of mouse rotation events
@@ -55,14 +42,15 @@ public class SetupMouseRotate3D {
     }
 
     //remember mouse coordinates on click and stop any continuous rotation
-    private void setup(Pane pane, Group group1) {
+    private void setup(Pane pane, Group[] groups) {
+        this.continuousRotators = new ArrayList<>(groups.length);
         pane.setOnMousePressed(e -> {
             xPrev = e.getSceneX();
             yPrev = e.getSceneY();
             xSave = xPrev;
             ySave = yPrev;
-
-            if (continuousRotator != null) continuousRotator.stop();
+            this.stopContinuousRotation();
+            //if (continuousRotator != null) continuousRotator.stop();
         });
 
 
@@ -72,11 +60,17 @@ public class SetupMouseRotate3D {
 
             //implement continous rotation animation if keys are pressed
             if (e.isControlDown() && e.isShiftDown()) {
-                if (this.continuousRotator != null) this.continuousRotator.stop(); // restart if running
+                //if (this.continuousRotator != null) this.continuousRotator.stop(); // restart if running
+                this.stopContinuousRotation();
                 //start a new continuous rotation using the axis the user is currently rotating with
                 //as speed of rotation, use the distance the user has dragged the mouse
-                this.continuousRotator = new ContinuousRotator(group1, axis, Math.sqrt(Math.pow(xSave - xPrev, 2) + Math.pow(ySave - yPrev, 2))); // 30° per second
-                this.continuousRotator.start();
+                this.continuousRotators.clear();
+                for (Group group : groups) {
+                    this.continuousRotators.add(new ContinuousRotator(group, axis, Math.sqrt(Math.pow(xSave - xPrev, 2) + Math.pow(ySave - yPrev, 2)))); // 30° per second
+                    this.continuousRotators.getLast().start();
+                }
+//                this.continuousRotator =
+//                this.continuousRotator.start();
             }
         });
 
@@ -84,17 +78,18 @@ public class SetupMouseRotate3D {
         pane.setOnMouseDragged(e -> {
             var dx = e.getSceneX() - xPrev;
             var dy = e.getSceneY() - yPrev;
-            axis = new Point3D(dy, -dx, 0).normalize();
+            axis = new Point3D(dy, -dx, 0).normalize();//TODO
             angle = Math.sqrt(dx * dx + dy * dy) * 0.5; // based on the distance of the mouse movement
 
-            applyGlobalRotation(group1, axis, angle);
+            for (Group group : groups) applyGlobalRotation(group, axis, angle);
 
             xPrev = e.getSceneX();
             yPrev = e.getSceneY();
         });
     }
     public void stopContinuousRotation() {
-        if (continuousRotator != null) continuousRotator.stop();
+        for (ContinuousRotator continuousRotator : continuousRotators) continuousRotator.stop();
+        //if (continuousRotator != null) continuousRotator.stop();
     }
 
     public void applyGlobalRotation(Group group, Point3D axis, double angle) {

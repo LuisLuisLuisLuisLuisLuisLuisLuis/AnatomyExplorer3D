@@ -4,8 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3c65ee50-307e-41c9-811a-e44a903afa8a" name="Changes" comment=":kappa:">
+    <list default="true" id="3c65ee50-307e-41c9-811a-e44a903afa8a" name="Changes" comment="Create SlicePlaneGroup">
+      <change afterPath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/SliceCommand.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/Project/window/Slicing/Plane.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/MainWindowController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/MainWindowController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/ThreeDPaneHandling/Axes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/ThreeDPaneHandling/Axes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/ThreeDPaneHandling/SetupMouseRotate3D.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/ThreeDPaneHandling/SetupMouseRotate3D.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/WindowPresenter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/WindowPresenter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/FXML/MainWindow.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/Project/FXML/MainWindow.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,7 +63,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "main",
     "jdk.selected.JAVA_MODULE": "corretto-23",
-    "last_opened_file_path": "C:/Users/dnexu/Documents/GitHub/AnatomyExploer3D_Private",
+    "last_opened_file_path": "C:/Users/dnexu/Documents/GitHub/AnatomyExploer3D_Private/src/main/resources/Project/FXML",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.43049932",
@@ -68,11 +75,11 @@
       <recent name="Project.command.Remember" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\dnexu\Documents\GitHub\AnatomyExploer3D_Private\src\main\resources\Project\FXML" />
+      <recent name="C:\Users\dnexu\Documents\GitHub\AnatomyExploer3D_Private\src\main\java\Project\window" />
       <recent name="C:\Users\dnexu\Documents\GitHub\TreeEditor_Kopie\src\main\resources\Project\anatomy" />
       <recent name="C:\Users\dnexu\Documents\GitHub\TreeEditor_Kopie\src\main\resources\Project\anatomy\partof_BP3D_4.0_obj_99" />
       <recent name="C:\Users\dnexu\Documents\GitHub\TreeEditor_Kopie\src\main\resources\Project\3DSupport" />
-      <recent name="C:\Users\dnexu\Documents\GitHub\TreeEditor_Kopie\src\main\resources\Project\anatomy\originalTrees_except_partof_rightshoulder" />
-      <recent name="C:\Users\dnexu\Documents\GitHub\TreeEditor\src\main\resources\Project\anatomy" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\dnexu\Documents\GitHub\TreeEditor_Kopie\src\main\resources\Project\FXML" />
@@ -88,10 +95,11 @@
       <recent name="com.example.helloworldmodule" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="Project.window.TreeView.TreeAnalysis.TreeViewEditing.Command" />
-      <recent name="Project.window.TreeView.TreeAnalysis.MVPPattern" />
+      <recent name="Project.window.Slicing" />
       <recent name="Project.window.ThreeDPaneHandling" />
-      <recent name="Project.command.TreeCommands" />
+      <recent name="Project.window" />
+      <recent name="Project.model" />
+      <recent name="Project.window.TreeView.TreeAnalysis.TreeViewEditing.Command" />
     </key>
   </component>
   <component name="RunAnythingCache">
@@ -115,7 +123,7 @@
       <command value="mvn -e clean javafx:run@anatomyExplorer" />
     </option>
   </component>
-  <component name="RunManager" selected="Maven.clean run">
+  <component name="RunManager" selected="Maven.run">
     <configuration default="true" type="JetRunConfigurationType">
       <module name="AnatomyViewer3D" />
       <method v="2">
@@ -304,7 +312,31 @@
       <option name="project" value="LOCAL" />
       <updated>1771831768531</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Import Slicing code from TreeEditor_SlicingTest">
+      <option name="closed" value="true" />
+      <created>1771835605201</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1771835605201</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Refactoring:&#10;- move CompareBP3DV to TreeAnalysis&#10;- delete I Stringable">
+      <option name="closed" value="true" />
+      <created>1771836092150</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1771836092150</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Create SlicePlaneGroup">
+      <option name="closed" value="true" />
+      <created>1771842891717</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1771842891717</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -325,7 +357,10 @@
     <MESSAGE value="Create TreeAnalysis.fxml" />
     <MESSAGE value="Initial commit" />
     <MESSAGE value=":kappa:" />
-    <option name="LAST_COMMIT_MESSAGE" value=":kappa:" />
+    <MESSAGE value="Import Slicing code from TreeEditor_SlicingTest" />
+    <MESSAGE value="Refactoring:&#10;- move CompareBP3DV to TreeAnalysis&#10;- delete I Stringable" />
+    <MESSAGE value="Create SlicePlaneGroup" />
+    <option name="LAST_COMMIT_MESSAGE" value="Create SlicePlaneGroup" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

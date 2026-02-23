@@ -49,7 +49,7 @@ public class Axes extends Group {
      * @param angle: angle as double in degrees.
      * @return your rotated shape.
      */
-    public Shape3D rotateShape3D(Shape3D shape, Point3D axis, double angle) {
+    public static Shape3D rotateShape3D(Shape3D shape, Point3D axis, double angle) {
         Rotate rotate = new Rotate(angle, axis);
 
         if (shape.getTransforms().isEmpty()) {
@@ -80,7 +80,7 @@ public class Axes extends Group {
     /**
      * Makes PhongMaterial of desired color and SpecularColor WHITE.
      */
-    private PhongMaterial makePhongMaterialW(Color color) {
+    public static PhongMaterial makePhongMaterialW(Color color) {
         PhongMaterial phongMaterial = new PhongMaterial(color);
         phongMaterial.setSpecularColor(Color.WHITE);
         return phongMaterial;

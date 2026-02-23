@@ -9,6 +9,7 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitMenuButton?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -54,7 +55,7 @@
                                           <content>
                                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                                    <children>
-                                                      <TreeView fx:id="partOfTreeView" prefHeight="225.6" prefWidth="288.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                      <TreeView fx:id="partOfTreeView" prefHeight="162.0" prefWidth="288.0" AnchorPane.bottomAnchor="-3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                                    </children></AnchorPane>
                                           </content>
                                         </Tab>
@@ -79,7 +80,7 @@
                                     </TabPane>
                                  </center>
                                  <bottom>
-                                    <ToolBar prefHeight="31.0" prefWidth="288.0" BorderPane.alignment="CENTER">
+                                    <ToolBar prefHeight="0.0" prefWidth="288.0" BorderPane.alignment="CENTER">
                                       <items>
                                           <Button fx:id="selectIn3DButton" mnemonicParsing="false" text="Select in 3D" />
                                           <CheckBox fx:id="selectionSynchCheck" mnemonicParsing="false" text="Sync with 3D" />
@@ -128,7 +129,7 @@
                               </BorderPane>
                            </center>
                            <bottom>
-                              <HBox alignment="CENTER_LEFT" prefHeight="22.0" prefWidth="583.0" BorderPane.alignment="CENTER">
+                              <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="288.0" BorderPane.alignment="CENTER">
                                  <children>
                                     <Label fx:id="botLabel_Tree" text="0 items selected." />
                                  </children>
@@ -142,34 +143,12 @@
                         <BorderPane prefHeight="369.6" prefWidth="288.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <center>
                               <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                                 <top>
-                                    <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                                       <items>
-                                        <Button fx:id="zoomInButton" mnemonicParsing="false" text="+" />
-                                          <Button fx:id="zoomOutButton" mnemonicParsing="false" text="-" />
-                                          <Separator orientation="VERTICAL" />
-                                          <Button fx:id="moveUpButton" mnemonicParsing="false" text="↑" />
-                                          <Button fx:id="moveDownButton" mnemonicParsing="false" text="↓" />
-                                          <Button fx:id="moveLeftButton" mnemonicParsing="false" text="←" />
-                                          <Button fx:id="moveRightButton" mnemonicParsing="false" text="→" />
-                                          <Separator orientation="VERTICAL" />
-                                          <Button fx:id="rotLeftButton" mnemonicParsing="false" text="↩" />
-                                          <Button fx:id="rotRightButton" mnemonicParsing="false" text="↪" />
-                                          <Button fx:id="rotUpButton" mnemonicParsing="false" text="⤻" />
-                                          <Button fx:id="rotDownButton" mnemonicParsing="false" text="⤺" />
-                                          <Separator orientation="VERTICAL" />
-                                          <Button fx:id="resetViewButton" mnemonicParsing="false" text="Reset" />
-                                          <Button fx:id="clearViewButton" mnemonicParsing="false" text="Clear View" />
-                                       </items>
-                                    </ToolBar>
-                                 </top>
                                  <center>
                                     <Pane fx:id="threeDPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
                                  </center>
                                  <bottom>
-                                    <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                    <ToolBar prefHeight="0.0" prefWidth="288.0" BorderPane.alignment="CENTER">
                                       <items>
-                                          <Button fx:id="cutButt" mnemonicParsing="false" text="Cut" />
                                           <Button fx:id="showInTreeButton" mnemonicParsing="false" text="Show in Tree" />
                                           <Button fx:id="selectAll3DButton" mnemonicParsing="false" text="Select All" />
                                           <Button fx:id="unselectAll3DButton" mnemonicParsing="false" text="Unselect All" />
@@ -177,17 +156,25 @@
                                       </items>
                                     </ToolBar>
                                  </bottom>
+                                 <top>
+                                    <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                      <items>
+                                          <Button fx:id="cutButt" mnemonicParsing="false" text="Cut" />
+                                          <SplitMenuButton fx:id="cutSelectionButton" mnemonicParsing="false" text="All" disable="true">
+                                            <items>
+                                              <MenuItem fx:id="cutAllMenuItem" mnemonicParsing="false" text="All" />
+                                              <MenuItem fx:id="cutSelectedMenuItem" mnemonicParsing="false" text="Selected" />
+                                            </items>
+                                          </SplitMenuButton>
+                                          <Separator orientation="VERTICAL" />
+                                          <ColorPicker fx:id="colorPicker" prefHeight="26.0" prefWidth="81.0" />
+                                          <Button fx:id="applyColorButton" mnemonicParsing="false" text="Apply to Selected" />
+                                          <Button fx:id="explodeButton" mnemonicParsing="false" text="Explode" />
+                                      </items>
+                                    </ToolBar>
+                                 </top>
                               </BorderPane>
                            </center>
-                           <top>
-                              <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                                <items>
-                                    <ColorPicker fx:id="colorPicker" />
-                                    <Button fx:id="applyColorButton" mnemonicParsing="false" text="Apply to Selected" />
-                                    <Button fx:id="explodeButton" mnemonicParsing="false" text="Explode" />
-                                </items>
-                              </ToolBar>
-                           </top>
                            <bottom>
                               <HBox alignment="CENTER_LEFT" prefHeight="22.0" prefWidth="583.0" BorderPane.alignment="CENTER">
                                  <children>
@@ -197,6 +184,27 @@
                                  </children>
                               </HBox>
                            </bottom>
+                           <top>
+                              <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                 <items>
+                                  <Button fx:id="zoomInButton" mnemonicParsing="false" text="+" />
+                                    <Button fx:id="zoomOutButton" mnemonicParsing="false" text="-" />
+                                    <Separator orientation="VERTICAL" />
+                                    <Button fx:id="moveUpButton" mnemonicParsing="false" text="↑" />
+                                    <Button fx:id="moveDownButton" mnemonicParsing="false" text="↓" />
+                                    <Button fx:id="moveLeftButton" mnemonicParsing="false" text="←" />
+                                    <Button fx:id="moveRightButton" mnemonicParsing="false" text="→" />
+                                    <Separator orientation="VERTICAL" />
+                                    <Button fx:id="rotLeftButton" mnemonicParsing="false" text="↩" />
+                                    <Button fx:id="rotRightButton" mnemonicParsing="false" text="↪" />
+                                    <Button fx:id="rotUpButton" mnemonicParsing="false" text="⤻" />
+                                    <Button fx:id="rotDownButton" mnemonicParsing="false" text="⤺" />
+                                    <Separator orientation="VERTICAL" />
+                                    <Button fx:id="resetViewButton" mnemonicParsing="false" text="Reset" />
+                                    <Button fx:id="clearViewButton" mnemonicParsing="false" text="Clear View" />
+                                 </items>
+                              </ToolBar>
+                           </top>
                         </BorderPane>
                      </children>
                   </AnchorPane>
@@ -220,8 +228,8 @@
                           <items>
                               <CheckMenuItem fx:id="darkModeMenuItem" mnemonicParsing="false" text="Dark Mode" />
                               <CheckMenuItem fx:id="fullScreenCheck" mnemonicParsing="false" text="Fullscreen" />
-                              <MenuItem fx:id="menuAddAxes" mnemonicParsing="false" text="Add Axes"></MenuItem>
-                              <MenuItem fx:id="menuRmAxes" mnemonicParsing="false" text="Add Axes"></MenuItem>
+                              <MenuItem fx:id="menuAddAxes" mnemonicParsing="false" text="Add Axes" />
+                              <MenuItem fx:id="menuRmAxes" mnemonicParsing="false" text="Add Axes" />
                           </items>
                         </Menu>
                       <Menu mnemonicParsing="false" text="Help">

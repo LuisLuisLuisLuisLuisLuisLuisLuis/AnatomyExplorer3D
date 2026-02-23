@@ -10,6 +10,12 @@ import javafx.scene.layout.VBox;
 public class MainWindowController {
 
     @FXML
+    private MenuItem cutSelectedMenuItem;
+    @FXML
+    private MenuItem cutAllMenuItem;
+    @FXML
+    private SplitMenuButton cutSelectionButton;
+    @FXML
     private Label botLabelDrawCount;
     @FXML
     private Button cutButt;
@@ -424,4 +430,10 @@ public class MainWindowController {
     public Button getCutButt(){return cutButt;}
 
     public Label getBotLabelDrawCount() {return botLabelDrawCount;}
+
+    public SplitMenuButton getCutSelectionButton() {return cutSelectionButton;}
+
+    public MenuItem getCutAllMenuItem() {return cutAllMenuItem;}
+
+    public MenuItem getCutSelectedMenuItem() {return cutSelectedMenuItem;}
 }
