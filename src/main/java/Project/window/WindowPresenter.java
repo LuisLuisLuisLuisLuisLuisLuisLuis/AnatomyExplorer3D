@@ -33,7 +33,6 @@ import Project.window.SupportingUI.TextSearch.SearchTree;
 import Project.window.ThreeDPaneHandling.*;
 import Project.SelectionModel.*;
 
-import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import Project.window.TreeView.TreeViewSetup;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -61,7 +60,6 @@ import javafx.scene.transform.Affine;
 import javafx.scene.transform.Translate;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.*;
 
@@ -89,11 +87,14 @@ public class WindowPresenter {
     private static final double zoomStep = 4;
     private static final double rotationStep = 2;
 
+    private final Group root3d;         //root group of the 3d view holding the groups below.
+    private final Group slicePlaneGroup;//will hold plane for slicing meshes
     private final Group contentGroup;   //holds the innerGroup
     private final Group innerGroup;     //holds the meshViews
 
     private final CamMover camMover = new CamMover(camera); // controls camera movement
-    private final Group3DRotation groupRotater;             // implements rotation of the 3D view via rotation of a group
+    private final Group3DRotation contentGroupRotater;      // implements rotation of the 3D view via rotation of a group
+    private final Group3DRotation slicePlaneGroupRotator;   // rotates the slicing plane
     private final SetupMouseRotate3D setupMouseRotate3D;    // uses groupRotater to rotate a group using mouse drag
     private boolean isRotating = false; //is the user rotating the 3D view via mouse drag right now? if so, disable click-selecting meshViews
 
@@ -122,11 +123,19 @@ public class WindowPresenter {
 
         //initialize the contentGroup via Setup3DSubPane
         LinkedList<Group> outerGroups = Setup3DSubPane.setup3DSubPane(controller.getThreeDPane(), camera, initialCameraPosition);
-        contentGroup = outerGroups.get(0);
+        root3d = outerGroups.get(0);    // root3d holds contentGroup.
+                                        // If you want to add more content that is independet from the meshes (i.e. independent from innerGroup),
+                                        // add a new group to root3d and put it in there. like for example the slice pane.
+                                        // It will not be affected by clearing the view or any rotation, mouse drag etc unless you add that group to
+                                        // specific methods (like SetupMouseRotate3D).
+        slicePlaneGroup = new Group();
+        root3d.getChildren().add(this.slicePlaneGroup);
+        contentGroup = outerGroups.get(1);
         this.innerGroup = new Group();
 
         // Rotation
-        this.groupRotater = new Group3DRotation(contentGroup);
+        this.contentGroupRotater = new Group3DRotation(contentGroup);
+        this.slicePlaneGroupRotator = new Group3DRotation(slicePlaneGroup);
         setupMouseRotate3D = new SetupMouseRotate3D(controller.getThreeDPane(), contentGroup, innerGroup);
 
 
@@ -137,6 +146,7 @@ public class WindowPresenter {
 
         contentGroup.getChildren().add(innerGroup);
         contentGroup.getTransforms().setAll(initialTransform);
+        slicePlaneGroup.getTransforms().setAll(initialTransform);
 
 
         //little bug-avoidance in case i add some objects at some point and forget to give them an ID. null ID will throw exceptions.
@@ -789,19 +799,19 @@ public class WindowPresenter {
 
         if (keyCode == KeyCode.LEFT) {
             if (!rotating) camMover.moveX(zoomStep);
-            else groupRotater.applyGlobalRotation(new Point3D(0, 1, 0), rotationStep);
+            else contentGroupRotater.applyGlobalRotation(new Point3D(0, 1, 0), rotationStep);
 
         } else if (keyCode == KeyCode.RIGHT) {
             if (!rotating) camMover.moveX(-zoomStep);
-            else groupRotater.applyGlobalRotation(new Point3D(0,1, 0), -rotationStep);
+            else contentGroupRotater.applyGlobalRotation(new Point3D(0,1, 0), -rotationStep);
 
         } else if (keyCode == KeyCode.UP) {
             if (!rotating) camMover.moveY(zoomStep);
-            else groupRotater.applyGlobalRotation(new Point3D(1, 0, 0), -rotationStep);
+            else contentGroupRotater.applyGlobalRotation(new Point3D(1, 0, 0), -rotationStep);
 
         } else if (keyCode == KeyCode.DOWN) {
             if (!rotating) camMover.moveY(-zoomStep);
-            else groupRotater.applyGlobalRotation(new Point3D(1,0,0), rotationStep);
+            else contentGroupRotater.applyGlobalRotation(new Point3D(1,0,0), rotationStep);
 
         } else if (keyCode == KeyCode.PLUS && !rotating) camMover.moveZ(zoomStep);
         else if (keyCode == KeyCode.MINUS && !rotating) camMover.moveZ(-zoomStep);

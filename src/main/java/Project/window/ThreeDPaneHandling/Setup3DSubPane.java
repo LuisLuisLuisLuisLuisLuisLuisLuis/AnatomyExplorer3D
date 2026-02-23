@@ -57,8 +57,8 @@ public class Setup3DSubPane {
 
         drawPane.getChildren().add(subScene);
         LinkedList<Group> groups = new LinkedList<>();
-        groups.add(contentGroup);
         groups.add(root3d);
+        groups.add(contentGroup);
         return groups;
     }
 
