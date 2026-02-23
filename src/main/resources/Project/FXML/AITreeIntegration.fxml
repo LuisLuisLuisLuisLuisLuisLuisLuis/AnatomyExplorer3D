@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Project.window.TreeView.AITreeIntegration.MVPattern.AITreeIntegrationController">
+   <children>
+      <SplitPane dividerPositions="0.3" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <items>
+            <BorderPane prefHeight="200.0" prefWidth="200.0">
+               <center>
+                  <TextArea fx:id="aiTextArea" prefHeight="114.0" prefWidth="598.0" BorderPane.alignment="CENTER" />
+               </center>
+               <bottom>
+                  <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                    <items>
+                      <Button fx:id="parseButton" mnemonicParsing="false" text="Parse" />
+                    </items>
+                     <tooltip>
+                        <Tooltip text="Did you create the edge list based on the current version of the tree? Only nodes that appear in the original subtree you are working on will be recognized and correctly copied to this new tree. All others who are not part of the original subtree will not be  recognized and newly created." />
+                     </tooltip>
+                  </ToolBar>
+               </bottom>
+            </BorderPane>
+            <BorderPane prefHeight="400.0" prefWidth="600.0">
+               <center>
+                  <SplitPane dividerPositions="0.5" BorderPane.alignment="CENTER">
+                    <items>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                           <children>
+                              <BorderPane prefHeight="154.4" prefWidth="295.2" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <center>
+                                    <TableView fx:id="tableView" editable="true" prefHeight="398.4" prefWidth="296.0" BorderPane.alignment="CENTER">
+                        </TableView>
+                                 </center>
+                                 <bottom>
+                                    <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                      <items>
+                                        <Button fx:id="addMissingToTreeButton" mnemonicParsing="false" text="Add Missing to Tree" />
+                                      </items>
+                                    </ToolBar>
+                                 </bottom>
+                              </BorderPane>
+                           </children>
+                        </AnchorPane>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                           <children>
+                              <BorderPane prefHeight="154.4" prefWidth="296.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <center>
+                                    <TreeView fx:id="treeView" prefHeight="398.4" prefWidth="296.8" BorderPane.alignment="CENTER" />
+                                 </center>
+                                 <top>
+                                    <ToolBar fx:id="searchToolBar" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                       <items>
+                                          <TextField fx:id="treeSearchField" promptText="Find..." />
+                                          <Button fx:id="treeSearchPrevButton" mnemonicParsing="false" text="&lt;" />
+                                          <Button fx:id="treeSearchNextButton" mnemonicParsing="false" text="&gt;" />
+                                          <CheckBox fx:id="regexCheck" mnemonicParsing="false" text="Regex" />
+                                       </items>
+                                    </ToolBar>
+                                 </top>
+                                 <bottom>
+                                    <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                      <items>
+                                        <Button fx:id="searchForDupIDsButton" mnemonicParsing="false" text="Search For Duplicate IDs" />
+                                      </items>
+                                    </ToolBar>
+                                 </bottom>
+                              </BorderPane>
+                           </children>
+                        </AnchorPane>
+                    </items>
+                  </SplitPane>
+               </center>
+               <bottom>
+                  <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                    <items>
+                      <Button fx:id="acceptButton" disable="true" mnemonicParsing="false" text="Accept" />
+                    </items>
+                  </ToolBar>
+               </bottom>
+            </BorderPane>
+        </items>
+      </SplitPane>
+   </children>
+</AnchorPane>

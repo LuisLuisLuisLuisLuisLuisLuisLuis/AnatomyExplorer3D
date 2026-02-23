@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="419.0" prefWidth="583.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Project.window.MainWindowController">
+   <children>
+      <BorderPane prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <center>
+            <SplitPane dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+              <items>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                     <children>
+                        <BorderPane prefHeight="372.8" prefWidth="296.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <top>
+                              <ToolBar fx:id="treeToolBar" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                <items>
+                                  <Button fx:id="treeExpandButton" mnemonicParsing="false" text="Expand" />
+                                    <Button fx:id="treeCollapseButton" mnemonicParsing="false" text="Collapse" />
+                                    <Button fx:id="treeSelectAllButton" mnemonicParsing="false" text="Select All of" />
+                                    <Button fx:id="treeSelectNoneButton" mnemonicParsing="false" text="Select None" />
+                                    <Separator orientation="VERTICAL" />
+                                    <Button fx:id="infoButton" mnemonicParsing="false" text="Leaf Info" />
+                                </items>
+                              </ToolBar>
+                           </top>
+                           <center>
+                              <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                 <center>
+                                    <TabPane fx:id="treeTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+                                      <tabs>
+                                        <Tab text="Part-of">
+                                          <content>
+                                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                   <children>
+                                                      <TreeView fx:id="partOfTreeView" prefHeight="225.6" prefWidth="288.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                   </children></AnchorPane>
+                                          </content>
+                                        </Tab>
+                                        <Tab text="Is-a">
+                                          <content>
+                                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                   <children>
+                                                      <TreeView fx:id="isATreeView" prefHeight="225.6" prefWidth="288.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                   </children></AnchorPane>
+                                          </content>
+                                        </Tab>
+                                          <Tab text="Dump">
+                                            <content>
+                                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                      <children>
+                                                          <TreeView fx:id="dumpTreeView" prefHeight="225.6" prefWidth="288.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                      </children>
+                                                </AnchorPane>
+                                            </content>
+                                          </Tab>
+                                      </tabs>
+                                    </TabPane>
+                                 </center>
+                                 <bottom>
+                                    <ToolBar prefHeight="31.0" prefWidth="288.0" BorderPane.alignment="CENTER">
+                                      <items>
+                                          <Button fx:id="selectIn3DButton" mnemonicParsing="false" text="Select in 3D" />
+                                          <CheckBox fx:id="selectionSynchCheck" mnemonicParsing="false" text="Sync with 3D" />
+                                          <Separator orientation="VERTICAL" />
+                                          <Button fx:id="drawIn3DButton" mnemonicParsing="false" text="Draw in 3D" />
+                                          <Button fx:id="removeFrom3DButton" mnemonicParsing="false" text="Remove from 3D" />
+                                          <Button fx:id="drawEverythingButton" mnemonicParsing="false" text="Draw Everything" />
+                                      </items>
+                                    </ToolBar>
+                                 </bottom>
+                                 <top>
+                                    <BorderPane BorderPane.alignment="CENTER">
+                                       <top>
+                                          <ToolBar fx:id="searchToolBar" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                            <items>
+                                                <TextField fx:id="treeSearchField" promptText="Find..." />
+                                              <Button fx:id="treeSearchPrevButton" mnemonicParsing="false" text="&lt;" />
+                                                <Button fx:id="treeSearchNextButton" mnemonicParsing="false" text="&gt;" />
+                                                <Button fx:id="treeSearchAllButton" mnemonicParsing="false" text="All" />
+                                                <CheckBox fx:id="regexCheck" mnemonicParsing="false" selected="false" text="Regex" />
+                                                <Separator orientation="VERTICAL" />
+                                                <CheckBox fx:id="showAICheck" mnemonicParsing="false" text="Show AI" />
+                                            </items>
+                                          </ToolBar>
+                                       </top>
+                                       <bottom>
+                                          <TableView fx:id="aiHistoryTable" managed="false" prefHeight="170.0" prefWidth="288.0" visible="false" BorderPane.alignment="CENTER">
+                                             <tooltip>
+                                                <Tooltip text="Empty Tooltip" />
+                                             </tooltip>
+                                          </TableView>
+                                       </bottom>
+                                       <right>
+                                          <VBox fx:id="aiButtonBox" BorderPane.alignment="CENTER_RIGHT">
+                                             <children>
+                                              <Button fx:id="askAIButton" mnemonicParsing="false" prefWidth="54.0" text="Ask AI " />
+                                                <Button fx:id="aiHistoryButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="54.0" text="History" />
+                                             </children>
+                                          </VBox>
+                                       </right>
+                                       <center>
+                                          <TextArea fx:id="aiPromptTextArea" prefHeight="0.0" prefWidth="250.0" promptText="Type your query..." BorderPane.alignment="CENTER" />
+                                       </center>
+                                    </BorderPane>
+                                 </top>
+                              </BorderPane>
+                           </center>
+                           <bottom>
+                              <HBox alignment="CENTER_LEFT" prefHeight="22.0" prefWidth="583.0" BorderPane.alignment="CENTER">
+                                 <children>
+                                    <Label fx:id="botLabel_Tree" text="0 items selected." />
+                                 </children>
+                              </HBox>
+                           </bottom>
+                        </BorderPane>
+                     </children>
+                  </AnchorPane>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                     <children>
+                        <BorderPane prefHeight="369.6" prefWidth="288.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <center>
+                              <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                 <top>
+                                    <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                       <items>
+                                        <Button fx:id="zoomInButton" mnemonicParsing="false" text="+" />
+                                          <Button fx:id="zoomOutButton" mnemonicParsing="false" text="-" />
+                                          <Separator orientation="VERTICAL" />
+                                          <Button fx:id="moveUpButton" mnemonicParsing="false" text="↑" />
+                                          <Button fx:id="moveDownButton" mnemonicParsing="false" text="↓" />
+                                          <Button fx:id="moveLeftButton" mnemonicParsing="false" text="←" />
+                                          <Button fx:id="moveRightButton" mnemonicParsing="false" text="→" />
+                                          <Separator orientation="VERTICAL" />
+                                          <Button fx:id="rotLeftButton" mnemonicParsing="false" text="↩" />
+                                          <Button fx:id="rotRightButton" mnemonicParsing="false" text="↪" />
+                                          <Button fx:id="rotUpButton" mnemonicParsing="false" text="⤻" />
+                                          <Button fx:id="rotDownButton" mnemonicParsing="false" text="⤺" />
+                                          <Separator orientation="VERTICAL" />
+                                          <Button fx:id="resetViewButton" mnemonicParsing="false" text="Reset" />
+                                          <Button fx:id="clearViewButton" mnemonicParsing="false" text="Clear View" />
+                                       </items>
+                                    </ToolBar>
+                                 </top>
+                                 <center>
+                                    <Pane fx:id="threeDPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                                 </center>
+                                 <bottom>
+                                    <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                      <items>
+                                          <Button fx:id="showInTreeButton" mnemonicParsing="false" text="Show in Tree" />
+                                          <Button fx:id="selectAll3DButton" mnemonicParsing="false" text="Select All" />
+                                          <Button fx:id="unselectAll3DButton" mnemonicParsing="false" text="Unselect All" />
+                                          <Button fx:id="removeObjButton" mnemonicParsing="false" text="Remove" />
+                                      </items>
+                                    </ToolBar>
+                                 </bottom>
+                              </BorderPane>
+                           </center>
+                           <top>
+                              <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                <items>
+                                    <ColorPicker fx:id="colorPicker" />
+                                    <Button fx:id="applyColorButton" mnemonicParsing="false" text="Apply to Selected" />
+                                    <Button fx:id="explodeButton" mnemonicParsing="false" text="Explode" />
+                                </items>
+                              </ToolBar>
+                           </top>
+                           <bottom>
+                              <HBox alignment="CENTER_LEFT" prefHeight="22.0" prefWidth="583.0" BorderPane.alignment="CENTER">
+                                 <children>
+                                    <Label fx:id="botLabel_3D" text="0 items selected." />
+                                    <TextField fx:id="fileIDTextfield" editable="false" prefHeight="26.0" prefWidth="204.0" HBox.hgrow="ALWAYS" />
+                                 </children>
+                              </HBox>
+                           </bottom>
+                        </BorderPane>
+                     </children>
+                  </AnchorPane>
+              </items>
+            </SplitPane>
+         </center>
+         <top>
+            <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+              <items>
+                  <MenuBar fx:id="topMenuBar">
+                    <menus>
+                      <Menu mnemonicParsing="false" text="File">
+                        <items>
+                              <MenuItem fx:id="menuSaveTree" mnemonicParsing="false" text="Save Trees" />
+                          <MenuItem fx:id="menuClose" mnemonicParsing="false" text="Close" />
+                              <MenuItem fx:id="menuClearView" mnemonicParsing="false" text="Clear View" />
+                              <MenuItem fx:id="menuResetView" mnemonicParsing="false" text="Reset View" />
+                        </items>
+                      </Menu>
+                        <Menu mnemonicParsing="false" text="View">
+                          <items>
+                              <CheckMenuItem fx:id="darkModeMenuItem" mnemonicParsing="false" text="Dark Mode" />
+                              <CheckMenuItem fx:id="fullScreenCheck" mnemonicParsing="false" text="Fullscreen" />
+                          </items>
+                        </Menu>
+                      <Menu mnemonicParsing="false" text="Help">
+                        <items>
+                            <MenuItem fx:id="menuGuide" mnemonicParsing="false" text="Guide" />
+                          <MenuItem fx:id="menuAbout" mnemonicParsing="false" text="About" />
+
+                        </items>
+                      </Menu>
+                    </menus>
+                  </MenuBar>
+                  <Separator orientation="VERTICAL" />
+                  <Button fx:id="undoButton" mnemonicParsing="false" text="Undo" />
+                <Button fx:id="redoButton" mnemonicParsing="false" text="Redo" />
+              </items>
+            </ToolBar>
+         </top>
+      </BorderPane>
+   </children>
+</AnchorPane>
