@@ -1,7 +1,13 @@
-package Project.model;
+package Project.window.TreeView.TreeAnalysis;
+
+import Project.model.ANode;
 
 import java.util.HashSet;
 
+/**
+ * This class compares one tree to two others. Used it to compare my restructured tree to BP3D Version 3.0 to see
+ * which items they have that i don't. Only checks if all the leaves of the two trees are contained in the one tree.
+ */
 public class CompareBP3DV {
     private final ANode myTreeroot;
     private final ANode v3partof;
@@ -24,6 +30,12 @@ public class CompareBP3DV {
         for (ANode child : testRoot.children()) fullLeafTreeCheck(targetRoot, child, missings);
     }
 
+    /**
+     *
+     * @param root
+     * @param name
+     * @return
+     */
     private static boolean leafContainsName(ANode root, String name) {
         if (root.name().contains(name)) return true;
         for (ANode child : root.children()) {

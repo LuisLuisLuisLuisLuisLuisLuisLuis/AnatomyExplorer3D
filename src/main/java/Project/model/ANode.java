@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 
-public class ANode implements Stringable, HasChildren<ANode> {
+public class ANode implements HasChildren<ANode> {
 
     private String conceptId;
     private String name;
