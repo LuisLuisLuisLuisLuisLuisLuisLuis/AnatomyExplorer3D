@@ -12,7 +12,7 @@ public class ContinuousRotator {
     private final AnimationTimer timer;
     private final double anglePerFrame;
 
-    public ContinuousRotator(Group group, Point3D axis, double anglePerSecond) {
+    public ContinuousRotator(Group group, Point3D axis, double anglePerSecond, Point3D pivot) {
 
         Point3D finalAxis = axis.normalize();
         this.anglePerFrame = anglePerSecond / 60.0; //smaller angle for 60 FPS -> 1x full angle per second
@@ -20,7 +20,7 @@ public class ContinuousRotator {
         this.timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                Group3DRotation.applyGlobalRotation(group, finalAxis, anglePerFrame);
+                Group3DRotation.applyGlobalRotation(group, finalAxis, anglePerFrame, pivot);
             }
         };
     }

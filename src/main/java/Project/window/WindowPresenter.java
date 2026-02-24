@@ -55,6 +55,7 @@ import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.MeshView;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
+import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 
 import java.io.File;
@@ -78,7 +79,7 @@ public class WindowPresenter {
     private static final Affine initialTransform = new Affine( //initial transform of the group holding the 3D contents. serves as reset position
             1.0, 0.0, 0.0, 0.0,
             0.0, 0.0, -1.0, 0.0,
-            0.0, 1, 0.0, 0.0
+            0.0, 1.0, 0.0, 0.0
     );
 
 
@@ -138,14 +139,24 @@ public class WindowPresenter {
         this.slicePlaneGroupRotator = new Group3DRotation(slicePlaneGroup);
         setupMouseRotate3D = new SetupMouseRotate3D(controller.getThreeDPane(), new Group[]{contentGroup, slicePlaneGroup});
 
+        //mouse scrolling functionality
+//        MouseScrolling3D mouseScrolling3D = new MouseScrolling3D(camMover, controller.getThreeDPane());
+        MouseScrolling3D mouseScrolling3D = new MouseScrolling3D(new Group3DRotation[] {contentGroupRotator, slicePlaneGroupRotator},controller.getThreeDPane());
+
 
         innerGroup.getChildren().addListener((InvalidationListener) e -> {
             centerGroupToItself(innerGroup);
         });
 
         contentGroup.getChildren().add(innerGroup);
+//        contentGroup.getChildren().add(slicePlaneGroup);
         contentGroup.getTransforms().setAll(initialTransform);
-        slicePlaneGroup.getTransforms().setAll(initialTransform);
+        contentGroup.getTransforms().addListener(new ListChangeListener<Transform>() {
+            @Override
+            public void onChanged(Change<? extends Transform> c) {
+
+            }
+        });
 
 
         //little bug-avoidance in case i add some objects at some point and forget to give them an ID. null ID will throw exceptions.
@@ -190,18 +201,15 @@ public class WindowPresenter {
         controller.getMoveUpButton().setOnAction(e -> rotationControl(KeyCode.UP, false));
         controller.getMoveRightButton().setOnAction(e -> rotationControl(KeyCode.RIGHT, false));
         controller.getMoveLeftButton().setOnAction(e -> rotationControl(KeyCode.LEFT, false));
+        controller.getZoomInButton().setOnAction(e -> rotationControl(KeyCode.PLUS, false));
+        controller.getZoomOutButton().setOnAction(e -> rotationControl(KeyCode.MINUS, false));
 
         controller.getRotDownButton().setOnAction(e -> rotationControl(KeyCode.DOWN, true));
         controller.getRotUpButton().setOnAction(e -> rotationControl(KeyCode.UP, true));
         controller.getRotRightButton().setOnAction(e -> rotationControl(KeyCode.RIGHT, true));
         controller.getRotLeftButton().setOnAction(e -> rotationControl(KeyCode.LEFT, true));
-
-        controller.getZoomInButton().setOnAction(e -> rotationControl(KeyCode.PLUS, false));
-        controller.getZoomOutButton().setOnAction(e -> rotationControl(KeyCode.MINUS, false));
-
-
-        //mouse scrolling functionality
-        MouseScrolling3D mouseScrolling3D = new MouseScrolling3D(camMover, controller.getThreeDPane());
+        controller.getTiltAntiClButton().setOnAction(e -> rotationControl(KeyCode.MINUS, true));
+        controller.getTiltClockwButton().setOnAction(e -> rotationControl(KeyCode.PLUS, true));
 
 
         //this implements undoable scrolling. but i choose to take it out because its imperfect.
@@ -353,7 +361,7 @@ public class WindowPresenter {
         SelectionMediator_Tree_3D selectionMediatorTree_3D_Content = new SelectionMediator_Tree_3D(treeViewSelectionGroup, threeDContentGroup, model.getIsA_Root(), model.getPartOfRoot());
 
         //----------menu File: 3D
-        controller.getMenuResetView().setOnAction(e -> executeCommand(new ResetViewDrawCommand(contentGroup,innerGroup, camera, initialTransform, initialCameraPosition, setupMouseRotate3D)));
+        controller.getMenuResetView().setOnAction(e -> executeCommand(new ResetViewDrawCommand(contentGroup, innerGroup, camera, initialTransform, initialCameraPosition, setupMouseRotate3D)));
         controller.getMenuClearView().setOnAction(e -> {
             executeCommand(new ClearCommand(contentGroup, innerGroup));
             threeDSelectionGroup.changeSelection(new HashSet<>(), true, false);
@@ -701,7 +709,9 @@ public class WindowPresenter {
                 controller.getCutSelectionButton().setDisable(false);
                 controller.getCutButt().setText("Cancel");
                 controller.getCutButt().setUserData(true);
-                slicePlaneGroup.getChildren().add(Plane.makeSlicePlane());
+                Group slicePlane = Plane.makeSlicePlane();  //setting the transfrom so that the plane spawns in the middle of the contentgroup
+                slicePlaneGroup.getTransforms().setAll(contentGroup.getTransforms().getFirst());
+                slicePlaneGroup.getChildren().add(slicePlane);
             }
         });
 
@@ -824,9 +834,10 @@ public class WindowPresenter {
     public void setKeyControls(Scene scene) {
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             boolean alt = event.isAltDown();
+            boolean shift = event.isShiftDown();
             KeyCode keyCode = event.getCode();
             if (event.isControlDown() || alt) {
-                if (List.of(KeyCode.LEFT, KeyCode.RIGHT, KeyCode.UP, KeyCode.DOWN).contains(keyCode)) rotationControl(keyCode, alt);
+                if (List.of(KeyCode.LEFT, KeyCode.RIGHT, KeyCode.UP, KeyCode.DOWN, KeyCode.PLUS, KeyCode.MINUS).contains(keyCode)) rotationControl(keyCode, alt, shift);
                 switch (keyCode) {
                     case KeyCode.F: controller.getTreeSearchField().requestFocus(); //ctrl+F -> search
                 }
@@ -834,32 +845,41 @@ public class WindowPresenter {
         });
     }
 
+
+    public void rotationControl(KeyCode keyCode, boolean rotating) {rotationControl(keyCode, rotating, false);}
+
     /**
-     * Influences how the 3D objects are displayed depending on the given
-     * keycode and boolean.
+     * Rotates/Translates 3D objects depending on the keycode and boolean.
      * @param keyCode controls the direction
      * @param rotating false -> the camera is moved. true -> the objects are rotated
      */
-    public void rotationControl(KeyCode keyCode, boolean rotating) {
+    public void rotationControl(KeyCode keyCode, boolean rotating, boolean shift) {
+        Group3DRotation groupRotator = shift ? slicePlaneGroupRotator : contentGroupRotator;
 
         if (keyCode == KeyCode.LEFT) {
-            if (!rotating) camMover.moveX(zoomStep);
-            else contentGroupRotator.applyGlobalRotation(new Point3D(0, 1, 0), rotationStep);
+            if (!rotating) groupRotator.applyTranslate(new Point3D(-zoomStep, 0, 0));
+            else groupRotator.applyGlobalRotation(new Point3D(0, 1, 0), rotationStep);
 
         } else if (keyCode == KeyCode.RIGHT) {
-            if (!rotating) camMover.moveX(-zoomStep);
-            else contentGroupRotator.applyGlobalRotation(new Point3D(0,1, 0), -rotationStep);
+            if (!rotating) groupRotator.applyTranslate(new Point3D(zoomStep, 0,0));
+            else groupRotator.applyGlobalRotation(new Point3D(0,1, 0), -rotationStep);
 
         } else if (keyCode == KeyCode.UP) {
-            if (!rotating) camMover.moveY(zoomStep);
-            else contentGroupRotator.applyGlobalRotation(new Point3D(1, 0, 0), -rotationStep);
+            if (!rotating) groupRotator.applyTranslate(new Point3D(0, -zoomStep, 0));
+            else groupRotator.applyGlobalRotation(new Point3D(1, 0, 0), -rotationStep);
 
         } else if (keyCode == KeyCode.DOWN) {
-            if (!rotating) camMover.moveY(-zoomStep);
-            else contentGroupRotator.applyGlobalRotation(new Point3D(1,0,0), rotationStep);
+            if (!rotating) groupRotator.applyTranslate(new Point3D(0, zoomStep, 0));
+            else groupRotator.applyGlobalRotation(new Point3D(1,0,0), rotationStep);
 
-        } else if (keyCode == KeyCode.PLUS && !rotating) camMover.moveZ(zoomStep);
-        else if (keyCode == KeyCode.MINUS && !rotating) camMover.moveZ(-zoomStep);
+        } else if (keyCode == KeyCode.PLUS) {
+            if (!rotating) groupRotator.applyTranslate(new Point3D(0 ,0 , -zoomStep));
+            else groupRotator.applyGlobalRotation(new Point3D(0,0,1), rotationStep);
+        }
+        else if (keyCode == KeyCode.MINUS) {
+            if (!rotating) groupRotator.applyTranslate(new Point3D(0,0,zoomStep));
+            else groupRotator.applyGlobalRotation(new Point3D(0,0,1), -rotationStep);
+        }
     }
 
 

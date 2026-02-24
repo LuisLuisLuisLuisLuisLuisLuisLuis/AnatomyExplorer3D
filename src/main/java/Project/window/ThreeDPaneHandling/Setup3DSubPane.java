@@ -45,12 +45,13 @@ public class Setup3DSubPane {
 
         // Add PointLight
         PointLight pointLight = new PointLight(Color.DARKGREY);
-        pointLight.setTranslateX(100);
-        pointLight.setTranslateY(-100);
-        pointLight.setTranslateZ(-100);
+
+        pointLight.setTranslateX(initialCameraPosition.getX());
+        pointLight.setTranslateY(initialCameraPosition.getY());
+        pointLight.setTranslateZ(initialCameraPosition.getZ());
 
         // Add AmbientLight
-        AmbientLight ambientLight = new AmbientLight(Color.rgb(180, 180, 180)); //TODO
+        AmbientLight ambientLight = new AmbientLight(Color.rgb(180, 180, 180));
 
         // Add lights to the root3d group
         root3d.getChildren().addAll(pointLight, ambientLight);

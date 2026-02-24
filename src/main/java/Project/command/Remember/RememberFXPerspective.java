@@ -7,9 +7,7 @@ import javafx.scene.transform.Transform;
 
 import java.util.LinkedList;
 
-/**
- * A group to remember the 3D perspective, made up of group transforms and camera position.
- */
+
 public class RememberFXPerspective {
     Group group;
     Group innerGroup;
@@ -20,9 +18,12 @@ public class RememberFXPerspective {
     Point3D cameraPosition;
 
     /**
-     * @param camera: an camera
-     * @param group: Holds innerGroup.
-     * @param innerGroup: Holds meshViews
+     *
+     * Remember the 3D perspective, made up of group transforms and camera position.
+     *
+     * @param camera an camera
+     * @param group Holds innerGroup.
+     * @param innerGroup Holds meshViews
      */
     public RememberFXPerspective(PerspectiveCamera camera, Group group, Group innerGroup) {
         this.cameraPosition = new Point3D(  // save camera positon

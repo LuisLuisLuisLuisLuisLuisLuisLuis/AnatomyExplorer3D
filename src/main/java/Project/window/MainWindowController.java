@@ -10,6 +10,10 @@ import javafx.scene.layout.VBox;
 public class MainWindowController {
 
     @FXML
+    private Button tiltClockwButton;
+    @FXML
+    private Button tiltAntiClButton;
+    @FXML
     private MenuItem cutSelectedMenuItem;
     @FXML
     private MenuItem cutAllMenuItem;
@@ -436,4 +440,8 @@ public class MainWindowController {
     public MenuItem getCutAllMenuItem() {return cutAllMenuItem;}
 
     public MenuItem getCutSelectedMenuItem() {return cutSelectedMenuItem;}
+
+    public Button getTiltClockwButton() {return tiltClockwButton;}
+
+    public Button getTiltAntiClButton() {return tiltAntiClButton;}
 }

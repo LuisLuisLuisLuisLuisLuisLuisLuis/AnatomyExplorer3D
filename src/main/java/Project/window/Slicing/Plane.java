@@ -25,8 +25,8 @@ public class Plane {
         box.setMaterial(phongMaterial);
         box.setTranslateX(0);
         box.setTranslateY(0);
-//        return (Box) Axes.rotateShape3D(box, new Point3D(0,1,0), 90);
-        return box;
+        return (Box) Axes.rotateShape3D(box, new Point3D(0,0,1), 90);
+//        return box;
     }
 
 

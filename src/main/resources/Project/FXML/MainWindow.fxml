@@ -160,7 +160,7 @@
                                     <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                                       <items>
                                           <Button fx:id="cutButt" mnemonicParsing="false" text="Cut" />
-                                          <SplitMenuButton fx:id="cutSelectionButton" mnemonicParsing="false" text="All" disable="true">
+                                          <SplitMenuButton fx:id="cutSelectionButton" disable="true" mnemonicParsing="false" text="All">
                                             <items>
                                               <MenuItem fx:id="cutAllMenuItem" mnemonicParsing="false" text="All" />
                                               <MenuItem fx:id="cutSelectedMenuItem" mnemonicParsing="false" text="Selected" />
@@ -194,6 +194,9 @@
                                     <Button fx:id="moveDownButton" mnemonicParsing="false" text="↓" />
                                     <Button fx:id="moveLeftButton" mnemonicParsing="false" text="←" />
                                     <Button fx:id="moveRightButton" mnemonicParsing="false" text="→" />
+                                    <Separator orientation="VERTICAL" />
+                                    <Button fx:id="tiltAntiClButton" mnemonicParsing="false" text="↶" />
+                                    <Button fx:id="tiltClockwButton" mnemonicParsing="false" text="↷" />
                                     <Separator orientation="VERTICAL" />
                                     <Button fx:id="rotLeftButton" mnemonicParsing="false" text="↩" />
                                     <Button fx:id="rotRightButton" mnemonicParsing="false" text="↪" />
