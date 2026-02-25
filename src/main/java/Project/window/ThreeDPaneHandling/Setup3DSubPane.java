@@ -33,7 +33,7 @@ public class Setup3DSubPane {
 
         // add camera
         camera.setFarClip(10000);
-        camera.setNearClip(0.1);
+        camera.setNearClip(20);//0.1 made the two boxes of which the slicePlane is made up glitch. besides, 20 is much more practical visually and close enough as the meshes are very large here anyway.
         camera.setTranslateZ(initialCameraPosition.getZ());
         camera.setTranslateX(initialCameraPosition.getX());
         camera.setTranslateY(initialCameraPosition.getY());

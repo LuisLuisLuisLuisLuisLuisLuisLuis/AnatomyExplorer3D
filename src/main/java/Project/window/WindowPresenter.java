@@ -52,6 +52,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Box;
 import javafx.scene.shape.MeshView;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
@@ -701,17 +702,16 @@ public class WindowPresenter {
             if (isCutting) {
                 //TODO: cancel
                 controller.getCutButt().setUserData(false);
-                controller.getCutButt().setText("Cut");
+                controller.getCutButt().setText("Slice");
                 controller.getCutSelectionButton().setDisable(true);
-                throw new RuntimeException("Cancel slicing not yet implemented");
-
+                slicePlaneGroup.getChildren().clear();
             } else {
                 controller.getCutSelectionButton().setDisable(false);
                 controller.getCutButt().setText("Cancel");
                 controller.getCutButt().setUserData(true);
                 Group slicePlane = Plane.makeSlicePlane();  //setting the transfrom so that the plane spawns in the middle of the contentgroup
                 slicePlaneGroup.getTransforms().setAll(contentGroup.getTransforms().getFirst());
-                slicePlaneGroup.getChildren().add(slicePlane);
+                slicePlaneGroup.getChildren().addAll(slicePlane.getChildren());
             }
         });
 
@@ -731,6 +731,7 @@ public class WindowPresenter {
                 controller.getCutSelectionButton().setDisable(true);
                 controller.getCutButt().setUserData(false);
                 controller.getCutButt().setText("Cut");
+                slicePlaneGroup.getChildren().clear();
                 return true;
             }
         };
@@ -739,14 +740,14 @@ public class WindowPresenter {
         controller.getCutAllMenuItem().setOnAction(e -> {
             LinkedList<MeshView> meshViews = new LinkedList<>();
             for (Node node : innerGroup.getChildren()) if (node instanceof MeshView) meshViews.add((MeshView) node);
-            executeCommand(new SliceCommand(meshViews));
+            executeCommand(new SliceCommand(meshViews, innerGroup, (Box) slicePlaneGroup.getChildren().getFirst()));
             postCutEvent.apply(controller.getCutAllMenuItem());
         });
         controller.getCutSelectedMenuItem().setOnAction(e -> {
             System.out.println("cut selected");
             LinkedList<MeshView> meshViews = new LinkedList<>();
             for (Node node : hasInnerGroupSelectedItems.getSelection()) if (node instanceof MeshView) meshViews.add((MeshView) node);
-            executeCommand(new SliceCommand(meshViews));
+            executeCommand(new SliceCommand(meshViews, innerGroup, (Box) slicePlaneGroup.getChildren().getFirst()));
             postCutEvent.apply(controller.getCutSelectedMenuItem());
         });
 

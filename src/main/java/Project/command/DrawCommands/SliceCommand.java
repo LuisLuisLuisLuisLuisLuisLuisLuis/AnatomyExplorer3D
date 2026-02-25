@@ -2,19 +2,27 @@ package Project.command.DrawCommands;
 
 import Project.command.Command;
 import Project.window.Slicing.MeshSlicer_Aware;
+import Project.window.Slicing.Plane;
+import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.shape.Box;
 import javafx.scene.shape.CullFace;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
+import javafx.scene.transform.NonInvertibleTransformException;
 
 import java.util.List;
 
 public class SliceCommand implements Command {
 
     private final List<MeshView> meshViews;
+    private final Box slicePlane;
+    private final Group meshViewGroup;
 
-    public SliceCommand(List<MeshView> meshViews) {
+    public SliceCommand(List<MeshView> meshViews, Group meshViewGroup, Box box) {
         this.meshViews = meshViews;
+        this.slicePlane = box;
+        this.meshViewGroup = meshViewGroup;
     }
 
     @Override
@@ -26,7 +34,13 @@ public class SliceCommand implements Command {
     public void execute() {
         for (MeshView meshView : meshViews) {
             if (!(meshView.getMesh() instanceof TriangleMesh)) continue;
-            meshView.setMesh(MeshSlicer_Aware.slicePositiveSide((TriangleMesh) meshView.getMesh(), 0,0,1,1000));
+            double[] nxyd;
+            try {
+                 nxyd = Plane.extractPlaneFromBox(this.slicePlane, meshViewGroup);
+            } catch (NonInvertibleTransformException ne) {
+                return;
+            }
+            meshView.setMesh(MeshSlicer_Aware.slicePositiveSide((TriangleMesh) meshView.getMesh(), nxyd[0], nxyd[1], nxyd[2], nxyd[3]));
             meshView.setCullFace(CullFace.NONE);    // VERY IMPORTANT! because now we can see inside the mesh, i.e. we can see the other side of the faces too -> both sides need to be rendered -> FRONT/BACK wont suffice
         }
     }

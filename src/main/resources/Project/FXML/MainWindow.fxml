@@ -159,7 +159,7 @@
                                  <top>
                                     <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                                       <items>
-                                          <Button fx:id="cutButt" mnemonicParsing="false" text="Cut" />
+                                          <Button fx:id="cutButt" mnemonicParsing="false" text="Slice" />
                                           <SplitMenuButton fx:id="cutSelectionButton" disable="true" mnemonicParsing="false" text="All">
                                             <items>
                                               <MenuItem fx:id="cutAllMenuItem" mnemonicParsing="false" text="All" />

@@ -4,12 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3c65ee50-307e-41c9-811a-e44a903afa8a" name="Changes" comment="Rest view now correctly works with the SlicePlane as well">
+    <list default="true" id="3c65ee50-307e-41c9-811a-e44a903afa8a" name="Changes" comment="Mame some things final. Delete GroupCameraCommand.java because it was unnecessary.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/ClearCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/ClearCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/ResetViewDrawCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/ResetViewDrawCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/command/Remember/RememberFXGroupContents.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/command/Remember/RememberFXGroupContents.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/command/Remember/RememberTreeViewSelection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/command/Remember/RememberTreeViewSelection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/SliceCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/SliceCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/Slicing/Plane.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/Slicing/Plane.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/ThreeDPaneHandling/Setup3DSubPane.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/ThreeDPaneHandling/Setup3DSubPane.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/WindowPresenter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/WindowPresenter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/FXML/MainWindow.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/Project/FXML/MainWindow.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -365,7 +366,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772015646217</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Mame some things final. Delete GroupCameraCommand.java because it was unnecessary.">
+      <option name="closed" value="true" />
+      <created>1772016664071</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1772016664071</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -393,7 +402,8 @@
     <MESSAGE value="SlicePlane and contentGroup can now be moved correctly via keys and scrolling. Scrolling moves them together while keys move them independently.&#10;SlicePlane always spawns in the middle of contentGroup.&#10;ResetView not working for SlicePlane yet." />
     <MESSAGE value="SetupMouseRotate3D &amp; ContinuousRotator:&#10;Make pivot Observable so that ContinuousRotator can observe and always have the correct value.&#10;RememberFXPerspective:&#10;Comment out innergroup transforms because they're superfluous since the transforms of innergroup never change (except when it centers itself after its contents were changed)." />
     <MESSAGE value="Rest view now correctly works with the SlicePlane as well" />
-    <option name="LAST_COMMIT_MESSAGE" value="Rest view now correctly works with the SlicePlane as well" />
+    <MESSAGE value="Mame some things final. Delete GroupCameraCommand.java because it was unnecessary." />
+    <option name="LAST_COMMIT_MESSAGE" value="Mame some things final. Delete GroupCameraCommand.java because it was unnecessary." />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
