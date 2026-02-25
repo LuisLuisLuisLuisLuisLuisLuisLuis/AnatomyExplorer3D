@@ -13,7 +13,9 @@ public class ClearCommand extends GroupCommand {
     private Group innerGroup;
 
     /**
-     * Clears the provided group.
+     * Clears view and resets perspective.
+     * @param innergroup Group to be cleared of contents.
+     * @param contentGroup Group whose perspective is to be reset.
      */
     public ClearCommand(Group contentGroup, Group innergroup) {
         super(contentGroup);
@@ -42,7 +44,7 @@ public class ClearCommand extends GroupCommand {
     }
 
     private void remember() {
-        this.rememberFxPerspective = new RememberFXPerspective(new PerspectiveCamera(), group, innerGroup);
+        this.rememberFxPerspective = new RememberFXPerspective(new PerspectiveCamera(), new Group[]{group});
         this.fxGroupSelection = new RememberFXGroupContents(innerGroup);
     }
 }

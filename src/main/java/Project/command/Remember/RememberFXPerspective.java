@@ -9,44 +9,33 @@ import java.util.LinkedList;
 
 
 public class RememberFXPerspective {
-    Group group;
-    Group innerGroup;
-    Point3D axis;
-    double value;
+
     PerspectiveCamera camera;
-    LinkedList<Transform> transforms = new LinkedList<>();
     Point3D cameraPosition;
 
+    private final RememberNodeTransform[] rememberNodeTransforms;
+
     /**
-     *
      * Remember the 3D perspective, made up of group transforms and camera position.
      *
-     * @param camera an camera
-     * @param group Holds innerGroup.
-     * @param innerGroup Holds meshViews
+     * @param camera the camera
+     * @param groups All the groups whose Transforms should be remembered
      */
-    public RememberFXPerspective(PerspectiveCamera camera, Group group, Group innerGroup) {
+    public RememberFXPerspective(PerspectiveCamera camera, Group[] groups) {
+        this.camera = camera;
         this.cameraPosition = new Point3D(  // save camera positon
                 camera.getTranslateX(),
                 camera.getTranslateY(),
                 camera.getTranslateZ()
         );
-        // save everything else
-        this.transforms.addAll(group.getTransforms());
-        this.group = group;
-        this.innerGroup = innerGroup;
-        this.axis = innerGroup.getRotationAxis();
-        this.value = group.getRotate();
-        this.camera = camera;
+        //remember all the group transforms
+        this.rememberNodeTransforms = new RememberNodeTransform[groups.length];
+        for (int i = 0; i < groups.length; i++) rememberNodeTransforms[i] = new RememberNodeTransform(groups[i]);
     }
     public void restorePerspective() {
-//        group.getTransforms().clear();
-//        group.getTransforms().addAll(this.transforms);
-        group.getTransforms().setAll(this.transforms);
+        for (RememberNodeTransform rememberNodeTransform : rememberNodeTransforms) rememberNodeTransform.restore();
         camera.setTranslateZ(this.cameraPosition.getZ());
         camera.setTranslateX(this.cameraPosition.getX());
         camera.setTranslateY(this.cameraPosition.getY());
-//        innerGroup.setRotationAxis(axis);
-//        innerGroup.setRotate(value);
     }
 }

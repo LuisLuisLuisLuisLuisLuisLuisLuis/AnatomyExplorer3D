@@ -4,11 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3c65ee50-307e-41c9-811a-e44a903afa8a" name="Changes" comment="">
+    <list default="true" id="3c65ee50-307e-41c9-811a-e44a903afa8a" name="Changes" comment="SetupMouseRotate3D &amp; ContinuousRotator:&#10;Make pivot Observable so that ContinuousRotator can observe and always have the correct value.&#10;RememberFXPerspective:&#10;Comment out innergroup transforms because they're superfluous since the transforms of innergroup never change (except when it centers itself after its contents were changed).">
+      <change afterPath="$PROJECT_DIR$/src/main/java/Project/command/Remember/RememberNodeTransform.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/ClearCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/ClearCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/ResetViewDrawCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/ResetViewDrawCommand.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Project/command/Remember/RememberFXPerspective.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/command/Remember/RememberFXPerspective.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/ThreeDPaneHandling/ContinuousRotator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/ThreeDPaneHandling/ContinuousRotator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/ThreeDPaneHandling/SetupMouseRotate3D.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/ThreeDPaneHandling/SetupMouseRotate3D.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/WindowPresenter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/WindowPresenter.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -349,7 +350,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771947729936</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="SetupMouseRotate3D &amp; ContinuousRotator:&#10;Make pivot Observable so that ContinuousRotator can observe and always have the correct value.&#10;RememberFXPerspective:&#10;Comment out innergroup transforms because they're superfluous since the transforms of innergroup never change (except when it centers itself after its contents were changed).">
+      <option name="closed" value="true" />
+      <created>1772005243288</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1772005243288</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -375,7 +384,8 @@
     <MESSAGE value="Create SlicePlaneGroup" />
     <MESSAGE value="Bind Slicing to Cut Button.&#10;Can Slice all or only selected items.&#10;Button also creates a visible Plane with red and green side, but its not functional and the coloring is buggy.&#10;Created Template SliceCommand" />
     <MESSAGE value="SlicePlane and contentGroup can now be moved correctly via keys and scrolling. Scrolling moves them together while keys move them independently.&#10;SlicePlane always spawns in the middle of contentGroup.&#10;ResetView not working for SlicePlane yet." />
-    <option name="LAST_COMMIT_MESSAGE" value="SlicePlane and contentGroup can now be moved correctly via keys and scrolling. Scrolling moves them together while keys move them independently.&#10;SlicePlane always spawns in the middle of contentGroup.&#10;ResetView not working for SlicePlane yet." />
+    <MESSAGE value="SetupMouseRotate3D &amp; ContinuousRotator:&#10;Make pivot Observable so that ContinuousRotator can observe and always have the correct value.&#10;RememberFXPerspective:&#10;Comment out innergroup transforms because they're superfluous since the transforms of innergroup never change (except when it centers itself after its contents were changed)." />
+    <option name="LAST_COMMIT_MESSAGE" value="SetupMouseRotate3D &amp; ContinuousRotator:&#10;Make pivot Observable so that ContinuousRotator can observe and always have the correct value.&#10;RememberFXPerspective:&#10;Comment out innergroup transforms because they're superfluous since the transforms of innergroup never change (except when it centers itself after its contents were changed)." />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

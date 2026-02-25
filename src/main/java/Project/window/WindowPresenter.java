@@ -361,14 +361,14 @@ public class WindowPresenter {
         SelectionMediator_Tree_3D selectionMediatorTree_3D_Content = new SelectionMediator_Tree_3D(treeViewSelectionGroup, threeDContentGroup, model.getIsA_Root(), model.getPartOfRoot());
 
         //----------menu File: 3D
-        controller.getMenuResetView().setOnAction(e -> executeCommand(new ResetViewDrawCommand(contentGroup, innerGroup, camera, initialTransform, initialCameraPosition, setupMouseRotate3D)));
+        controller.getMenuResetView().setOnAction(e -> executeCommand(new ResetViewDrawCommand(new Group[]{contentGroup, slicePlaneGroup}, camera, initialTransform, initialCameraPosition, setupMouseRotate3D)));
         controller.getMenuClearView().setOnAction(e -> {
             executeCommand(new ClearCommand(contentGroup, innerGroup));
             threeDSelectionGroup.changeSelection(new HashSet<>(), true, false);
 
 
         });
-        controller.getResetViewButton().setOnAction(e -> executeCommand(new ResetViewDrawCommand(contentGroup, innerGroup, camera, initialTransform, initialCameraPosition, setupMouseRotate3D)));
+        controller.getResetViewButton().setOnAction(e -> executeCommand(new ResetViewDrawCommand(new Group[]{contentGroup,slicePlaneGroup}, camera, initialTransform, initialCameraPosition, setupMouseRotate3D)));
         controller.getClearViewButton().setOnAction(e -> {
             executeCommand(new ClearCommand(contentGroup, innerGroup));
             threeDSelectionGroup.changeSelection(new HashSet<>(), true, false);
