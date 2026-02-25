@@ -9,8 +9,8 @@ import java.util.LinkedList;
  * Remembers the contents of a group and provides method to restore that state.
  */
 public class RememberFXGroupContents {
-    private Group group;
-    private LinkedList<Node> selection;
+    private final Group group;
+    private final LinkedList<Node> selection;
     public RememberFXGroupContents(Group group) {
         this.group = group;
         this.selection = new LinkedList<>(group.getChildren());

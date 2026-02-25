@@ -18,8 +18,8 @@ public class ResetViewDrawCommand implements Command {
     private final Group[] groups;
 
 
-    private static Affine initialTransform;
-    private static Point3D initialCameraPosition;
+    private final Affine initialTransform;
+    private final Point3D initialCameraPosition;
 
     private RememberFXPerspective rememberFxPerspective;
 

@@ -10,8 +10,8 @@ import java.util.List;
  * A group to remember the tree selection.
  */
 public class RememberTreeViewSelection {
-    private TreeView treeView;
-    private List<TreeItem> previousSelection = new LinkedList<>();  // save
+    private final TreeView treeView;
+    private final List<TreeItem> previousSelection = new LinkedList<>();  // save
 
     public RememberTreeViewSelection(TreeView treeView) {
         previousSelection.addAll(treeView.getSelectionModel().getSelectedItems());

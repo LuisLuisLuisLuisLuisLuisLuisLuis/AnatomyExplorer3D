@@ -10,7 +10,7 @@ public class ClearCommand extends GroupCommand {
 
     private RememberFXGroupContents fxGroupSelection;
     private RememberFXPerspective rememberFxPerspective;
-    private Group innerGroup;
+    private final Group innerGroup;
 
     /**
      * Clears view and resets perspective.
