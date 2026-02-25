@@ -1,18 +1,28 @@
 package Project.window.ThreeDPaneHandling;
 
 import javafx.animation.AnimationTimer;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.transform.Rotate;
 
-//implements continuous rotation along a given axis at a given speed.
-//does this by the same mechanic as mouse drag rotation, using applyGlobalRotation()
+import java.util.function.Function;
+
+
 public class ContinuousRotator {
 
     private final AnimationTimer timer;
     private final double anglePerFrame;
 
-    public ContinuousRotator(Group group, Point3D axis, double anglePerSecond, Point3D pivot) {
+    /**
+     * //implements continuous rotation along a given axis at a given speed.
+     * //does this by the same mechanic as mouse drag rotation, using applyGlobalRotation()
+     * @param group A Group to rotate.
+     * @param axis Axis
+     * @param anglePerSecond Angle per second
+     * @param pivot Pivot around which the rotation will occur. Must be observable so that the rotation is always correct even as the pivot changes.
+     */
+    public ContinuousRotator(Group group, Point3D axis, double anglePerSecond, SimpleObjectProperty<Point3D> pivot) {
 
         Point3D finalAxis = axis.normalize();
         this.anglePerFrame = anglePerSecond / 60.0; //smaller angle for 60 FPS -> 1x full angle per second
@@ -20,7 +30,7 @@ public class ContinuousRotator {
         this.timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                Group3DRotation.applyGlobalRotation(group, finalAxis, anglePerFrame, pivot);
+                Group3DRotation.applyGlobalRotation(group, finalAxis, anglePerFrame, pivot.get());
             }
         };
     }

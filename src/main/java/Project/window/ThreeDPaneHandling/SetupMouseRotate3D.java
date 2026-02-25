@@ -1,5 +1,7 @@
 package Project.window.ThreeDPaneHandling;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.layout.Pane;
@@ -20,6 +22,7 @@ public class SetupMouseRotate3D {
     Point3D axis;
     double angle;
     private RememberRotation rememberRotation = new RememberRotation();
+    private final Group[] groups;
 
     private Runnable listener;
 
@@ -32,7 +35,13 @@ public class SetupMouseRotate3D {
         return yPrev - ySave;
     }
 
+    /**
+     Pivot around which all groups rotate. It is the pivot of the first of the groups so that all rotation occurs around the same pivot.
+     */
+    private SimpleObjectProperty<Point3D> pivot = new SimpleObjectProperty<>(new Point3D(0,0,0));
+
     public SetupMouseRotate3D(Pane pane, Group[] groups) {
+        this.groups = groups;
         setup(pane, groups);
     }
 
@@ -43,6 +52,11 @@ public class SetupMouseRotate3D {
 
     //remember mouse coordinates on click and stop any continuous rotation
     private void setup(Pane pane, Group[] groups) {
+
+        groups[0].getTransforms().addListener((InvalidationListener) l -> {
+            pivot.set(new Point3D(groups[0].getTransforms().getFirst().getTx(), groups[0].getTransforms().getFirst().getTy(), groups[0].getTransforms().getFirst().getTz()));
+        });
+
         this.continuousRotators = new ArrayList<>(groups.length);
         pane.setOnMousePressed(e -> {
             xPrev = e.getSceneX();
@@ -66,7 +80,7 @@ public class SetupMouseRotate3D {
                 //as speed of rotation, use the distance the user has dragged the mouse
                 this.continuousRotators.clear();
                 for (Group group : groups) {
-                    this.continuousRotators.add(new ContinuousRotator(group, axis, Math.sqrt(Math.pow(xSave - xPrev, 2) + Math.pow(ySave - yPrev, 2)), getPivot(groups))); // 30° per second
+                    this.continuousRotators.add(new ContinuousRotator(group, axis, Math.sqrt(Math.pow(xSave - xPrev, 2) + Math.pow(ySave - yPrev, 2)), pivot));
                     this.continuousRotators.getLast().start();
                 }
 //                this.continuousRotator =
@@ -83,7 +97,7 @@ public class SetupMouseRotate3D {
 
             //so that they all rotate around the same pivot, i make them rotate around the pivot of the first group.
             //otherwise they'd rotate round their own ones which arent equal
-            for (Group group : groups) Group3DRotation.applyGlobalRotation(group, axis, angle, getPivot(groups));//Group3DRotation.applyGlobalRotation(group, axis, angle);
+            for (Group group : groups) Group3DRotation.applyGlobalRotation(group, axis, angle, pivot.get());//Group3DRotation.applyGlobalRotation(group, axis, angle);
 
             xPrev = e.getSceneX();
             yPrev = e.getSceneY();
@@ -93,14 +107,6 @@ public class SetupMouseRotate3D {
         for (ContinuousRotator continuousRotator : continuousRotators) continuousRotator.stop();
         //if (continuousRotator != null) continuousRotator.stop();
     }
-
-    /**
-    Pivot is the pivot of the first of the groups. So that all rotation occurs around the same pivot.
-     */
-    public Point3D getPivot(Group[] groups) {
-        return new Point3D(groups[0].getTransforms().getFirst().getTx(), groups[0].getTransforms().getFirst().getTy(), groups[0].getTransforms().getFirst().getTz());
-    }
-
 
     public static class RememberRotation {
         private int i = 0;

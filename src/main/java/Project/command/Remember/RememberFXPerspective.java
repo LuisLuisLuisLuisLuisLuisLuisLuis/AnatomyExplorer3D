@@ -40,12 +40,13 @@ public class RememberFXPerspective {
         this.camera = camera;
     }
     public void restorePerspective() {
-        group.getTransforms().clear();
-        group.getTransforms().addAll(this.transforms);
+//        group.getTransforms().clear();
+//        group.getTransforms().addAll(this.transforms);
+        group.getTransforms().setAll(this.transforms);
         camera.setTranslateZ(this.cameraPosition.getZ());
         camera.setTranslateX(this.cameraPosition.getX());
         camera.setTranslateY(this.cameraPosition.getY());
-        innerGroup.setRotationAxis(axis);
-        innerGroup.setRotate(value);
+//        innerGroup.setRotationAxis(axis);
+//        innerGroup.setRotate(value);
     }
 }
