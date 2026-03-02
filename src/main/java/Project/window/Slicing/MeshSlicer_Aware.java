@@ -13,7 +13,7 @@ public class MeshSlicer_Aware {
             double nx, double ny, double nz,
             double d
     ) {
-        VertexFormat fmt = input.getVertexFormat();
+        VertexFormat vertexFormat = input.getVertexFormat();
 
         // --- Determine face layout ---
         // crucial for correctly parsing the faces because:
