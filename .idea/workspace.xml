@@ -4,13 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3c65ee50-307e-41c9-811a-e44a903afa8a" name="Changes" comment="Mame some things final. Delete GroupCameraCommand.java because it was unnecessary.">
+    <list default="true" id="3c65ee50-307e-41c9-811a-e44a903afa8a" name="Changes" comment="Slicing now happens at the visualized Plane. &#10;Also increased nearClip of the camera because the SlicingPlane was glitching at long distance">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/SliceCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/SliceCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/Slicing/MeshSlicer_Aware.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/Slicing/MeshSlicer_Aware.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/Slicing/Plane.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/Slicing/Plane.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/ThreeDPaneHandling/Group3DRotation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/ThreeDPaneHandling/Group3DRotation.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/ThreeDPaneHandling/Setup3DSubPane.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/ThreeDPaneHandling/Setup3DSubPane.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/WindowPresenter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/WindowPresenter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/FXML/MainWindow.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/Project/FXML/MainWindow.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,20 +55,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;corretto-23&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/dnexu/Documents/GitHub/AnatomyExploer3D_Private/src/main/resources/Project/FXML&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.43049932&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.updates&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
+    "jdk.selected.JAVA_MODULE": "corretto-23",
+    "last_opened_file_path": "C:/Users/dnexu/Documents/GitHub/AnatomyExploer3D_Private/src/main/resources/Project/FXML",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.43049932",
+    "settings.editor.selected.configurable": "configurable.group.appearance"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="Project.command.Remember" />
@@ -374,7 +375,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772016664071</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Slicing now happens at the visualized Plane. &#10;Also increased nearClip of the camera because the SlicingPlane was glitching at long distance">
+      <option name="closed" value="true" />
+      <created>1772034051782</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1772034051782</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -403,7 +412,8 @@
     <MESSAGE value="SetupMouseRotate3D &amp; ContinuousRotator:&#10;Make pivot Observable so that ContinuousRotator can observe and always have the correct value.&#10;RememberFXPerspective:&#10;Comment out innergroup transforms because they're superfluous since the transforms of innergroup never change (except when it centers itself after its contents were changed)." />
     <MESSAGE value="Rest view now correctly works with the SlicePlane as well" />
     <MESSAGE value="Mame some things final. Delete GroupCameraCommand.java because it was unnecessary." />
-    <option name="LAST_COMMIT_MESSAGE" value="Mame some things final. Delete GroupCameraCommand.java because it was unnecessary." />
+    <MESSAGE value="Slicing now happens at the visualized Plane. &#10;Also increased nearClip of the camera because the SlicingPlane was glitching at long distance" />
+    <option name="LAST_COMMIT_MESSAGE" value="Slicing now happens at the visualized Plane. &#10;Also increased nearClip of the camera because the SlicingPlane was glitching at long distance" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -19,7 +19,7 @@ public class MeshSlicer_Aware {
         // crucial for correctly parsing the faces because:
         // POINT_NORMAL_TEXCOORD means every vertex in a face is represented by 3 ints (so 9 ints for a face of 3 vertices), while
         // POINT_TEXCOORD means every face is represented by 2 ints (so 6 ints for a face of 3 vertices)
-        final boolean hasNormals = (fmt == VertexFormat.POINT_NORMAL_TEXCOORD);
+        final boolean hasNormals = (vertexFormat == VertexFormat.POINT_NORMAL_TEXCOORD);
         // -> set the step size
         final int VERT_STRIDE = hasNormals ? 3 : 2;
         final int FACE_STRIDE = 3 * VERT_STRIDE; // 6 or 9
@@ -30,10 +30,10 @@ public class MeshSlicer_Aware {
         int[] inFaces = input.getFaces().toArray(null);
 
         // --- Output buffers ---
-        ArrayList<Float> outPts   = new ArrayList<>();
-        ArrayList<Float> outTex   = new ArrayList<>();
+        ArrayList<Float> outPts = new ArrayList<>();
+        ArrayList<Float> outTex = new ArrayList<>();
         ArrayList<Float> outNorms = hasNormals ? new ArrayList<>() : null;
-        ArrayList<Integer> outFaces = new ArrayList<>();
+        ArrayList<Integer>outFaces = new ArrayList<>();
 
         // Copy texcoords (if empty, add dummy)
         if (inTex.length == 0) {
@@ -65,8 +65,7 @@ public class MeshSlicer_Aware {
         Map<Edge,Integer> edgeToPoint = new HashMap<>();
 
 
-        // Distance of a Point P(x,y,z) to the given fixed Point F(nx,ny,nz, -d). Used to determine on which side of A
-        // P lies to decide whether to keep or discard it.
+
         class Dist {
             double eval(double x,double y,double z) {
                 return nx*x + ny*y + nz*z - d;
@@ -81,7 +80,7 @@ public class MeshSlicer_Aware {
              * [pIdx, new index of point in outPts] in pointMap.
              * @param pIdx index of a point in the list of inPts. Note that a point consists of three numbers and
              *             inPts stores for every point those three numbers one after another. Thus, the three numbers
-             *             making up point i will be found at indices i*3, i*3 + 1 and i*3 + 2.
+             *             making up point i will be found at indices i*3, i*3+1 and i*3+2.
              * @return the already existing or now computed value associated with the specified key (pIdx)
              */
             @Override
@@ -100,11 +99,11 @@ public class MeshSlicer_Aware {
         // --- Add intersection vertex ---
         class AddIntersection {
             /**
-             * Create a new point at the intersection between a->b and the plane given by F.
+             * Create a new point at the intersection between the line a->b and the plane given by F.
              * @param a Rank (not index) of point A in inPts
              * @param b Rank (not index) of point B in inPts.
-             * @param sa Distance of A to the given Point F.
-             * @param sb Distance of B to the given Point F.
+             * @param sa Distance of A to Point F.
+             * @param sb Distance of B to Point F.
              * @return The rank I of that point in outPts. Obtain the coords of that point at outPts[I*3], [I*3 + 1] and [I*3 + 2].
              */
             int apply(int a, int b, double sa, double sb) {
@@ -305,7 +304,7 @@ public class MeshSlicer_Aware {
         }
 
         // --- Build output mesh ---
-        TriangleMesh out = new TriangleMesh(fmt);
+        TriangleMesh out = new TriangleMesh(vertexFormat);
 
         out.getPoints().setAll(toFloatArray(outPts));
         out.getTexCoords().setAll(toFloatArray(outTex));

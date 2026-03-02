@@ -36,6 +36,7 @@ import Project.SelectionModel.*;
 import Project.window.TreeView.TreeViewSetup;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -697,6 +698,13 @@ public class WindowPresenter {
 
         //------------------cutting-------------------------
         controller.getCutButt().setUserData(false);
+        InvalidationListener setupSlicePlaneListener = new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                setupSlicePlane();
+            }
+        };
+
         controller.getCutButt().setOnAction(e -> {
             boolean isCutting = (boolean) controller.getCutButt().getUserData();
             if (isCutting) {
@@ -705,13 +713,14 @@ public class WindowPresenter {
                 controller.getCutButt().setText("Slice");
                 controller.getCutSelectionButton().setDisable(true);
                 slicePlaneGroup.getChildren().clear();
+                contentGroupRotator.clearIsTransformForbidden();
+                innerGroup.getChildren().removeListener(setupSlicePlaneListener);
             } else {
                 controller.getCutSelectionButton().setDisable(false);
                 controller.getCutButt().setText("Cancel");
-                controller.getCutButt().setUserData(true);
-                Group slicePlane = Plane.makeSlicePlane();  //setting the transfrom so that the plane spawns in the middle of the contentgroup
-                slicePlaneGroup.getTransforms().setAll(contentGroup.getTransforms().getFirst());
-                slicePlaneGroup.getChildren().addAll(slicePlane.getChildren());
+                controller.getCutButt().setUserData(true);      //size of the plane will be the size of the drawn 3D objects * 2
+                setupSlicePlane();
+                innerGroup.getChildren().addListener(setupSlicePlaneListener);
             }
         });
 
@@ -853,6 +862,7 @@ public class WindowPresenter {
      * Rotates/Translates 3D objects depending on the keycode and boolean.
      * @param keyCode controls the direction
      * @param rotating false -> the camera is moved. true -> the objects are rotated
+     * @param shift If shift is pressed, move the slice plane.
      */
     public void rotationControl(KeyCode keyCode, boolean rotating, boolean shift) {
         Group3DRotation groupRotator = shift ? slicePlaneGroupRotator : contentGroupRotator;
@@ -933,6 +943,34 @@ public class WindowPresenter {
             //System.out.println("Redoing " + redoList.getLast().name());
             undoList.add(redoList.removeLast());
         }
+    }
+
+    /**
+     * <li>Creates the slice plane according to the size of innergroup.</li>
+     * <li>Sets the maximum allowed distance the slice plane and the contentgroup are allowed to move,
+     * making sure that they always overlap.</li>
+     */
+    private void setupSlicePlane() {
+        double planeSize = Math.max(Math.max(innerGroup.getBoundsInLocal().getMaxX() - innerGroup.getBoundsInLocal().getMinX(), innerGroup.getBoundsInLocal().getMaxY() - innerGroup.getBoundsInLocal().getMinY()), innerGroup.getBoundsInLocal().getMaxZ() - innerGroup.getBoundsInLocal().getMinZ()) * 2;
+        Group slicePlane = Plane.makeSlicePlane((int) planeSize);
+        slicePlaneGroupRotator.setIsTransformForbidden(new Function<Transform, Boolean>() {
+            @Override
+            public Boolean apply(Transform transform) {
+                Transform conTrans = contentGroup.getTransforms().getFirst();
+                Point3D diff = new Point3D(Math.abs(transform.getTx() - conTrans.getTx()), Math.abs(transform.getTy() - conTrans.getTy()), Math.abs(transform.getTz() - conTrans.getTz()));
+                return diff.getX() >= planeSize / 4 || diff.getY() >= planeSize / 4|| diff.getZ() >= planeSize / 4;
+            }
+        });
+        contentGroupRotator.setIsTransformForbidden(new Function<Transform, Boolean>() {
+            @Override
+            public Boolean apply(Transform transform) {
+                Transform conTrans = slicePlaneGroup.getTransforms().getFirst();
+                Point3D diff = new Point3D(Math.abs(transform.getTx() - conTrans.getTx()), Math.abs(transform.getTy() - conTrans.getTy()), Math.abs(transform.getTz() - conTrans.getTz()));
+                return diff.getX() >= planeSize / 4 || diff.getY() >= planeSize / 4|| diff.getZ() >= planeSize / 4;
+            }
+        });
+        slicePlaneGroup.getTransforms().setAll(contentGroup.getTransforms().getFirst());    //setting the transfrom so that the plane spawns in the middle of the contentgroup
+        slicePlaneGroup.getChildren().addAll(slicePlane.getChildren());
     }
 
 

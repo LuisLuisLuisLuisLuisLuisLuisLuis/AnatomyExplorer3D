@@ -6,14 +6,66 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 
+import java.util.function.Function;
+
 public class Group3DRotation {
 
     private final Group contentGroup;
 
-
-    public Group3DRotation(Group contentGroup) {
-        this.contentGroup = contentGroup;
+    public Group3DRotation(Group group) {
+        this.contentGroup = group;
+        clearIsTransformForbidden();
     }
+
+    private Function<Transform, Boolean > isTransformForbidden;
+
+    public void clearIsTransformForbidden() {isTransformForbidden = new Function<Transform, Boolean>() {
+        @Override
+        public Boolean apply(Transform transform) {
+            return false;
+        }
+    };}
+
+    public void setIsTransformForbidden(Function<Transform, Boolean> isTransformForbidden) {
+        this.isTransformForbidden = isTransformForbidden;
+    }
+
+    /*
+    ----------ON TRANSFORMS AND ROTATIONS-----------------
+    Applying a Translate to a group does not change whatever it stores in group.getTranslateX/Y/Z().
+    It can only be found in group.getTransforms().getFirst().getTx/y/z(). (Note: transform.toString() is very useful).
+    A Rotate() needs a pivot point to rotate around. To rotate around the group center, use the coords given by
+    group.getTransforms().getFirst().getTx/y/z().
+
+    you can play around with:
+            System.out.println("Group getXYZ: " + group.getTranslateX() + " " + group.getTranslateY() + " " + group.getTranslateZ()); -> always zeros
+            Transform transform = group.getTransforms().getFirst();
+            System.out.println(transform);
+            System.out.println(transform.getTx() + " " + transform.getTy() + " "+ transform.getTz()); -> pivot point for rotation
+
+     */
+
+    public void applyGlobalRotation(Point3D axis, double angle) {
+        var currentTransform = contentGroup.getTransforms().isEmpty() ? new Rotate() : contentGroup.getTransforms().getFirst();
+        var rotate = new Rotate(angle, currentTransform.getTx(), currentTransform.getTy(), currentTransform.getTz(), axis);
+        currentTransform = rotate.createConcatenation(currentTransform);
+        contentGroup.getTransforms().setAll(currentTransform);
+    }
+
+    public void applyTranslate(Point3D step) {
+        var currentTransform = contentGroup.getTransforms().isEmpty() ? new Translate() : contentGroup.getTransforms().getFirst();
+        var translate = new Translate(step.getX(), step.getY(), step.getZ());
+        Transform concatenation = translate.createConcatenation(currentTransform);
+        if (isTransformForbidden.apply(concatenation)) return;
+        contentGroup.getTransforms().setAll(concatenation);
+    }
+
+    public static void printTransform(Group group) {
+        Transform transform = group.getTransforms().getFirst();
+//        System.out.println(transform);
+        System.out.println(transform.getTx() + " " + transform.getTy() + " "+ transform.getTz());
+    }
+
 
     /**
      * Applies a global rotation transformation to the specified 3D content group.
@@ -39,38 +91,6 @@ public class Group3DRotation {
         currentTransform = rotate.createConcatenation(currentTransform);
         contentGroup.getTransforms().setAll(currentTransform);
     }
-
-    /*
-    ----------ON TRANSFORMS AND ROTATIONS-----------------
-    Applying a Translate to a group does not change whatever it stores in group.getTranslateX/Y/Z().
-    It can only be found in group.getTransforms().getFirst().getTx/y/z(). (Note: transform.toString() is very useful).
-    This is the center of the groups contents I believe.
-    A Rotate() needs a pivot point to rotate around. To rotate around its center, use the coords given by
-    group.getTransforms().getFirst().getTx/y/z().
-
-    you can play around with:
-            System.out.println("Group getXYZ: " + group.getTranslateX() + " " + group.getTranslateY() + " " + group.getTranslateZ()); -> always zeros
-            Transform transform = group.getTransforms().getFirst();
-            System.out.println(transform);
-            System.out.println(transform.getTx() + " " + transform.getTy() + " "+ transform.getTz()); -> pivot point for rotation
-
-     */
-
-    public void applyGlobalRotation(Point3D axis, double angle) {
-        var currentTransform = contentGroup.getTransforms().isEmpty() ? new Rotate() : contentGroup.getTransforms().getFirst();
-        var rotate = new Rotate(angle, currentTransform.getTx(), currentTransform.getTy(), currentTransform.getTz(), axis);
-        currentTransform = rotate.createConcatenation(currentTransform);
-        contentGroup.getTransforms().setAll(currentTransform);
-    }
-
-    public void applyTranslate(Point3D step) {
-        var currentTransform = contentGroup.getTransforms().isEmpty() ? new Translate() : contentGroup.getTransforms().getFirst();
-        var translate = new Translate(step.getX(), step.getY(), step.getZ());
-        currentTransform = translate.createConcatenation(currentTransform);
-        contentGroup.getTransforms().setAll(currentTransform);
-    }
-
-
 
 
 

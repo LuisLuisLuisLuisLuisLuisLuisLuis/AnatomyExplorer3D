@@ -41,7 +41,7 @@ public class SliceCommand implements Command {
                 return;
             }
             meshView.setMesh(MeshSlicer_Aware.slicePositiveSide((TriangleMesh) meshView.getMesh(), nxyd[0], nxyd[1], nxyd[2], nxyd[3]));
-            meshView.setCullFace(CullFace.NONE);    // VERY IMPORTANT! because now we can see inside the mesh, i.e. we can see the other side of the faces too -> both sides need to be rendered -> FRONT/BACK wont suffice
+            meshView.setCullFace(CullFace.NONE);    // VERY IMPORTANT! because now we can see inside the mesh, i.e. we can see both sides of the faces -> both sides need to be rendered -> FRONT/BACK wont suffice
         }
     }
 
