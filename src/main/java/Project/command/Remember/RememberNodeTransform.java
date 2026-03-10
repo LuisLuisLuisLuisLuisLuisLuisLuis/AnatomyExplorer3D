@@ -12,7 +12,7 @@ public class RememberNodeTransform {
     private final List<Transform> transforms;
 
     /**
-     * Remembers the transforms of the Node upon instanciation of this class and allows to restore them.
+     * Remembers the transforms of the Node upon instantiation of this class and allows to restore them.
      * @param node Node whose transforms should be remembered.
      */
     public RememberNodeTransform(Node node) {

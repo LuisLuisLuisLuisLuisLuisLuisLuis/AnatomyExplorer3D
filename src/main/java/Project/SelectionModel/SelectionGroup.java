@@ -13,6 +13,14 @@ import java.util.*;
  */
 
 public class SelectionGroup<groupSelection> {
+
+    //id
+    private final String id;
+
+    public SelectionGroup(String id) {this.id = id;}
+
+    public String getId() {return id;}
+
     /**
      * All the SelectionContainers in this group.
      */

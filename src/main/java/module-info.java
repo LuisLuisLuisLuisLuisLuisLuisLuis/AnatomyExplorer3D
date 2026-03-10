@@ -12,6 +12,7 @@ module com.anatomyExplorer {
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.annotation;
     requires java.net.http;
+    requires org.jetbrains.annotations;
 
     exports Project.AI.Format to com.fasterxml.jackson.databind;
     exports Project.window.ThreeDPaneHandling.Coloring to com.fasterxml.jackson.databind;

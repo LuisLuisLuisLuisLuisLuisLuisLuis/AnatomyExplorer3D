@@ -1,0 +1,30 @@
+.root {
+    -fx-font-size: 12px;
+}
+
+.text-title {
+    -fx-font-size: 1.8em;
+    -fx-font-weight: bold;
+}
+
+.text-large {
+    -fx-font-size: 1.2em;
+}
+
+.text-larger {
+    -fx-font-size: 1.3em;
+}
+
+
+.text-small {
+    -fx-font-size: 0.8em;
+}
+
+.dialog-pane .text {
+    -fx-fill: -fx-text-inner-color;
+}
+
+.dialog-pane .content.label {
+    -fx-text-fill: -fx-text-inner-color;
+}
+

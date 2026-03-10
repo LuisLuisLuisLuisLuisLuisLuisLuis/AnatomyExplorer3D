@@ -11,14 +11,12 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitMenuButton?>
 <?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -49,35 +47,7 @@
                            <center>
                               <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                                  <center>
-                                    <TabPane fx:id="treeTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
-                                      <tabs>
-                                        <Tab text="Part-of">
-                                          <content>
-                                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                                   <children>
-                                                      <TreeView fx:id="partOfTreeView" prefHeight="162.0" prefWidth="288.0" AnchorPane.bottomAnchor="-3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                                   </children></AnchorPane>
-                                          </content>
-                                        </Tab>
-                                        <Tab text="Is-a">
-                                          <content>
-                                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                                   <children>
-                                                      <TreeView fx:id="isATreeView" prefHeight="225.6" prefWidth="288.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                                   </children></AnchorPane>
-                                          </content>
-                                        </Tab>
-                                          <Tab text="Dump">
-                                            <content>
-                                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                                      <children>
-                                                          <TreeView fx:id="dumpTreeView" prefHeight="225.6" prefWidth="288.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                                      </children>
-                                                </AnchorPane>
-                                            </content>
-                                          </Tab>
-                                      </tabs>
-                                    </TabPane>
+                                    <TabPane fx:id="treeTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
                                  </center>
                                  <bottom>
                                     <ToolBar prefHeight="0.0" prefWidth="288.0" BorderPane.alignment="CENTER">
@@ -221,6 +191,9 @@
                     <menus>
                       <Menu mnemonicParsing="false" text="File">
                         <items>
+                              <MenuItem fx:id="loadHierarchyMenu" mnemonicParsing="false" text="Load hierarchy" />
+                              <CheckMenuItem fx:id="loadBP3DV3checkMenu" mnemonicParsing="false" text="Load BP3D 3.0" />
+                            <CheckMenuItem fx:id="enableBP3DPartsCheckmenu" mnemonicParsing="false" text="Enable BP3D 3.0 parts" />
                               <MenuItem fx:id="menuSaveTree" mnemonicParsing="false" text="Save Trees" />
                             <MenuItem fx:id="menuClose" mnemonicParsing="false" text="Close" />
                               <MenuItem fx:id="menuClearView" mnemonicParsing="false" text="Clear View" />

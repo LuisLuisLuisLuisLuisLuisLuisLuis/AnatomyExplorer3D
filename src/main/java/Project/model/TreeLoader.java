@@ -35,13 +35,17 @@ public class TreeLoader {
         HashMap<String, HashSet<String>> fileList  = loadFileList (elementsFile);
         LinkedList<Relation> relations = Relation.loadFromFile(relationsFile);
 
-        if (fileList == null || relations.isEmpty()) {
+        if (relations.isEmpty()) {
             return null;
         }
 
         return createTree(relations, fileList);
     }
 
+    public static ANode load(InputStream relationsFile) {
+        if (relationsFile == null) return null;
+        return createTree(Relation.loadFromFile(relationsFile), new HashMap<>());
+    }
 
     /**
      * From a List of Relations, generates ANode objects with the appropriate child-relations.
@@ -60,15 +64,17 @@ public class TreeLoader {
             String childID = relation.childID();
             String childName = relation.childName();
 
-            if (childID.isEmpty()) {
+            if (childID.isBlank()) {
                 if (!nodes.containsKey(parentID)) nodes.put(parentID, new ANode(parentID, parentName, new HashSet<>(), new HashSet<>()));
                 continue;
             }
 
+            if (nodes.containsKey(childID)) continue;   // prevents cycles
 
             //get child/parent
             ANode child = nodes.containsKey(childID) ? nodes.get(childID) : new ANode(childID, childName, new HashSet<>(), fileList.getOrDefault(childID, new HashSet<>()));
             ANode parent = nodes.containsKey(parentID) ? nodes.get(parentID) : new ANode(parentID, parentName, new HashSet<>(), fileList.getOrDefault(parentID, new HashSet<>()));
+
             //add child to parents children
             parent.addChild(child);
 

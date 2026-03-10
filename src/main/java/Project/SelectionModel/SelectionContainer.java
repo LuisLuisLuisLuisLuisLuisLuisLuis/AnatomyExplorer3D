@@ -29,8 +29,6 @@ public abstract class SelectionContainer<selectionType, groupSelectionType> {
     protected SelectionGroup<groupSelectionType> selectionGroup;
 
     private boolean isPartOfGroup;
-
-
     public boolean isPartOfGroup() {return isPartOfGroup;}
 
     /**
@@ -46,7 +44,7 @@ public abstract class SelectionContainer<selectionType, groupSelectionType> {
         return true;
     }
     protected void removeFromGroup() {
-        this.selectionGroup = new SelectionGroup<>();
+        this.selectionGroup = null;
         isPartOfGroup = false;
     }
 
@@ -54,13 +52,13 @@ public abstract class SelectionContainer<selectionType, groupSelectionType> {
      * am I currently being updated by the selectionGroup?
      */
     private boolean isBeingUpdated = false;
-
-    protected void isBeingUpdated(boolean state) {isBeingUpdated = state;}
     protected boolean isBeingUpdated() {return isBeingUpdated;}
+    protected void isBeingUpdated(boolean state) {isBeingUpdated = state;}
+
 
     private boolean isUpdatingGroup = false;    // i am updating my group
     protected boolean isUpdatingGroup() {return isUpdatingGroup;}
-    protected void isUpdatingGroup(boolean state) {isUpdatingGroup = state;}
+    protected void isUpdatingGroup(boolean state) {isUpdatingGroup = state;}    //TODO: ALWAYS FALSE correct?
 
     private boolean noUpdating = false;
     protected void setNoUpdating(boolean state) {
@@ -70,8 +68,9 @@ public abstract class SelectionContainer<selectionType, groupSelectionType> {
     /**
      * Update the selectionGroup using the selection of this class.
      */
-    protected void updateGroup() {
-        if (isPartOfGroup() && !isBeingUpdated && !noUpdating) {
+    public void updateGroup() {
+        if (isPartOfGroup() && !isBeingUpdated() && !noUpdating) {
+            isUpdatingGroup = true;
             selectionGroup.changeSelection(getSelectionFormatted(), true, false);
         } else isUpdatingGroup(false);
     }
@@ -88,7 +87,8 @@ public abstract class SelectionContainer<selectionType, groupSelectionType> {
      * @param groupSelection: the selection.
      * @return those items that were failed to be selected.
      */
-    protected ObservableList<groupSelectionType> changeSelection(Set<groupSelectionType> groupSelection, boolean clear, boolean remove) {
+    public ObservableList<groupSelectionType> changeSelection(Set<groupSelectionType> groupSelection, boolean clear, boolean remove) {
+        long startTime = System.nanoTime();
         if (!isUpdatingGroup()) {
             isBeingUpdated(true);
             clearFailedList();
@@ -98,7 +98,6 @@ public abstract class SelectionContainer<selectionType, groupSelectionType> {
                 if (itemsToSelect == null) continue;
                 for (selectionType item : itemsToSelect) {
                     if (item != null) {
-                        System.out.println("container: " + item.toString());
                         if (!remove) hasSelection.select(item);
                         else hasSelection.unselect(item);
                     } else {
@@ -111,6 +110,10 @@ public abstract class SelectionContainer<selectionType, groupSelectionType> {
             isUpdatingGroup(false);
             clearFailedList();
         }
+        long endTime = System.nanoTime();
+        long durationMillis = (endTime - startTime) / 1000000;
+        System.out.println("changeSelection took " + durationMillis);
+
         return getFailedToSelect();
     }
 
@@ -136,7 +139,6 @@ public abstract class SelectionContainer<selectionType, groupSelectionType> {
         this.hasSelection = hasSelection;
         this.selectionGroup = selectionGroup;
         this.hasSelection.getSelection().addListener((ListChangeListener<? super selectionType>) e -> {
-            isUpdatingGroup = true;
             updateGroup(); //if the selection changes, update the group
         });
         isPartOfGroup = true;
@@ -149,9 +151,10 @@ public abstract class SelectionContainer<selectionType, groupSelectionType> {
     public SelectionContainer(HasSelection<selectionType> hasSelection) {
         this.hasSelection = hasSelection;
         this.hasSelection.getSelection().addListener((ListChangeListener<? super selectionType>) e -> {
-            isUpdatingGroup = true;
             updateGroup(); //if the selection changes, update the group
         });
         isPartOfGroup = false;
     }
+
+    public String getId() {return this.hasSelection.getId();}
 }

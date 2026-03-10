@@ -15,6 +15,13 @@ import java.util.List;
  */
 public class HasFXGroupSelection implements HasSelection<Node> {
 
+    private final String id;
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
     /**
      * The group.
      */
@@ -29,7 +36,8 @@ public class HasFXGroupSelection implements HasSelection<Node> {
      * Initialize by giving a group.
      * @param group
      */
-    public HasFXGroupSelection(Group group) {
+    public HasFXGroupSelection(Group group, String id) {
+        this.id = id;
         this.group = group;
     }
 
@@ -75,4 +83,5 @@ public class HasFXGroupSelection implements HasSelection<Node> {
     public ObservableList<Node> getAllItemsObservable() {
         return group.getChildren();
     }
+
 }

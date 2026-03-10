@@ -8,7 +8,7 @@ import java.util.Set;
 
 /**
  * This class mediates between two SelectionGroups.
- * Used to add/remove/push the selection of one group onto the other.
+ * Use to add/remove/push the selection of one group onto the other.
  * @param <A> data type of Set() Selection of selectionGroupA
  * @param <B> data type of Set() Selection of selectionGroupB
  */

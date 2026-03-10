@@ -7,6 +7,11 @@ import java.util.*;
 
 public class SelectionMediator_Tree_3D extends SelectionMediator<ANode, String> {
 
+    /**
+     * Collects all FileIDs from the set of ANodes.
+     * @param selection
+     * @return
+     */
     @Override
     public Set<String> transformAselectionToBSelection(Set<ANode> selection) {
         Set<String> transformedSelection = new HashSet<>();
@@ -14,8 +19,8 @@ public class SelectionMediator_Tree_3D extends SelectionMediator<ANode, String> 
             //if (item == null) System.out.println("SelectionGroupA.getSelection has a null item; in transformASelectionToBSelection in Mediator");
             Collection<String> fileIDs = item.getFileIds();
             transformedSelection.addAll(fileIDs);
-            for (String fileID : fileIDs) System.out.println(item + ", " + fileID);
         }
+        System.out.println("mediator_tree_3d A->B " + transformedSelection);
         return transformedSelection;
     }
 
@@ -26,6 +31,7 @@ public class SelectionMediator_Tree_3D extends SelectionMediator<ANode, String> 
             //transformedSelection.add(fileIDtoName.getOrDefault(item, new LinkedList<>()));
             for (ANode anode : fileIDtoANode.getOrDefault(item, new LinkedList<>())) transformedSelection.add(anode);
         }
+        System.out.println("mediator_tree_3d B->A " + transformedSelection);
         return transformedSelection;
     }
 
@@ -33,82 +39,87 @@ public class SelectionMediator_Tree_3D extends SelectionMediator<ANode, String> 
      * Map fileIDs to ANode.name and vice versa.
      */
     private TreeMap<String, Collection<ANode>> fileIDtoANode = new TreeMap<>();
-    private TreeMap<ANode, Collection<String>> anodeToFileID = new TreeMap<>();
 
-    private final ANode partofRoot;
-    private final ANode isaRoot;
+    private final Collection<ANode> roots;
+    public void addRoot(ANode root) {
+        if (this.roots.contains(root)) return; //don't add if already present
+        this.roots.add(root);
+        reloadDicts();
+    }
+    public void removeRoot(ANode root) {
+        this.roots.remove(root);
+        reloadDicts();
+    }
 
     public Collection<ANode> fileIDtoANode(String fileID) {
         return fileIDtoANode.get(fileID);
     }
-    public Collection<String> nameToFileID(ANode aNode) {
-        return anodeToFileID.get(aNode);
-    }
 
-    public SelectionMediator_Tree_3D (SelectionGroup<ANode> selectionGroupTree, SelectionGroup<String> selectionGroup3D, ANode isARoot, ANode partOfRoot) {
+    public SelectionMediator_Tree_3D (SelectionGroup<ANode> selectionGroupTree, SelectionGroup<String> selectionGroup3D, Collection<ANode> roots) {
         super(selectionGroupTree, selectionGroup3D);
-        this.partofRoot = partOfRoot;
-        this.isaRoot = isARoot;
+        this.roots = roots;
         reloadDicts();
     }
-
-    /**
-     * Allows post-creation extension of the Treemaps.
-     */
-    public void addNameToFileIDmapping(ANode anode, Set<String> fileIDs) {
-        for (String fileID : fileIDs) {
-            Collection<ANode> list = fileIDtoANode.getOrDefault(fileID, new LinkedList<>());
-            list.add(anode);
-            fileIDtoANode.put(fileID, list);
-        }
-        anodeToFileID.put(anode, fileIDs);
+    public SelectionMediator_Tree_3D (SelectionGroup<ANode> selectionGroupTree, SelectionGroup<String> selectionGroup3D) {
+        super(selectionGroupTree, selectionGroup3D);
+        this.roots = new ArrayList<>();
     }
+    public SelectionMediator_Tree_3D (Collection<ANode> roots, String id) {
+        super(null, null);
+        this.roots = roots;
+        reloadDicts();
+        this.id = id;
+    }
+
 
     //may be necessary multiple times if the FileID associations change.
     //like when the tree is modified.
     public void reloadDicts() {
         this.fileIDtoANode.clear();
-        initializeDicts(isaRoot);
-        initializeDicts(partofRoot);
+        for (ANode root : roots) initializeDicts(root);
     }
 
     /**
      * Initialize the Maps with ANode roots from the trees.
-     * @param node
+     * @param root
      */
-    private void initializeDicts(ANode node) {
+    private void initializeDicts(ANode root) {
         /*
         INFO:
          - what to select / (draw) when internal nodes are selected?
          - all their children basically? or nothing
-         -> comes down to: do i want to select all children if i select an internal node?
+         -> comes down to: do i want to select all children if i select an internal root?
             - because internal nodes dont have (only one) corresponding body part.
             -> this logic is handled by the tree . i only add leaf to fileID mapping here.
 
           UPDATE: for TreeEditor, I also map internal nodes to their FileIDs, as it turns out
           that there are few FileIDs that are only mapped to internal nodes
          */
-        Collection<ANode> children = node.children();
+        Collection<ANode> children = root.children();
 //        if (children.isEmpty()) {
-//            for (String fileID : node.fileIds()) {
+//            for (String fileID : root.fileIds()) {
 //                Collection<String> list = fileIDtoName.getOrDefault(fileID, new LinkedList<>());
-//                list.add(node.name());
+//                list.add(root.name());
 //                fileIDtoName.put(fileID, list);
 //            }
-//            nameToFileID.put(node.name(), node.fileIds());
+//            nameToFileID.put(root.name(), root.fileIds());
 //            } else {
 //            for (ANode child : children) {
 //                initializeDicts(child);
 //            }
 //        }
-        for (String fileID : node.getFileIds()) {
+        for (String fileID : root.getFileIds()) {
                 Collection<ANode> list = fileIDtoANode.getOrDefault(fileID, new LinkedList<>());
-                list.add(node);
+                list.add(root);
                 fileIDtoANode.put(fileID, list);
             }
-//        anodeToFileID.put(node, node.fileIds());
+//        anodeToFileID.put(root, root.fileIds());
         for (ANode child : children) {
                 initializeDicts(child);
             }
     }
+
+    private String id = "";
+
+    public String getId() {return id;}
 }

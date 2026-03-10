@@ -5,16 +5,15 @@ import Project.SelectionModel.SelectionContainer;
 import Project.SelectionModel.SelectionGroup;
 import Project.window.ThreeDPaneHandling.Coloring.FileGroupingScheme;
 import Project.window.ThreeDPaneHandling.OpenOBJ;
-import Project.window.WindowPresenter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.MeshView;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.*;
 
 public class HasFXGroupContentsContainer extends SelectionContainer<Node, String> {
@@ -31,7 +30,6 @@ public class HasFXGroupContentsContainer extends SelectionContainer<Node, String
     private int anatomicalGroupLevel;
 
     public Color getColorForGroup(String group) {
-        System.out.println("Getting color for Group " + group);
         return Color.web(this.fileGroupingScheme.groupToColor.getOrDefault(group, "#789B73"));
     }
 
@@ -46,13 +44,32 @@ public class HasFXGroupContentsContainer extends SelectionContainer<Node, String
         return selectionFormatted;
     }
 
+    /**
+     * This returns a mock MeshView with the correct id as this is often sufficient for HasFXGroupContents. Only when needed
+     * will HasFXGroupContents request the actual MeshView via createMesh().
+     * @param groupItem a FileID
+     * @return MeshView with the FileID as id.
+     */
     @Override
     protected Collection<Node> transformGroupItemToSelectionItem(String groupItem) {
 
-        InputStream inputStream = findTreeFileInResource(groupItem);
-        LinkedList<Node> result = new LinkedList<>();
+        MeshView mock = new MeshView();
+        mock.setId(groupItem);
+        return List.of(mock);
+
+    }
+
+    public Node createMeshView(String groupItem) {
+
+        Node node = this.hasFXGroupContents.getNodeWithID(groupItem);
+        if (node != null) return node;
+
+
+        InputStream inputStream = findTreeFileInResource(groupItem);    // try to find the item first in the resources
+        if (inputStream == null) inputStream = findTreeFile(groupItem); // and then in the provided files if unfound.
 
         if (inputStream != null) {
+            long startTime = System.nanoTime();
             String[] anatomicalGroups = this.fileGroupingScheme.fileIDstoGroups.getOrDefault(groupItem, null);
             String anatomicalGroup;
             if (anatomicalGroups != null ) {
@@ -62,30 +79,40 @@ public class HasFXGroupContentsContainer extends SelectionContainer<Node, String
                 anatomicalGroup = null;
             }
             //fileGroupingScheme.groupToColor returns hex values of the color (String) which must be converted to Color using Color.web(string)
-            result.add(OpenOBJ.objInputStreamToMeshViews(inputStream, groupItem, getColorForGroup(anatomicalGroup)));
+            Node result = OpenOBJ.objInputStreamToMeshViews(inputStream, groupItem, getColorForGroup(anatomicalGroup));
+            long endTime = System.nanoTime();
+            long durationMillis = (endTime - startTime) / 1000000;
+            System.out.println("transformGroupItemToSelecitonItem took " + durationMillis);
             return result;
         }
         else {
-            Node meshView = new MeshView();
-            meshView.setId(groupItem);  //returning this mock meshView with the groupItem as ID so that the downstream methods
-            result.add(meshView);      // can still search for the groupitem
-            return result;              //TODO: if else branch runs, nothing will be drawn but item will still be added
+            System.out.println("HasFXGroupContentsContainer: inputstream is null");
+            return null;
+//
+//            Node meshView = new MeshView();
+//            meshView.setId(groupItem);  //returning this mock meshView with the groupItem as ID so that the downstream methods
+//            result.add(meshView);      // can still search for the groupitem
+//            return result;              //TODO: if else branch runs, nothing will be drawn but item will still be added
         }                               // to selection.
-    }                                   // When does else-branch run?
+        // When does else-branch run?
+    }
 
-
+    /**
+    This is a hack so I can access getNodeWithID().. shouldn't be used for other purposes
+     */
+    private final HasFXGroupContents hasFXGroupContents;
 
     /**
      * @param hasSelection   : an object that has a selection
      * @param selectionGroup : a SelectionGroup for this container to be part of
      */
-    public HasFXGroupContentsContainer(HasSelection<Node> hasSelection, SelectionGroup<String> selectionGroup) {
+    public HasFXGroupContentsContainer(HasFXGroupContents hasSelection, SelectionGroup<String> selectionGroup) {
         super(hasSelection, selectionGroup);
-        this.fileLocations = new ArrayList<>(2);
-        this.resourceLocations = new ArrayList<>(2);
-        //in constructor: , String[] fileLocations
-        //this.fileLocations.add(fileLocations[0]);
-        //this.fileLocations.add(fileLocations[1]);
+        this.hasFXGroupContents = hasSelection;
+        this.fileDirs = new ArrayList<>(2);
+        this.resourceLocations = new ArrayList<>(3);
+
+        //TODO: NOT VIA FILE! VIA STREAM OR STH
         try {
             this.fileGroupingScheme = new ObjectMapper().readValue(
                     new File(this.getClass().getResource("/Project/3DSupport/fileGroupingScheme_manual_V4.json").getFile().substring(1)),
@@ -110,14 +137,16 @@ public class HasFXGroupContentsContainer extends SelectionContainer<Node, String
      */
     public InputStream findTreeFileInResource(String nameWithoutExtension) {
         InputStream inputStream;
-        for (String fileLocation : resourceLocations) {
-            inputStream = WindowPresenter.class.getResourceAsStream(fileLocation + nameWithoutExtension + ".obj");
-            if (inputStream != null) {
-                return inputStream;
-            }
+        for (URL fileLocation : resourceLocations) {
+
+            try {inputStream = new URL(fileLocation, nameWithoutExtension + ".obj").openStream();
+            } catch (IOException i) {continue;}
+
+            if (inputStream != null) return inputStream;
         }
         return null;
     }
+
 
     /**
      * Tries to find a .obj file in either of the file folders of both trees.
@@ -125,36 +154,42 @@ public class HasFXGroupContentsContainer extends SelectionContainer<Node, String
      * @return the file if it exists, else return null.
      * *is legacy code right now. might be useful later if I decide to allow user to Open user-provided .obj files.
      */
-    public File findTreeFile(String nameWithoutExtension) {
-        File file;
-        for (String fileLocation : fileLocations) {
-            file = new File(fileLocation + File.separator + nameWithoutExtension + ".obj");
-            if (file.exists()) return file;
+    public InputStream findTreeFile(String nameWithoutExtension) {
+
+        for (File dir : fileDirs) {
+            try {
+                Path directoryPath = dir.toPath();
+                Path modelPath = directoryPath.resolve(nameWithoutExtension + ".obj");
+                URL fileURL = modelPath.toUri().toURL();
+                return fileURL.openStream();
+            }
+            catch (IOException ignored) {continue;}
         }
         return null;
     }
-    /*
+
     /**
      * Stores where the two folders with the .obj files are located.
      */
-    private ArrayList<String> fileLocations;
-    public ArrayList<String> getFileLocations() {
-        return fileLocations;
+    private final ArrayList<File> fileDirs;
+    public ArrayList<File> getFileDirs() {
+        return fileDirs;
     }
-    public void addFileLocation(String location) {
-        fileLocations.add(location);
+    public void addFileDir(File dir) {
+        fileDirs.add(dir);
     }
+    public void removeFileDir(File dir) {fileDirs.remove(dir);}
 
 
     /**
      * Stores where the two folders with the .obj files are located.
      */
-    private ArrayList<String> resourceLocations;
-    public ArrayList<String> getResourceLocationsLocations() {
+    private final ArrayList<URL> resourceLocations;
+    public ArrayList<URL> getResourceLocationsLocations() {
         return resourceLocations;
     }
-    public void addResourceLocation(String location) {
-        resourceLocations.add(location);
-    }
+    public void addResourceLocations(Collection<URL> urls) {resourceLocations.addAll(urls);}
+    public void addResourceLocation(URL url) {resourceLocations.add(url);}
+    public void removeResourceLocation(URL url) {resourceLocations.remove(url);}
 
 }

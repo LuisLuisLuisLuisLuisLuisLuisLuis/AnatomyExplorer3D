@@ -18,22 +18,21 @@ public class TreeViewSelectionContainer extends SelectionContainer<TreeItem<ANod
         ObservableList<TreeItem<ANode>> selectedItems = hasSelection.getSelection();
         Set<ANode> selectionFormatted = new HashSet<ANode>();
         for (TreeItem<ANode> treeItem : selectedItems) {
-            if (treeItem == null) {
-                //System.out.println("null in selectedItems in TreeViewSelectionContainer:getSelectionFormatted()");
-                continue;
-            }
+            if (treeItem == null) continue;
+
             selectionFormatted.add(treeItem.getValue());
         }
         return selectionFormatted;
     }
 
+    /**
+     * @return the set of ANodes of the given treeItems.
+     */
     public Set<ANode> getSelectionFormatted(ObservableList<TreeItem<ANode>> selectedItems) {
         Set<ANode> selectionFormatted = new HashSet<>();
         for (TreeItem<ANode> treeItem : selectedItems) {
-            if (treeItem == null) {
-                //System.out.println("null in selectedItems in TreeViewSelectionContainer:getSelectionFormatted()");
-                continue;
-            }
+            if (treeItem == null) {continue;}
+
             selectionFormatted.add(treeItem.getValue());
         }
         return selectionFormatted;
@@ -54,7 +53,6 @@ public class TreeViewSelectionContainer extends SelectionContainer<TreeItem<ANod
     public TreeViewSelectionContainer(HasTreeView<ANode> hasTreeView, SelectionGroup<ANode> selectionGroup) {
         super(hasTreeView, selectionGroup);
         setupQuickAccessMap();
-
     }
 
 

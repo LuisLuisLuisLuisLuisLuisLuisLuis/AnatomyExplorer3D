@@ -40,13 +40,13 @@ public class FileExplorerInteraction {
         return dirChooser.showDialog(new Stage());
     }
 
-    public static List<File> findTxt(String target) {
+    public static File findTxt(String title) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Find " + target);
+        fileChooser.setTitle(title);
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Text file", "*.txt"),
                 new FileChooser.ExtensionFilter("All files", "*.*")
         );
-        return fileChooser.showOpenMultipleDialog(new Stage());
+        return fileChooser.showOpenDialog(new Stage());
     }
 }

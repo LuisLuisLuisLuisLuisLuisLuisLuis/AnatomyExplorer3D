@@ -17,6 +17,8 @@ import Project.command.Command;
 import Project.command.DrawCommands.*;
 import Project.command.DrawCommands.DrawAnatomyCommands.DrawItemIn3DCommand;
 import Project.command.DrawCommands.DrawAnatomyCommands.RemoveObjFrom3DCommand;
+import Project.command.Remember.RememberFXGroupContents;
+import Project.command.Remember.RememberFXMeshViewColors;
 import Project.command.TreeCommands.CollapseTreeViewCommand;
 import Project.command.TreeCommands.ExpandTreeViewCommand;
 import Project.command.TreeCommands.SelectAllTreeViewCommand;
@@ -29,17 +31,20 @@ import Project.window.PopUp.Help;
 import Project.window.PopUp.InfoChart;
 import Project.window.PopUp.LittlePopUp;
 import Project.window.Slicing.Plane;
+import Project.window.SupportingUI.FileExplorerInteraction;
 import Project.window.SupportingUI.TextSearch.SearchTree;
 import Project.window.ThreeDPaneHandling.*;
 import Project.SelectionModel.*;
 
+import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import Project.window.TreeView.TreeViewSetup;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -61,9 +66,13 @@ import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 
 import java.io.File;
-import java.net.URL;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils.replaceANodeByCopy;
 
 
 /**
@@ -75,6 +84,7 @@ public class WindowPresenter {
     private final ObservableList<Command> undoList = FXCollections.observableList(new LinkedList<>()); //undo-redo
     private final ObservableList<Command> redoList = FXCollections.observableList(new LinkedList<>());
 
+
     private static final PerspectiveCamera camera = new PerspectiveCamera(true); //camera in 3D view
     private static final Point3D initialCameraPosition = new Point3D(0,-10,-1500);
 
@@ -83,7 +93,6 @@ public class WindowPresenter {
             0.0, 0.0, -1.0, 0.0,
             0.0, 1.0, 0.0, 0.0
     );
-
 
     // these two doubles decide how large each step of zoom (via scrolling) or rotation is
     private static final double zoomStep = 4;
@@ -100,26 +109,34 @@ public class WindowPresenter {
     private final SetupMouseRotate3D setupMouseRotate3D;    // uses groupRotater to rotate a group using mouse drag
     private boolean isRotating = false; //is the user rotating the 3D view via mouse drag right now? if so, disable click-selecting meshViews
 
-    //these hold the locations of the files of the respective trees
-    private SimpleObjectProperty<String> partOfFilesLocation = new SimpleObjectProperty<>();
-    private SimpleObjectProperty<String> isAFilesLocation = new SimpleObjectProperty<>();
 
-    //these are classes that have a tree and can search it
-    private SearchTree partOfTreeSearcher;
-    private SearchTree isATreeSearcher;
+    private final ArrayList<TreeView<ANode>> treeViews;
+    private final ArrayList<SearchTree> searchTrees;
+    private final SelectionGroup<ANode> treeViewSelectionGroup;
+    private final ArrayList<TreeViewSelectionContainer> treeViewSelectionContainers;
 
+    private final HasFXGroupContents hasInnerGroupContents;
+    private final SelectionGroup<String> threeDContentGroup;
+    private final HasFXGroupContentsContainer hasTheeDContentsContainer;
+    private final SelectionGroup<String> threeDSelectionGroup;
+
+    private final ArrayList<SelectionMediator_Tree_3D> selectionMediatorTree3DS;
+    private final SelectionMediator_Tree_3D selectionMediatorTree3D_Selection;
+    private final SelectionMediator_Tree_3D selectionMediatorTree_3D_Content;
+
+    private final TreeViewSetup treeViewSetup = new TreeViewSetup();
+
+    private final ArrayList<Tab> tabs;
+
+    private final ArrayList<Model> models;
 
     private final AIService aiService;  //implements AI support
 
     /**
      *
      * @param controller Holds all UI FXML components used by this presenter.
-     * @param model Has ANode roots of the part-of and is-a tree
      */
-    public WindowPresenter(MainWindowController controller, Model model, String partOf_folder, String isa_folder) {
-
-        partOfFilesLocation.set(partOf_folder);
-        isAFilesLocation.set(isa_folder);
+    public WindowPresenter(MainWindowController controller) {
 
         this.controller = controller;
 
@@ -142,23 +159,12 @@ public class WindowPresenter {
         setupMouseRotate3D = new SetupMouseRotate3D(controller.getThreeDPane(), new Group[]{contentGroup, slicePlaneGroup});
 
         //mouse scrolling functionality
-//        MouseScrolling3D mouseScrolling3D = new MouseScrolling3D(camMover, controller.getThreeDPane());
         MouseScrolling3D mouseScrolling3D = new MouseScrolling3D(new Group3DRotation[] {contentGroupRotator, slicePlaneGroupRotator},controller.getThreeDPane());
 
-
-        innerGroup.getChildren().addListener((InvalidationListener) e -> {
-            centerGroupToItself(innerGroup);
-        });
+        innerGroup.getChildren().addListener((InvalidationListener) e -> centerGroupToItself(innerGroup));
 
         contentGroup.getChildren().add(innerGroup);
-//        contentGroup.getChildren().add(slicePlaneGroup);
         contentGroup.getTransforms().setAll(initialTransform);
-        contentGroup.getTransforms().addListener(new ListChangeListener<Transform>() {
-            @Override
-            public void onChanged(Change<? extends Transform> c) {
-
-            }
-        });
 
 
         //little bug-avoidance in case i add some objects at some point and forget to give them an ID. null ID will throw exceptions.
@@ -176,6 +182,41 @@ public class WindowPresenter {
             }
         });
 
+        //----------------create the models----------------
+
+        this.models = new ArrayList<>();
+
+        Model mainModel = new Model(
+                getClass().getResourceAsStream("/Project/anatomy/partof_inclusion_relation_list.txt"),
+                getClass().getResourceAsStream("/Project/anatomy/partof_element_parts.txt"),
+                "anatomy",
+                WindowPresenter.class.getResource("/Project/anatomy/BP3D_4.0_obj_99/"));
+
+        Model partof_v3 = new Model(
+                getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_conventional_partof.txt"),
+                getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_parts_v4_format_cleaned.txt"),
+                "BP3D 3.0 part-of",
+                getClass().getResource("/Project/anatomy/BodyParts3D_3.0_obj_99")
+                );
+        Model isa_v3 = new Model(
+                getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_composite_isa.txt"),
+                getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_parts_v4_format_cleaned.txt"),
+                "BP3D 3.0 is-a",
+                getClass().getResource("/Project/anatomy/BodyParts3D_3.0_obj_99")
+                );
+
+        this.models.add(mainModel);
+        this.models.add(partof_v3);
+        this.models.add(isa_v3);
+        //--------initialize tree selection model----------
+        this.treeViewSelectionGroup = new SelectionGroup<>("treeViewSelectionGroup");
+        this.treeViewSelectionContainers = new ArrayList<>(this.models.size());
+        this.searchTrees = new ArrayList<>(this.models.size());
+        this.selectionMediatorTree3DS = new ArrayList<>(3);
+        this.treeViews = new ArrayList<>(this.models.size());
+        this.tabs = new ArrayList<>(3);
+        //-----------------------------
+
 
         //bind undo redo buttons
         controller.getUndoButton().setOnAction(e -> undoCommand());
@@ -188,11 +229,49 @@ public class WindowPresenter {
         controller.getTreeSelectNoneButton().setOnAction(e -> executeCommand(new SelectNoneTreeViewCommand(getSelectedTreeView())));
 
         //menu: File
+        MenuItem searchForDups = new MenuItem("Search for Dups");
+        searchForDups.setOnAction(e -> {searchForDupIDs( treeViews.get(controller.getTreeTabPane().getSelectionModel().getSelectedIndex()).getRoot());});
+        controller.getTopMenuBar().getMenus().getFirst().getItems().add(searchForDups);
         controller.getMenuClose().setOnAction(e -> Platform.exit());
 //        controller.getMenuSaveTree().setOnAction(e -> TreeExport.writeToFiles(getSelectedTreeView(), new File(partOfFilesLocation.get()).getParent()));
         controller.getMenuSaveTree().setOnAction(e -> {
-            TreeExport.saveTrees(List.of(controller.getPartOfTreeView(), controller.getIsATreeView(), controller.getDumpTreeView()), List.of("partof", "isa", "dump"));
+            TreeExport.saveTrees(treeViews.stream().toList(), models.stream().map(Model::getName).toList());
         });
+
+        controller.getLoadBP3DV3checkMenu().setUserData(false); //a flag to prevent this listener from actioning
+        controller.getLoadBP3DV3checkMenu().selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if ((boolean) controller.getLoadBP3DV3checkMenu().getUserData()) return;
+                if (newValue) {
+                    executeCommand(new AddModelCommand(List.of(partof_v3, isa_v3)));
+                }
+                else {
+                    executeCommand(new RemoveModelCommand(List.of(partof_v3, isa_v3)));
+                }
+            }
+        });
+        controller.getTreeTabPane().getTabs().addListener(new InvalidationListener() {  //if BP3D 3.0 is added/removed via undo/redo the menu must still show the correct check.
+            @Override
+            public void invalidated(Observable observable) {
+                if (tabs.stream().filter(tab -> tab.getText().equals("BP3D 3.0 part-of") || tab.getText().equals("BP3D 3.0 is-a")).toList().size() == 2) {
+                    controller.getLoadBP3DV3checkMenu().setUserData(true);
+                    controller.getLoadBP3DV3checkMenu().setSelected(true);
+                } else {
+                    controller.getLoadBP3DV3checkMenu().setUserData(true);
+                    controller.getLoadBP3DV3checkMenu().setSelected(false);
+                }
+                controller.getLoadBP3DV3checkMenu().setUserData(false);
+            }
+        });
+
+        controller.getEnableBP3DPartsCheckmenu().selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+
+            }
+        });
+
         //removed axes for now because it doesn't look good with the anatomy parts
         //controller.getMenuAddAxes().setOnAction(e -> executeCommand(new AddAxesCommand(innerGroup)));
         //controller.getMenuRmAxes().setOnAction(e -> executeCommand(new RemoveAxesCommand(innerGroup)));
@@ -223,58 +302,63 @@ public class WindowPresenter {
          */
 
 
-        //-----initialize the trees
-        TreeViewSetup treeViewSetup = new TreeViewSetup();
-        treeViewSetup.setupTree(controller.getPartOfTreeView(), model.getPartOfRoot());
-        treeViewSetup.setupTree(controller.getIsATreeView(), model.getIsA_Root());
-        treeViewSetup.setupTree(controller.getDumpTreeView(), model.getDumpRoot());
-        //-------------
-
-        //--------initialize tree selection model----------
-        SelectionGroup<ANode> treeViewSelectionGroup = new SelectionGroup<>();
-        TreeViewSelectionContainer partOfTreeSelectionContainer = new TreeViewSelectionContainer(
-                new HasTreeView<ANode>(controller.getPartOfTreeView()), treeViewSelectionGroup
-        );
-        TreeViewSelectionContainer isATreeSelectionContainer = new TreeViewSelectionContainer(
-                new HasTreeView<ANode>(controller.getIsATreeView()), treeViewSelectionGroup
-        );
-        treeViewSelectionGroup.addSelectionContainer(partOfTreeSelectionContainer);
-        treeViewSelectionGroup.addSelectionContainer(isATreeSelectionContainer);
-
-        TreeViewSelectionContainer dumpTreeSelectionContainer = new TreeViewSelectionContainer(
-                new HasTreeView<>(controller.getDumpTreeView()), treeViewSelectionGroup
-        );
-        treeViewSelectionGroup.addSelectionContainer(dumpTreeSelectionContainer);
-        //-----------------------------
-
-
         //---------------initialize 3D selection model-----------
-        SelectionGroup<String> threeDSelectionGroup = new SelectionGroup<>();
-        HasFXGroupSelection hasInnerGroupSelectedItems = new HasFXGroupSelection(innerGroup);
+        threeDSelectionGroup = new SelectionGroup<>("3dSelectionGroup");
+        HasFXGroupSelection hasInnerGroupSelectedItems = new HasFXGroupSelection(innerGroup, "hasInnerGroupSelectedItems");
         FXGroupSelectionContainer threeDSelectionContainer = new FXGroupSelectionContainer(
                 hasInnerGroupSelectedItems, threeDSelectionGroup);
         threeDSelectionGroup.addSelectionContainer(threeDSelectionContainer);
         //-----------------------------------------------
 
-        //create a mediator
-        SelectionMediator_Tree_3D selectionMediatorTree3D_Selection = new SelectionMediator_Tree_3D(treeViewSelectionGroup, threeDSelectionGroup, model.getIsA_Root(), model.getPartOfRoot());
+        //-------------initialize selection model for 3D contents (so not 3D selection but what meshViews are drawn)
+        this.hasInnerGroupContents = new HasFXGroupContents(innerGroup, "hasinnergroupMeshes");
+        this.threeDContentGroup = new SelectionGroup<String>("3dContentGroup");
+        this.hasTheeDContentsContainer = new HasFXGroupContentsContainer(hasInnerGroupContents, threeDContentGroup); //, new String[]{isAFilesLocation.getValue().getAbsolutePath(), partOfFilesLocation.getValue().getAbsolutePath()}
+        this.hasInnerGroupContents.setHasFXGroupContentsContainer(hasTheeDContentsContainer);
+        threeDContentGroup.addSelectionContainer(hasTheeDContentsContainer);
+        hasTheeDContentsContainer.addResourceLocations(models.stream().map(Model::getFilesDirURL).collect(Collectors.toList()));
+        //---------------------------
+
+        //mediator between tree selection and 3D content
+        this.selectionMediatorTree_3D_Content = new SelectionMediator_Tree_3D(treeViewSelectionGroup, threeDContentGroup);
+
+        //mediator between tree selection and 3D selection
+        this.selectionMediatorTree3D_Selection = new SelectionMediator_Tree_3D(treeViewSelectionGroup, threeDSelectionGroup);
+
+        //------------load main model------------
+        loadModel(mainModel);
+        makeModelVisible(mainModel);
+        //---------------------------------------
+
+
         //listen to TreeViewSetup for cut, paste and delete events.
         //these necessitate that the mediator reloads his mapping of FileIDs to ANodes.
         treeViewSetup.setOnEvent(new Runnable() {
             @Override
             public void run() {
-                System.out.println("running the runnable");
                 selectionMediatorTree3D_Selection.reloadDicts();
             }
         });
 
         //---------enable the mediator------------------
         controller.getSelectIn3DButton().setOnAction(e -> {
-            selectionMediatorTree3D_Selection.pushAtoB();
+//            selectionMediatorTree3D_Selection.pushAtoB();
+            TreeViewSelectionContainer treeViewSelectionContainer = null;
+            for (TreeViewSelectionContainer treeViewSelectionContainer1 : this.treeViewSelectionContainers) if (treeViewSelectionContainer1.getId().equals(getSelectedTreeView().getId())) treeViewSelectionContainer = treeViewSelectionContainer1;
+            if (treeViewSelectionContainer == null) {return;}
+            threeDSelectionGroup.changeSelection(selectionMediatorTree3D_Selection.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()), true, false);
         });
         controller.getShowInTreeButton().setOnAction(e -> {
-            selectionMediatorTree3D_Selection.pushBtoA();
+//            selectionMediatorTree3D_Selection.pushBtoA(); unfortunately not correct if there are ANodes with same id but different files in multiple trees.
+            TreeViewSelectionContainer treeViewSelectionContainer = null;
+            for (TreeViewSelectionContainer treeViewSelectionContainer1 : this.treeViewSelectionContainers) if (treeViewSelectionContainer1.getId().equals(getSelectedTreeView().getId())) treeViewSelectionContainer = treeViewSelectionContainer1;
+            if (treeViewSelectionContainer == null) {return;}
+            SelectionMediator_Tree_3D selectionMediatorTree3D = getSelectionMediatorTree3D(treeViewSelectionContainer.getId());
+            selectionMediatorTree3D = selectionMediatorTree3D != null ? selectionMediatorTree3D : selectionMediatorTree3D_Selection;
+            treeViewSelectionContainer.changeSelection(selectionMediatorTree3D.transformBSelectionToASelection(threeDSelectionGroup.getSelection()), true, false);
+            treeViewSelectionContainer.updateGroup();
         });
+
         controller.getSelectIn3DButton().disableProperty().bind(controller.getSelectionSynchCheck().selectedProperty());
         controller.getShowInTreeButton().disableProperty().bind(controller.getSelectionSynchCheck().selectedProperty());
         //--------------------------------
@@ -326,42 +410,6 @@ public class WindowPresenter {
         });
         //---------------------------------------------------
 
-        //-------------initialize selection model for 3D contents (so not 3D selection but what meshViews are drawn)
-        HasFXGroupContents hasInnerGroupContents = new HasFXGroupContents(innerGroup);
-        SelectionGroup<String> threeDContentGroup = new SelectionGroup<String>();
-        HasFXGroupContentsContainer hasTheeDContentsContainer = new HasFXGroupContentsContainer(hasInnerGroupContents, threeDContentGroup); //, new String[]{isAFilesLocation.getValue().getAbsolutePath(), partOfFilesLocation.getValue().getAbsolutePath()}
-        threeDContentGroup.addSelectionContainer(hasTheeDContentsContainer);
-        //TODO: what if file locations don't exist because parsing went wrong?
-        hasTheeDContentsContainer.addResourceLocation(isAFilesLocation.getValue());
-        hasTheeDContentsContainer.addResourceLocation(partOfFilesLocation.getValue());
-
-        controller.getDrawEverythingButton().setOnAction(e -> {
-            URL isaDir = (WindowPresenter.class.getResource(isa_folder));
-            String[] isaFiles = new String[]{};
-            URL partofDir = (WindowPresenter.class.getResource(partOf_folder));
-            String[] partofFiles = new String[]{};;
-            if (isaDir != null) {
-
-                File isaFile = new File(isaDir.getFile().substring(1));
-                isaFiles = (isaFile.list());
-            }
-            if (partofDir != null) {
-                partofFiles = new File(partofDir.getFile().substring(1)).list();
-            }
-            System.out.println(isaFiles.length + " isaFiles and " + partofFiles.length + " partof files");
-
-            HashSet<String> allFiles = new HashSet<>();
-            for (String file : partofFiles) allFiles.add(file.substring(0, file.lastIndexOf(".")));
-            for (String file : isaFiles) allFiles.add(file.substring(0, file.lastIndexOf(".")));
-            threeDContentGroup.changeSelection(allFiles, true, false);
-        });
-
-
-        //---------------------------
-
-        //mediator between tree selection and 3D content
-        SelectionMediator_Tree_3D selectionMediatorTree_3D_Content = new SelectionMediator_Tree_3D(treeViewSelectionGroup, threeDContentGroup, model.getIsA_Root(), model.getPartOfRoot());
-
         //----------menu File: 3D
         controller.getMenuResetView().setOnAction(e -> executeCommand(new ResetViewDrawCommand(new Group[]{contentGroup, slicePlaneGroup}, camera, initialTransform, initialCameraPosition, setupMouseRotate3D)));
         controller.getMenuClearView().setOnAction(e -> {
@@ -407,8 +455,15 @@ public class WindowPresenter {
         controller.getRemoveObjButton().disableProperty().bind(Bindings.isEmpty(hasInnerGroupContents.getSelection()));
 
         controller.getDrawIn3DButton().setOnAction(e -> {
-            HashSet<String> toDraw = new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionGroup.getSelection()));
-            for (String item : new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionGroup.getSelection()))) {
+            TreeViewSelectionContainer treeViewSelectionContainer = null;
+            for (TreeViewSelectionContainer treeViewSelectionContainer1 : this.treeViewSelectionContainers) if (treeViewSelectionContainer1.getId().equals(getSelectedTreeView().getId())) treeViewSelectionContainer = treeViewSelectionContainer1;
+            if (treeViewSelectionContainer == null) {System.out.println("drawin3dButton: treeViewSelectionContainer is null!"); return;}
+            // commented out because if you switch to another treetab and there is stuff selected (because tabs are synced) then the button would still draw the selection of the tree where the selection was last changed (not the one youre looking at).
+//            HashSet<String> toDraw = new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionGroup.getSelection()));
+//            for (String item : new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionGroup.getSelection()))) {  //need to create this again to not concurrently modify doDraw
+            HashSet<String> toDraw = new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()));
+            for (String item : new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()))) {  //need to create this again to not concurrently modify doDraw
+
                 if (threeDContentGroup.getSelection().contains(item)) {
                     toDraw.remove(item);    //remove already present items
                 }
@@ -422,36 +477,98 @@ public class WindowPresenter {
                 }
             }
         });
-        controller.getDrawIn3DButton().disableProperty().bind(partOfFilesLocation.isNull().or(isAFilesLocation.isNull()));
 
         controller.getRemoveFrom3DButton().setOnAction(e -> {
-            executeCommand(new RemoveObjFrom3DCommand(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionGroup.getSelection()), threeDContentGroup, hasInnerGroupContents, threeDSelectionGroup));
+            TreeViewSelectionContainer treeViewSelectionContainer = null;
+            for (TreeViewSelectionContainer treeViewSelectionContainer1 : this.treeViewSelectionContainers) if (treeViewSelectionContainer1.getId().equals(getSelectedTreeView().getId())) treeViewSelectionContainer = treeViewSelectionContainer1;
+            if (treeViewSelectionContainer == null) {System.out.println("drawin3dButton: treeViewSelectionContainer is null!"); return;}
+            HashSet<String> toRemove = new HashSet<>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()));
+            for (String item : new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()))) {  //need to create this again to not concurrently modify doDraw
+                if (!threeDContentGroup.getSelection().contains(item)) {
+                    toRemove.remove(item);    //remove items that aren't even drawn
+                }
+            }
+            if (!toRemove.isEmpty()) {
+                executeCommand(new RemoveObjFrom3DCommand(toRemove, threeDContentGroup, hasInnerGroupContents, threeDSelectionGroup));
+                if (controller.getSelectionSynchCheck().isSelected()) {
+                    treeViewSelectionGroup.setNoUpdating(true);
+                    threeDSelectionGroup.changeSelection(toRemove, false, false);
+                    treeViewSelectionGroup.setNoUpdating(false);
+                }
+            }
+//            executeCommand(new RemoveObjFrom3DCommand(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionGroup.getSelection()), threeDContentGroup, hasInnerGroupContents, threeDSelectionGroup));
         });
-        controller.getRemoveFrom3DButton().disableProperty().bind(
-                Bindings.isEmpty(hasInnerGroupContents.getSelection()).or(partOfFilesLocation.isNull().or(isAFilesLocation.isNull())
-        ));
+        controller.getRemoveFrom3DButton().disableProperty().bind(Bindings.isEmpty(hasInnerGroupContents.getSelection()));
         //-----------------------------------------------------------
 
 
-        //------------find the .obj files ----------------
-        /*
-        controller.getFindFileTreeMenuItem().setOnAction(e -> {
-            partOfFilesLocation.set(FileExplorerInteraction.findDir("folder containing * Part-Of * anatomy files."));
-            isAFilesLocation.set(FileExplorerInteraction.findDir("folder containing * is-A * anatomy files."));
+        //-----------------enable loading of custom models---------------------
+        controller.getLoadHierarchyMenu().setOnAction(e -> {
 
-            if (partOfFilesLocation.getValue() != null && isAFilesLocation.getValue() != null) {
-                System.out.println(partOfFilesLocation.getValue().getAbsolutePath());
-                System.out.println(isAFilesLocation.getValue().getAbsolutePath());
-                hasTheeDContentsContainer.addFileLocation(isAFilesLocation.getValue().getAbsolutePath());
-                hasTheeDContentsContainer.addFileLocation(partOfFilesLocation.getValue().getAbsolutePath());
+            if (!LittlePopUp.showLoadHierInfo()) return;
+
+            Function<String, InputStream> findFileAndMakeStream = new Function<String, InputStream>() {
+                @Override
+                public InputStream apply(String prompt) {
+                    File file = FileExplorerInteraction.findTxt(prompt);
+                    InputStream relationsStream = null;
+                    do {
+                        if (file == null) return null;
+                        try {
+                            relationsStream = file.toURI().toURL().openStream();
+                            break;
+                        } catch (IOException ex) {
+                            if (!LittlePopUp.showMsg("Error", "Failed to read file\n("+ex.getMessage()+")", "Retry", "Cancel")) break;
+                        }
+                    } while (true);
+
+                    return relationsStream;
+                }
+            };
+
+            InputStream relationsStream = findFileAndMakeStream.apply("Edge list");
+            if (relationsStream == null) return;
+
+            InputStream filesListStream = null;
+            File filesDir = null;
+            if (LittlePopUp.showMsg("", "Add OBJ files?", "Yes", "No")) {
+                filesListStream = findFileAndMakeStream.apply("File List");
+                if (filesListStream != null) {    //only ask for the directory if the files list is provided
+                    do {
+                        filesDir = FileExplorerInteraction.findDir("Folder containing .obj files");
+                        if (filesDir == null || !filesDir.isDirectory() || filesDir.list().length == 0) {
+                            if (!LittlePopUp.showMsg("Error", "No valid directory", "Retry", "Cancel")) {
+                                filesListStream = null;
+                                break;
+                            }
+                        } else break;
+                    } while (true);
+                }
             }
+
+            String name;
+            while (true) {    //try to
+                name = LittlePopUp.askForString("Set a name", "");
+                if (name == null || name.isBlank()) return;
+                String finalName = name;
+                if (!models.stream().filter(model -> model.getName().equals(finalName)).toList().isEmpty() && !name.equals("BP3D 3.0 part-of") && !name.equals("BP3D 3.0 is-a")) {
+                    if (!LittlePopUp.showMsg("Error", "Name already exists, choose a different name.", "OK", "Cancel")) return;
+                } else break; // success
+            }
+
+
+            Model model = filesListStream == null ? new Model(relationsStream, name) : new Model(relationsStream, filesListStream, name, filesDir);
+            ContextMenu contextMenu = new ContextMenu();
+            MenuItem remove = new MenuItem("Remove");
+            remove.setOnAction(actionEvent -> executeCommand(new RemoveModelCommand(model)));
+            contextMenu.getItems().add(remove);
+            executeCommand(new AddModelCommand(model, contextMenu));
         });
         //-----------------------------------------
-        */
+
 
         // ----------------set up text search in trees----
-        partOfTreeSearcher = new SearchTree(controller.getPartOfTreeView());
-        isATreeSearcher = new SearchTree(controller.getIsATreeView());
+
         controller.getTreeSearchField().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER && !controller.getTreeSearchField().getText().isEmpty()) {
                 getSelectedSearchTree().find(controller.getTreeSearchField().getText(), false, controller.getRegexCheck().isSelected());
@@ -468,7 +585,8 @@ public class WindowPresenter {
                 getSelectedSearchTree().find(controller.getTreeSearchField().getText(), true, controller.getRegexCheck().isSelected());
                 treeViewSelectionGroup.setNoUpdating(false);
 //                treeViewSelectionGroup.changeSelection(partOfTreeSelectionContainer.getSelectionFormatted(getSelectedTreeView().getSelectionModel().getSelectedItems()), true, false);
-                treeViewSelectionGroup.changeSelection(partOfTreeSelectionContainer.getSelectionFormatted(getSelectedTreeView().getSelectionModel().getSelectedItems()), true, false);
+                //TODO: is this the cause? maybe replace partOf (now getFirst() ) with getSelected()?
+                treeViewSelectionGroup.changeSelection(treeViewSelectionContainers.getFirst().getSelectionFormatted(getSelectedTreeView().getSelectionModel().getSelectedItems()), true, false);
             }
         });
 
@@ -488,12 +606,16 @@ public class WindowPresenter {
         //-------------------------------------------------------
 
         //----------- bot label-----------
-        controller.getPartOfTreeView().getSelectionModel().getSelectedItems().addListener((InvalidationListener) i -> {
-            updateTreeBotLabel();
-        });
-        controller.getIsATreeView().getSelectionModel().getSelectedItems().addListener((InvalidationListener) i -> {
-            updateTreeBotLabel();
-        });
+        InvalidationListener treeBotLabelUpdater = new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                updateTreeBotLabel();
+            }
+
+        };
+
+//        for (TreeView<ANode> treeView : treeViews) treeView.getSelectionModel().getSelectedItems().addListener((InvalidationListener) i -> updateTreeBotLabel());
+
         hasInnerGroupSelectedItems.getSelection().addListener((InvalidationListener) i -> {
             update3DBotLabel(hasInnerGroupSelectedItems.getSelection().size() + " items selected.");
             StringBuilder stringBuilder = new StringBuilder();
@@ -506,10 +628,9 @@ public class WindowPresenter {
 
         // ------------------------
         // bind things that depend on which tree is selected. i need to do it once in the beginning and then again every time the tree tab switches
-        bindTreeDependantThings();
+        bindTreeDependantThings(treeBotLabelUpdater);
         controller.getTreeTabPane().getSelectionModel().selectedItemProperty().addListener((InvalidationListener) e -> {
-            // stuff in here needs to be rebound every time the tree tab switches because getSelectedTree..() dont dynamically react to tab-switching
-            bindTreeDependantThings();
+            bindTreeDependantThings(treeBotLabelUpdater);  // stuff in here needs to be rebound every time the tree tab switches because getSelectedTree..() doesn't dynamically react to tab-switching
             updateTreeBotLabel(); // update the bottom label
         });
         // -------------------
@@ -786,8 +907,9 @@ public class WindowPresenter {
 
     /**
      * Set up the bindings of the tree text search buttons which depend on which tree is shown
+     * @param treeBotLabelUpdater a listener that is to be added to only the selected TreeView / Tab and removed from the others.
      */
-    private void bindTreeDependantThings() {
+    private void bindTreeDependantThings(InvalidationListener treeBotLabelUpdater) {
         controller.getTreeSearchNextButton().disableProperty().unbind();
         controller.getTreeSearchPrevButton().disableProperty().unbind();
 
@@ -795,6 +917,10 @@ public class WindowPresenter {
         controller.getTreeSearchNextButton().disableProperty().bind(getSelectedSearchTree().getCanNextObservable().not());
         controller.getTreeSearchPrevButton().setOnAction(e -> getSelectedSearchTree().previous());
         controller.getTreeSearchPrevButton().disableProperty().bind(getSelectedSearchTree().getHasPreviousObservable());
+
+        for (TreeView<ANode> treeView : this.treeViews) treeView.getSelectionModel().getSelectedItems().removeListener(treeBotLabelUpdater);
+        getSelectedTreeView().getSelectionModel().getSelectedItems().addListener(treeBotLabelUpdater);
+
     }
 
 
@@ -898,19 +1024,21 @@ public class WindowPresenter {
      * @return the treeview the user is currently looking at
      */
     private TreeView<ANode> getSelectedTreeView() {
-        return switch (controller.getTreeTabPane().getSelectionModel().getSelectedIndex()) {
-            case 0 -> controller.getPartOfTreeView();
-            case 1 -> controller.getIsATreeView();
-            default -> controller.getDumpTreeView();
-        };
+        TreeView<ANode> result = null;
+        for (TreeView<ANode> treeView : this.treeViews) if (treeView.getId().equals(controller.getTreeTabPane().getTabs().get(controller.getTreeTabPane().getSelectionModel().getSelectedIndex()).getText())) result = treeView;
+        return result;
     }
 
     /**
      * @return the treeSearcher for the currently selected treeView.
      */
     private SearchTree getSelectedSearchTree() {
-        if (controller.getTreeTabPane().getSelectionModel().getSelectedIndex() == 0) return partOfTreeSearcher;
-        else return isATreeSearcher;
+        return searchTrees.get(controller.getTreeTabPane().getSelectionModel().getSelectedIndex());
+    }
+
+    private SelectionMediator_Tree_3D getSelectionMediatorTree3D(String name) {
+        for (SelectionMediator_Tree_3D selectionMediatorTree3D : selectionMediatorTree3DS) if (selectionMediatorTree3D.getId().equals(name)) return selectionMediatorTree3D;
+        return null;
     }
 
     /**
@@ -1000,5 +1128,209 @@ public class WindowPresenter {
      * @return whether fullscreen is selected or not
      */
     public BooleanProperty getFullScreenCheckProperty() {return controller.getFullScreenCheck().selectedProperty();}
+
+    private void makeModelVisible(Model model) {
+        Tab tab = this.tabs.stream().filter(tab1 -> tab1.getText().equals(model.getName())).toList().getFirst();    //get the tab of the model
+        controller.getTreeTabPane().getTabs().add(tab);     //make tab visible
+        if (model.getFilesDirURL() != null) this.hasTheeDContentsContainer.addResourceLocation(model.getFilesDirURL()); // make the model drawable by adding the file location
+        else if (model.getFilesDir() != null) this.hasTheeDContentsContainer.addFileDir(model.getFilesDir());
+    }
+
+    private void makeModelInvisible(Model model) {
+        Tab tab = this.tabs.stream().filter(tab1 -> tab1.getText().equals(model.getName())).toList().getFirst();    //get the tab of the model
+        controller.getTreeTabPane().getTabs().remove(tab);     //make tab visible
+        if (model.getFilesDirURL() != null) this.hasTheeDContentsContainer.removeResourceLocation(model.getFilesDirURL()); // make the model drawable by adding the file location
+        else if (model.getFilesDir() != null) this.hasTheeDContentsContainer.removeFileDir(model.getFilesDir());
+    }
+
+    private void loadModel(Model model) {
+        loadModel(model, null);
+    }
+    /**
+     * - generate TreeView
+     * - create SelectionContainer
+     * - add SelectionContainer to TreeSElectionGroup
+     * - add TreeView to treeViews
+     * - create a SearchTree
+     * - create a Tab and return it
+     * Does *not* make the model accessible yet by showing the tab
+     */
+    private void loadModel(Model model, ContextMenu contextMenu) {
+        this.models.add(model);
+        TreeView<ANode> treeView = new TreeView<>();
+        treeView.setId(model.getName());
+        treeViewSetup.setupTree(treeView, model.getRoot());
+        TreeViewSelectionContainer treeViewSelectionContainer = new TreeViewSelectionContainer(new HasTreeView<ANode>(treeView), this.treeViewSelectionGroup);
+        this.treeViewSelectionGroup.addSelectionContainer(treeViewSelectionContainer);
+        this.treeViewSelectionContainers.add(treeViewSelectionContainer);
+        this.selectionMediatorTree3D_Selection.addRoot(model.getRoot());
+        this.selectionMediatorTree_3D_Content.addRoot(model.getRoot());
+        this.selectionMediatorTree3DS.add(new SelectionMediator_Tree_3D(List.of(model.getRoot()), model.getName()));
+        this.treeViews.add(treeView);
+        searchTrees.add(new SearchTree(treeView));
+        Tab tab = new Tab(model.getName(), treeView);
+        this.tabs.add(tab);
+        tab.setContextMenu(contextMenu);
+        /*
+        To add checklist:
+        - create & setup treeview, set id. add to treeviews list
+        - create tab with name, add to tabs list
+        - create selectionContainer, add to list. add to selectiongroup
+        - add root to mediators
+        - create searchtree
+         */
+    }
+
+    /**
+     * Remove the model's Container, TreeView, Searchtree and Tab. Undraw all items from the model.
+     * Relies on HasTreeView, TreeViewSelectionContainer and SearchTree .getId() == model.getName() and tab.getText() == model.getName().
+     * CALLS makeModelInvisible() !
+     * @param model The model to remove
+     */
+    private void forgetModel(Model model) {
+        makeModelInvisible(model);
+        TreeViewSelectionContainer modelTreeViewSelectionContainer = treeViewSelectionContainers.stream().filter(treeViewSelectionContainer -> treeViewSelectionContainer.getId().equals(model.getName())).toList().get(0);
+
+        TreeView<ANode> modelTreeView = this.treeViews.stream().filter(treeView -> treeView.getId().equals(model.getName())).toList().getFirst();
+        treeViewSelectionGroup.removeSelectionContainer(modelTreeViewSelectionContainer);
+
+        threeDContentGroup.changeSelection(
+                selectionMediatorTree_3D_Content.transformAselectionToBSelection(
+                        modelTreeViewSelectionContainer.getSelectionFormatted(
+                                FXCollections.observableList(
+                                        TreeAnalysisUtils.accumulateForEveryNodeBelow(modelTreeView.getRoot(), treeItem -> treeItem)))), false, true);
+
+        this.treeViewSelectionContainers.removeIf(treeViewSelectionContainer -> treeViewSelectionContainer.getId().equals(model.getName()));
+        this.selectionMediatorTree3D_Selection.removeRoot(model.getRoot());
+        this.selectionMediatorTree_3D_Content.removeRoot(model.getRoot());
+        this.selectionMediatorTree3DS.remove(getSelectionMediatorTree3D(model.getName()));
+        this.treeViews.remove(modelTreeView);
+        this.searchTrees.removeIf(searchTree -> searchTree.getId().equals(model.getName()));
+        this.tabs.removeIf(tab -> tab.getText().equals(model.getName()));
+        controller.getTreeTabPane().getTabs().removeIf(tab -> tab.getText().equals(model.getName()));
+        this.models.remove(model);
+    }
+
+    // This class sits here and not in Command because it depends entirely on the implementation of WindowPresenter.
+    // (so do the other commands kind of but this one only calls addModel() / forgetModel() which work with so many
+    // lists it would be a pain to pass them all in the constructor).
+
+    /**
+     * Add a model to this Presenter.
+     */
+    private class AddModelCommand implements Command {
+        private final List<Model> models;
+        private final List<ContextMenu> contextMenus;
+
+        public AddModelCommand(List<Model> models, List<ContextMenu> contextMenus) {
+            this.models = models;
+            this.contextMenus = contextMenus;
+        }
+        public AddModelCommand(List<Model> models) {
+            this.models = models;
+            this.contextMenus = new ArrayList<>(models.size());
+            for (int i = 0; i < models.size(); i++) contextMenus.add(null);
+        }
+        public AddModelCommand(Model model, ContextMenu contextMenu) {
+            this(List.of(model), List.of(contextMenu));
+        }
+        @Override
+        public void undo() {for (Model model : models) forgetModel(model);}
+        @Override
+        public void execute() {for (int m = 0; m < models.size(); m++) {
+            Model model = models.get(m);
+            loadModel(model, contextMenus.get(m));
+            makeModelVisible(model);
+        }}
+        @Override
+        public void redo() {execute();}
+        @Override
+        public String name() {return "AddModelCommand";}
+    }
+
+    /**
+     * Remove the model and also all of its 3D stuff that is currently drawn.
+     */
+    private class RemoveModelCommand implements Command {
+        private final List<Model> models;
+        private final Set<String> meshViewIDsToRemove;  //meshviews that need to be undrawn when the model is removed
+        private RememberFXGroupContents rememberFXGroupContents;
+        private RememberFXMeshViewColors rememberFXMeshViewColors;
+        private final List<ContextMenu> contextMenus;
+
+        public RemoveModelCommand(List<Model> models) {
+            this.models = models;
+            this.contextMenus = new ArrayList<>(models.size());
+            this.meshViewIDsToRemove = new HashSet<>();
+            for (Model model : models) {
+                TreeView<ANode> modelTreeView = treeViews.stream().filter(treeView -> treeView.getId().equals(model.getName())).toList().getFirst();
+                TreeViewSelectionContainer modelTreeViewSelectionContainer = treeViewSelectionContainers.stream().filter(treeViewSelectionContainer -> treeViewSelectionContainer.getId().equals(model.getName())).toList().get(0);
+                meshViewIDsToRemove.addAll(selectionMediatorTree_3D_Content.transformAselectionToBSelection(
+                        modelTreeViewSelectionContainer.getSelectionFormatted(
+                                FXCollections.observableList(
+                                        TreeAnalysisUtils.accumulateForEveryNodeBelow(modelTreeView.getRoot(), treeItem -> treeItem)))));
+                Tab tab_ = null;
+                for (Tab tab : tabs) {
+                    if (tab.getText().equals(model.getName())) {contextMenus.add(tab.getContextMenu()); tab_ = tab; break;}
+                }
+                if (tab_ == null) contextMenus.add(null);
+            }
+        }
+        public RemoveModelCommand(Model model) {this(List.of(model));}
+
+        @Override
+        public void execute() {
+            this.rememberFXGroupContents = new RememberFXGroupContents(innerGroup);
+            this.rememberFXMeshViewColors = new RememberFXMeshViewColors(meshViewIDsToRemove, hasInnerGroupContents, threeDSelectionGroup);
+            for (Model model : models) {forgetModel(model);}
+        }
+        @Override
+        public void undo() {
+            for (int m = 0; m < models.size(); m++) {
+                Model model = models.get(m);
+                loadModel(model, contextMenus.get(m));makeModelVisible(model);
+            }
+            this.rememberFXGroupContents.restoreSelection();
+            this.rememberFXMeshViewColors.restoreSelection();
+        }
+        @Override
+        public void redo() {execute();}
+        @Override
+        public String name() {return "RemoveModelCommand";}
+    }
+
+
+
+    private boolean searchForDupIDs(TreeItem<ANode> root) {
+        LinkedList<TreeItem<ANode>> allAITreeItems = new LinkedList<>();
+        TreeAnalysisUtils.accumulateForEveryNodeBelow(root, allAITreeItems, t -> t);
+        HashMap<TreeItem<ANode>, Collection<TreeItem<ANode>>> duplicateItemsMap = TreeAnalysisUtils.lookForDuplicateIDsInTree(allAITreeItems, root, false);
+
+
+        if (!duplicateItemsMap.isEmpty()) {
+
+            StringBuilder stringBuilder = new StringBuilder();
+            for (TreeItem<ANode> dupTreeItem : duplicateItemsMap.keySet()) {
+                for (TreeItem<ANode> aNode : duplicateItemsMap.get(dupTreeItem))
+                    stringBuilder.append("ID: " + dupTreeItem.getValue().conceptId() + " Name: " + dupTreeItem.getValue().name() + "  |  ID: " + aNode.getValue().conceptId() + " Name: " + aNode.getValue().name() + "\n");
+            }
+
+            String popupText = """
+                The followings nodes share the same IDs with at least one other node.
+                Assign new IDs to duplicated nodes and continue?
+                
+                Node  |  Other node with same ID
+                
+                """ + stringBuilder.toString();
+
+            if (LittlePopUp.showScrollableTextPopup("Warning", popupText)) {
+                for (TreeItem<ANode> itemWDuplicateANode : duplicateItemsMap.keySet()) replaceANodeByCopy(itemWDuplicateANode, root);
+                return true;
+            } else return false;
+        } else {
+            LittlePopUp.showScrollableTextPopup("Info", "No duplicate IDs in the tree.");
+            return true;
+        }
+    }
 
 }

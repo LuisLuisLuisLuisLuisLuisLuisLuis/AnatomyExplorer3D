@@ -22,12 +22,20 @@ public class HasTreeView<T> implements HasSelection<TreeItem<T>> {
      */
     private final TreeView<T> treeView;
 
+    private final String id;
+
+    /**
+     * @return The ID of the treeview, i.e. treeView.getId().
+     */
+    @Override
+    public String getId() {return id;}
 
     /**
      * Initialize by giving a treeview.
      */
     public HasTreeView(TreeView<T> treeView) {
         this.treeView = treeView;
+        this.id = treeView.getId();
     }
 
     /**
@@ -52,9 +60,10 @@ public class HasTreeView<T> implements HasSelection<TreeItem<T>> {
      */
     @Override
     public void select(TreeItem<T> item) {
-        System.out.println("HasTreeView selecting " + item.toString());
+        System.out.println(getId() + " HasTreeView selecting " + item.toString() + " " + (item.getParent() != null ? item.getParent().toString() : ""));
         treeView.getSelectionModel().select(item);
         item.setExpanded(true);
+        System.out.println(treeView.getRow(item));
     }
 
     @Override

@@ -43,13 +43,13 @@ public record Relation(String parentID, String parentName, String childID, Strin
             //edge case where there's an entry that represents only a node without relationship.
             //necessary since this is the way single childless root of a tree is saved. otherwise it would not be saved since it has no relationships.
             if (parts.length == 2) relations.add(new Relation(parts[0], parts[1], "", ""));
-            else {
+            else if (parts.length >3) {
                 String parentID = parts[0].trim();
                 String parentName = parts[1].trim();
                 String childID = parts[2].trim();
                 String childName = parts[3].trim();
                 relations.add(new Relation(parentID, parentName, childID, childName));
-                }
+            } else continue;
         }
         return relations;
     }

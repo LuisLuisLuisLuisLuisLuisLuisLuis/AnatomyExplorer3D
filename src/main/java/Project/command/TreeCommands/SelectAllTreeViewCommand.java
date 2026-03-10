@@ -77,8 +77,15 @@ public class SelectAllTreeViewCommand extends TreeCommand {
         }
     }
     private void bulkSelect() {
+        if (itemsToSelect.isEmpty()) return;
         for (TreeItem<ANode> treeItem : itemsToSelect) treeItem.setExpanded(true);
-        for (TreeItem<ANode> treeItem : itemsToSelect) treeView.getSelectionModel().select(treeItem);
+        int[] indicesToSelect = new int[itemsToSelect.size()];
+        if (itemsToSelect.size() == 1) {
+            treeView.getSelectionModel().select(treeView.getRow(itemsToSelect.getFirst()));
+            return;
+        }
+        for (int i = 1; i < itemsToSelect.size(); i++) indicesToSelect[i] = treeView.getRow(itemsToSelect.get(i));
+        treeView.getSelectionModel().selectIndices(treeView.getRow(itemsToSelect.getFirst()), indicesToSelect);
     }
 
 }

@@ -1,29 +1,36 @@
 package Project.model;
 
-import java.util.Collection;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
 
 
-public class ANode implements HasChildren<ANode> {
+public class ANode implements HasChildren<ANode>, Comparable<ANode> {
 
     private String conceptId;
     private String name;
-    private Collection<String> fileIds;
-    private Collection<ANode> children;
+    private Set<String> fileIds;
+    private Set<ANode> children;
 
     public String getConceptId() {return conceptId;}
     public String getName() {return name;}
-    public Collection<String> getFileIds() {return fileIds;}
-    public Collection<ANode> getChildren() {return children;}
+    public Set<String> getFileIds() {return fileIds;}
+    public Set<ANode> getChildren() {return children;}
 
     public String conceptId() {return conceptId;}
     public String name() {return name;}
-    public Collection<String> fileIds() {return fileIds;}
-    public Collection<ANode> children() {return children;}
+    public Set<String> fileIds() {return fileIds;}
+    public Set<ANode> children() {return children;}
 
     public void setName(String name) {this.name = name;}
+
+    /**
+     * Compares names of the ANodes. Thus, NOT consistent with Objects.equals().
+     */
+    public int compareTo(@NotNull ANode other) {
+        return this.getName().compareTo(other.getName());
+    }
 
     /**
      * New implementation of ANode! (DIFFERENT TO ANode FROM ASSIGNMENT01!)

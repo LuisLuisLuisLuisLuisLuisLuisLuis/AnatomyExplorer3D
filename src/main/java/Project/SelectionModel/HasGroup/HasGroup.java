@@ -18,6 +18,11 @@ public class HasGroup<groupSelection> implements HasSelection<groupSelection> {
 
     private SelectionGroup<groupSelection> selectionGroup;
 
+    @Override
+    public String getId() {
+        return selectionGroup.getId();
+    }
+
     public HasGroup(SelectionGroup selectionGroup) {
         this.selectionGroup = selectionGroup;
 

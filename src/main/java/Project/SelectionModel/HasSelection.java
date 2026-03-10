@@ -15,6 +15,6 @@ public interface HasSelection<T> {
     void unselect(T item);
     void clearSelection();
     List<T> getAllItems();
-
+    String getId();
 
 }

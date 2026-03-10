@@ -71,6 +71,11 @@ public class TreeAnalysisUtils {
         }
 
     }
+    public static <T, O> LinkedList<O> accumulateForEveryNodeBelow(TreeItem<T> root, Function<TreeItem<T>, O> function) {
+        LinkedList<O> result = new LinkedList<>();
+        accumulateForEveryNodeBelow(root, result, function);
+        return result;
+    }
 
 
     /**

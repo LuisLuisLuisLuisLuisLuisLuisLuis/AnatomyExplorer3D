@@ -17,6 +17,9 @@ import java.util.regex.Pattern;
 
 public class SearchTree {
 
+    private final String id;
+    public String getId() {return id;}
+
     private StringProperty query = new SimpleStringProperty(""); //query which this class is currently working with if its a string
     private Pattern pattern;    //query if its regex
     private SimpleBooleanProperty regex = new SimpleBooleanProperty(false); //are we searching with regex?
@@ -46,6 +49,7 @@ public class SearchTree {
      */
     public SearchTree(TreeView<ANode> treeView) {
         this.treeView = treeView;
+        this.id = treeView.getId();
         treeView.getSelectionModel().getSelectedItems().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
@@ -187,16 +191,34 @@ public class SearchTree {
         } else return s1.contains(s2);
     }
 
+//    private void bulkSelect() {
+//        changingTheTree = true;
+//        clearTreeSelection();
+//        for (TreeItem<ANode> treeItem : bulkSelectList) {
+//            expandParents(treeItem);    // if i dont do this before it fails to select nodes of collapsed parents.
+//                                        // For some reason it also doesnt work if i merge these two loops....
+//        }
+//        for (TreeItem<ANode> treeItem : bulkSelectList) {
+//            treeView.getSelectionModel().select(treeItem);
+//        }
+//        changingTheTree = false;
+//        bulkSelectList.clear();
+//    }
+
     private void bulkSelect() {
         changingTheTree = true;
         clearTreeSelection();
-        for (TreeItem<ANode> treeItem : bulkSelectList) {
-            expandParents(treeItem);    // if i dont do this before it fails to select nodes of collapsed parents.
-                                        // For some reason it also doesnt work if i merge these two loops....
+        if (bulkSelectList.isEmpty()) return;
+        for (TreeItem<ANode> treeItem : bulkSelectList) expandParents(treeItem);
+
+
+        if (bulkSelectList.size() == 1) {
+            treeView.getSelectionModel().select(treeView.getRow(bulkSelectList.getFirst()));
+            return;
         }
-        for (TreeItem<ANode> treeItem : bulkSelectList) {
-            treeView.getSelectionModel().select(treeItem);
-        }
+        int[] indicesToSelect = new int[bulkSelectList.size()-1];
+        for (int i = 1; i < bulkSelectList.size(); i++) indicesToSelect[i-1] = treeView.getRow(bulkSelectList.get(i));
+        treeView.getSelectionModel().selectIndices(treeView.getRow(bulkSelectList.getFirst()), indicesToSelect);
         changingTheTree = false;
         bulkSelectList.clear();
     }

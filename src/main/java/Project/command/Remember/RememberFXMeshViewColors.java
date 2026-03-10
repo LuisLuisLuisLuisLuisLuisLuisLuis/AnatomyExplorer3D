@@ -1,12 +1,10 @@
 package Project.command.Remember;
 
 import Project.SelectionModel.FXGroupDraw.HasFXGroupContents;
-import Project.SelectionModel.FXGroupSelection.HasFXGroupSelection;
 import Project.SelectionModel.SelectionGroup;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Mesh;
 import javafx.scene.shape.MeshView;
 
 import java.util.*;
@@ -16,10 +14,10 @@ import java.util.*;
  */
 public class RememberFXMeshViewColors {
 
-    private Map<String, Color> oldColors = new HashMap<>(); //remembers the colors as fileID : color. remembers them in their unselected/desaturated state
-    private Set<String> nodeIDs;
-    private HasFXGroupContents hasFXGroupContents;
-    private SelectionGroup<String> selectionGroup;
+    private final Map<String, Color> oldColors = new HashMap<>(); //remembers the colors as fileID : color. remembers them in their unselected/desaturated state
+    private final Set<String> nodeIDs;
+    private final HasFXGroupContents hasFXGroupContents;
+    private final SelectionGroup<String> selectionGroup;
 
     /**
      * @param nodeIDs: Nodes whose color is to be remembered
