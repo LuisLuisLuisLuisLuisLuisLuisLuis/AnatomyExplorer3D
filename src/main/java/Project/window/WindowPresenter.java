@@ -256,6 +256,7 @@ public class WindowPresenter {
                             
                             Note that version 4.0 and 3.0 do not share the same coordinates and sizes! This means that even identical anatomy parts from different versions will be offset from each other. Drawing an item from version 3.0 next to an item from version 4.0 means it will have a slightly wrong location. The severity of this offset is different from part to part.
                             You can see this for example by drawing the tibia from version 4.0 and 3.0 next to each other.
+                            Version 3.0 will always be drawn in default green to always make them distinguishable.
                             
                             If you wish to continue, press 'Ok'.
                             """, "Ok", "Cancel")) return;
@@ -851,6 +852,7 @@ public class WindowPresenter {
                 contentGroupRotator.clearIsTransformForbidden();
                 innerGroup.getChildren().removeListener(setupSlicePlaneListener);
             } else {
+                if (innerGroup.getChildren().isEmpty()) return;
                 controller.getCutSelectionButton().setDisable(false);
                 controller.getCutButt().setText("Cancel");
                 controller.getCutButt().setUserData(true);      //size of the plane will be the size of the drawn 3D objects * 2
@@ -858,14 +860,12 @@ public class WindowPresenter {
                 innerGroup.getChildren().addListener(setupSlicePlaneListener);
             }
         });
-
         //cutSelectionButton will store the last clicked MenuItem under UserData.
         //Thats what fires when the button is clicked. 'All' is the default behaviour.
         controller.getCutSelectionButton().setUserData(controller.getCutSelectionButton().getItems().getFirst());
         controller.getCutSelectionButton().setOnAction(e -> {
-            ((MenuItem)controller.getCutSelectionButton().getUserData()).fire();    //fire the menuItem stored in UserData
+            ((MenuItem) controller.getCutSelectionButton().getUserData()).fire();    //fire the menuItem stored in UserData
         });
-
         // Set the default action and text after the user cut something
         Function<MenuItem, Boolean> postCutEvent = new Function<MenuItem, Boolean>() {
             @Override
@@ -876,6 +876,8 @@ public class WindowPresenter {
                 controller.getCutButt().setUserData(false);
                 controller.getCutButt().setText("Cut");
                 slicePlaneGroup.getChildren().clear();
+                innerGroup.getChildren().removeListener(setupSlicePlaneListener);
+                hasInnerGroupSelectedItems.clearSelection();
                 return true;
             }
         };
@@ -888,6 +890,7 @@ public class WindowPresenter {
             postCutEvent.apply(controller.getCutAllMenuItem());
         });
         controller.getCutSelectedMenuItem().setOnAction(e -> {
+            if (hasInnerGroupSelectedItems.getSelection().isEmpty()) return;
             System.out.println("cut selected");
             LinkedList<MeshView> meshViews = new LinkedList<>();
             for (Node node : hasInnerGroupSelectedItems.getSelection()) if (node instanceof MeshView) meshViews.add((MeshView) node);
@@ -1092,6 +1095,10 @@ public class WindowPresenter {
      * making sure that they always overlap.</li>
      */
     private void setupSlicePlane() {
+        if (innerGroup.getChildren().isEmpty()) {
+            return;
+        }
+        slicePlaneGroup.getChildren().clear();
         double planeSize = Math.max(Math.max(innerGroup.getBoundsInLocal().getMaxX() - innerGroup.getBoundsInLocal().getMinX(), innerGroup.getBoundsInLocal().getMaxY() - innerGroup.getBoundsInLocal().getMinY()), innerGroup.getBoundsInLocal().getMaxZ() - innerGroup.getBoundsInLocal().getMinZ()) * 2;
         Group slicePlane = Plane.makeSlicePlane((int) planeSize);
         slicePlaneGroupRotator.setIsTransformForbidden(new Function<Transform, Boolean>() {

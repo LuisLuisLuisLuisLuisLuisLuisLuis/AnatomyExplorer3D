@@ -1,5 +1,6 @@
 package Project.window.Slicing;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.shape.VertexFormat;
 
@@ -11,7 +12,8 @@ public class MeshSlicer_Aware {
     public static TriangleMesh slicePositiveSide(
             TriangleMesh input,
             double nx, double ny, double nz,
-            double d
+            double d,
+            SimpleBooleanProperty modified
     ) {
         VertexFormat vertexFormat = input.getVertexFormat();
 
@@ -189,7 +191,7 @@ public class MeshSlicer_Aware {
             boolean in2 = s2 >= 0;
 
             int inside = (in0?1:0)+(in1?1:0)+(in2?1:0); // count how many of them are kept.
-
+            if (!modified.get()) if (inside != 3) modified.set(true);
             if (inside == 0) continue;
 
             // This triangle can be kept entirely.
