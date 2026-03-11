@@ -192,8 +192,7 @@
                       <Menu mnemonicParsing="false" text="File">
                         <items>
                               <MenuItem fx:id="loadHierarchyMenu" mnemonicParsing="false" text="Load hierarchy" />
-                              <CheckMenuItem fx:id="loadBP3DV3checkMenu" mnemonicParsing="false" text="Load BP3D 3.0" />
-                            <CheckMenuItem fx:id="enableBP3DPartsCheckmenu" mnemonicParsing="false" text="Enable BP3D 3.0 parts" />
+                              <CheckMenuItem fx:id="enableBP3DV3checkMenu" mnemonicParsing="false" text="Enable BP3D 3.0" />
                               <MenuItem fx:id="menuSaveTree" mnemonicParsing="false" text="Save Trees" />
                             <MenuItem fx:id="menuClose" mnemonicParsing="false" text="Close" />
                               <MenuItem fx:id="menuClearView" mnemonicParsing="false" text="Clear View" />

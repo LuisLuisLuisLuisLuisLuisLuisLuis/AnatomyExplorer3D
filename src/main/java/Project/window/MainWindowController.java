@@ -10,11 +10,9 @@ import javafx.scene.layout.VBox;
 public class MainWindowController {
 
     @FXML
-    private CheckMenuItem enableBP3DPartsCheckmenu;
-    @FXML
     private MenuItem loadHierarchyMenu;
     @FXML
-    private CheckMenuItem loadBP3DV3checkMenu;
+    private CheckMenuItem enableBP3DV3checkMenu;
     @FXML
     private Button tiltClockwButton;
     @FXML
@@ -451,9 +449,8 @@ public class MainWindowController {
 
     public Button getTiltAntiClButton() {return tiltAntiClButton;}
 
-    public CheckMenuItem getLoadBP3DV3checkMenu() {return loadBP3DV3checkMenu;}
+    public CheckMenuItem getEnableBP3DV3checkMenu() {return enableBP3DV3checkMenu;}
 
     public MenuItem getLoadHierarchyMenu() {return loadHierarchyMenu;}
 
-    public CheckMenuItem getEnableBP3DPartsCheckmenu() {return enableBP3DPartsCheckmenu;}
 }

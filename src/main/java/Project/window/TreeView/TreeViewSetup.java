@@ -385,14 +385,12 @@ public class TreeViewSetup {
                     treeAnalysisView.getController().getAddFileIDButton().setOnAction(e -> {
                         String fileID = treeAnalysisView.getController().getAddFileIDTextField().getCharacters().toString();
                         if (fileID.isBlank()) return;
-                        addFileIDsToParentsRec(this.getTreeItem(),List.of(fileID));
                         runOnANodeFileIDsModified();
                     });
 
                     treeAnalysisView.getController().getRemoveFileIDButton().setOnAction(e -> {
-//                        removeFileIDsFromParentsRec(this.getTreeItem(), List.of(treeAnalysisView.getController().getAddFileIDTextField().getText()));
                         this.getTreeItem().getValue().fileIds().remove(treeAnalysisView.getController().getAddFileIDTextField().getText());
-                        removeFileIDsFromParentsRec(this.getTreeItem().getParent(), List.of(treeAnalysisView.getController().getAddFileIDTextField().getText()), this.getTreeItem());
+//                        removeFileIDsFromParentsRec(this.getTreeItem().getParent(), List.of(treeAnalysisView.getController().getAddFileIDTextField().getText()), this.getTreeItem());
                         runOnANodeFileIDsModified();
                     });
 
@@ -465,7 +463,7 @@ public class TreeViewSetup {
         Collection<String> fileIDsToRemove = collectFileIDsBelow(treeItem.getValue()).keySet(); //not doing this.getFileIDs because what if theres a fileID in subtree that this doesnt have
 
         if (treeItem.getParent() != null) {
-            removeFileIDsFromParentsRec(treeItem.getParent(), fileIDsToRemove, treeItem);
+//            removeFileIDsFromParentsRec(treeItem.getParent(), fileIDsToRemove);
             treeItem.getParent().getValue().children().remove(treeItem.getValue()); //remove the anode relationship also!
         }
 
@@ -512,12 +510,11 @@ public class TreeViewSetup {
 
         //now the regular pasting.
         if (!this.treeViewEditor1.paste(treeItem)) return; //this node IS the targetParent
-        //if (this.getTreeItem().getParent() != null) addFileIDsToParentsRec(this.getTreeItem(), this.getTreeItem().getChildren().getLast().getValue().getFileIds());
 
         //getLast() weil treeItem hier das parent ist und wir uns für die fileIDs des gerade hier gepasteten childs interessieren, was das letzte in der liste children ist.
-        Collection<String> fileIDsToAdd = collectFileIDsBelow(treeItem.getChildren().getLast().getValue()).keySet();
-        for (String fileID : fileIDsToAdd) System.out.println(fileID);
-        addFileIDsToParentsRec(treeItem, fileIDsToAdd);   //add the fileIDs to all parents
+//        Collection<String> fileIDsToAdd = collectFileIDsBelow(treeItem.getChildren().getLast().getValue()).keySet();  it is no longer desired for parents to hold all fileids of their subtree
+//        for (String fileID : fileIDsToAdd) System.out.println(fileID);
+//        addFileIDsToParentsRec(treeItem, fileIDsToAdd);   //add the fileIDs to all parents
         for (TreeItem<ANode> childTreeItem : treeItem.getChildren()) {
             ANode childNode = childTreeItem.getValue(); //make sure the anode relationships are also created!
             if (!treeItem.getValue().children().contains(childNode)) treeItem.getValue().children().add(childNode);
@@ -528,7 +525,7 @@ public class TreeViewSetup {
     public void delete(TreeItem<ANode> treeItem) {
         if (treeItem.getParent() == null) return;
 //        removeFileIDsFromParentsRec(treeItem.getParent(), treeItem.getValue().getFileIds(), treeItem);
-        removeFileIDsFromParentsRec(treeItem.getParent(), collectFileIDsBelow(treeItem.getValue()).keySet(), treeItem);
+//        removeFileIDsFromParentsRec(treeItem.getParent(), collectFileIDsBelow(treeItem.getValue()).keySet());
 
         treeItem.getParent().getValue().children().remove(treeItem.getValue()); //also delete anode relationship
         this.treeViewEditor1.delete(treeItem);
@@ -538,28 +535,47 @@ public class TreeViewSetup {
     public void restore() {
         if (!treeViewEditor1.canRestore().get()) return;
         TreeItem<ANode> restored = treeViewEditor1.restore();
-        addFileIDsToParentsRec(restored.getParent(), new LinkedList<>());   //add the fileIDs to all parents
+//        addFileIDsToParentsRec(restored.getParent(), new LinkedList<>());   //add the fileIDs to all parents
         restored.getParent().getValue().children().add(restored.getValue());
         runOnANodeFileIDsModified();
     }
 
-    public void addFileIDsToParentsRec(TreeItem<ANode> firstParent, Collection<String> fileIDs) {
+    public static void addFileIDsToParentsRec(TreeItem<ANode> firstParent, Collection<String> fileIDs) {
         for (String fileID : fileIDs) if (!firstParent.getValue().getFileIds().contains(fileID)) firstParent.getValue().getFileIds().add(fileID);
         if (firstParent.getParent() != null) addFileIDsToParentsRec(firstParent.getParent(), fileIDs);
     }
 
-    public void removeFileIDsFromParentsRec(TreeItem<ANode> firstParent, Collection<String> fileIDs, TreeItem<ANode> avoid) {
+    /**
+     * Removes the fileIDs from all parents recursively.
+     * @param firstParent The first parent from which the fileIDs will be removed.
+     * @param fileIDs The fileIDs.
+     */
+    public static void removeFileIDsFromParentsRec(TreeItem<ANode> firstParent, Collection<String> fileIDs) {
+        firstParent.getValue().getFileIds().removeAll(fileIDs);
+        if (firstParent.getParent() != null) removeFileIDsFromParentsRec(firstParent.getParent(), fileIDs);
+    }
+
+
+    /**
+     * Wrapper for removeFileIDsFromParentsRec().
+     * Removes the fileIDs from the parents recursively except when they occur in the subtree below the parent elsewhere than avoid.
+     * -> Thus, ensures that every fileID that occurs in the parent's subtree (except under avoid) is not removed from the parent.
+     * This makes this method suitable for use when it is necessary that parents always hold the fileIDs of their subtree.
+     */
+    public static void removeFileIDsFromParentsRec(TreeItem<ANode> firstParent, Collection<String> fileIDs, TreeItem<ANode> avoid) {
         HashMap<String, Boolean> fileIDMap = new HashMap<>();
         for (String fileID : fileIDs) fileIDMap.put(fileID, false);
         removeFileIDsFromParentsRec(firstParent, fileIDMap, avoid);
     }
     /**
-     * T
+     * Removes the fileIDs from the parents recursively except when they occur in the subtree below the parent elsewhere than avoid.
+     *      * -> Thus, ensures that every fileID that occurs in the parent's subtree (except under avoid) is not removed from the parent.
+     *      * This makes this method suitable for use when it is necessary that parents always hold the fileIDs of their subtree.
      * @param firstParent
      * @param fileListMap
      * @param avoid
      */
-    public void removeFileIDsFromParentsRec(TreeItem<ANode> firstParent, HashMap<String, Boolean> fileListMap, TreeItem<ANode> avoid) {
+    public static void removeFileIDsFromParentsRec(TreeItem<ANode> firstParent, HashMap<String, Boolean> fileListMap, TreeItem<ANode> avoid) {
         for (String fileID: fileListMap.keySet()) {
             if (!fileListMap.get(fileID)) {
                 boolean isInSubtreeExceptAvoid = isFileIDInSubtreeExceptAvoidAndItsParent(fileID, firstParent, avoid);
@@ -581,7 +597,7 @@ public class TreeViewSetup {
      * @param avoid
      * @return
      */
-    public boolean isFileIDInSubtreeExceptAvoidAndItsParent(String fileID, TreeItem<ANode> parentOfAvoid, TreeItem<ANode> avoid) {
+    public static boolean isFileIDInSubtreeExceptAvoidAndItsParent(String fileID, TreeItem<ANode> parentOfAvoid, TreeItem<ANode> avoid) {
         for (TreeItem<ANode> child : parentOfAvoid.getChildren()) {
             if (child == avoid) continue;
             if (isFileIDinSubtreeExceptNode(fileID, child)) return true;
@@ -592,7 +608,7 @@ public class TreeViewSetup {
     /**
      * Is fileID in the subtree of treeItem?
      */
-    public boolean isFileIDinSubtreeExceptNode(String fileID, TreeItem<ANode> treeItem) {
+    public static boolean isFileIDinSubtreeExceptNode(String fileID, TreeItem<ANode> treeItem) {
         if (treeItem.getValue().fileIds().contains(fileID)) return true;
         for (TreeItem<ANode> child : treeItem.getChildren()) {
             if (isFileIDinSubtreeExceptNode(fileID, child)) return true;
@@ -601,7 +617,7 @@ public class TreeViewSetup {
         return false;
     }
 
-    public ANode makeAnode(String name, ANode modelRoot) {
+    public static ANode makeAnode(String name, ANode modelRoot) {
         String id = generateUnusedID(modelRoot);
         return new ANode(
                 id, name, new HashSet<>(), new HashSet<>()

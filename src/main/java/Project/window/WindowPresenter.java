@@ -24,6 +24,7 @@ import Project.command.TreeCommands.ExpandTreeViewCommand;
 import Project.command.TreeCommands.SelectAllTreeViewCommand;
 import Project.command.TreeCommands.SelectNoneTreeViewCommand;
 import Project.model.ANode;
+import Project.model.EnableDisableBP3DV3Parts;
 import Project.model.Model;
 import Project.model.TreeExport;
 import Project.window.PopUp.About;
@@ -129,6 +130,9 @@ public class WindowPresenter {
     private final ArrayList<Tab> tabs;
 
     private final ArrayList<Model> models;
+    private final Model mainModel;
+    private final Model partof_v3;
+    private final Model isa_v3;
 
     private final AIService aiService;  //implements AI support
 
@@ -186,19 +190,19 @@ public class WindowPresenter {
 
         this.models = new ArrayList<>();
 
-        Model mainModel = new Model(
-                getClass().getResourceAsStream("/Project/anatomy/partof_inclusion_relation_list.txt"),
-                getClass().getResourceAsStream("/Project/anatomy/partof_element_parts.txt"),
+        mainModel = new Model(
+                getClass().getResourceAsStream("/Project/anatomy/anatomy_inclusion_relation_list.txt"),
+                getClass().getResourceAsStream("/Project/anatomy/anatomy_element_parts.txt"),
                 "anatomy",
                 WindowPresenter.class.getResource("/Project/anatomy/BP3D_4.0_obj_99/"));
 
-        Model partof_v3 = new Model(
+        partof_v3 = new Model(
                 getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_conventional_partof.txt"),
                 getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_parts_v4_format_cleaned.txt"),
                 "BP3D 3.0 part-of",
                 getClass().getResource("/Project/anatomy/BodyParts3D_3.0_obj_99")
                 );
-        Model isa_v3 = new Model(
+        isa_v3 = new Model(
                 getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_composite_isa.txt"),
                 getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_parts_v4_format_cleaned.txt"),
                 "BP3D 3.0 is-a",
@@ -235,19 +239,32 @@ public class WindowPresenter {
         controller.getMenuClose().setOnAction(e -> Platform.exit());
 //        controller.getMenuSaveTree().setOnAction(e -> TreeExport.writeToFiles(getSelectedTreeView(), new File(partOfFilesLocation.get()).getParent()));
         controller.getMenuSaveTree().setOnAction(e -> {
-            TreeExport.saveTrees(treeViews.stream().toList(), models.stream().map(Model::getName).toList());
+            TreeExport.saveTrees(treeViews.stream().toList(), treeViews.stream().map(TreeView::getId).toList());
         });
 
-        controller.getLoadBP3DV3checkMenu().setUserData(false); //a flag to prevent this listener from actioning
-        controller.getLoadBP3DV3checkMenu().selectedProperty().addListener(new ChangeListener<Boolean>() {
+        controller.getEnableBP3DV3checkMenu().setUserData(false); //a flag to prevent this listener from actioning
+        controller.getEnableBP3DV3checkMenu().selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if ((boolean) controller.getLoadBP3DV3checkMenu().getUserData()) return;
+                if ((boolean) controller.getEnableBP3DV3checkMenu().getUserData()) return;
                 if (newValue) {
-                    executeCommand(new AddModelCommand(List.of(partof_v3, isa_v3)));
+                    if (!LittlePopUp.showMsg("Disclaimer", """
+                            The BodyParts3D database comes in different versions. 
+                            The versions share most anatomy parts, but there are some anatomy parts that are can only be found in one version.
+                            
+                            By default, this program uses version 4.0. By enabling version 3.0, the items labeled with '(available in BP3D 3.0)' will become drawable. Further, you will be able to browse the full tree of version 3.0.
+                            
+                            Note that version 4.0 and 3.0 do not share the same coordinates and sizes! This means that even identical anatomy parts from different versions will be offset from each other. Drawing an item from version 3.0 next to an item from version 4.0 means it will have a slightly wrong location. The severity of this offset is different from part to part.
+                            You can see this for example by drawing the tibia from version 4.0 and 3.0 next to each other.
+                            
+                            If you wish to continue, press 'Ok'.
+                            """, "Ok", "Cancel")) return;
+//                    executeCommand(new AddModelCommand(List.of(partof_v3, isa_v3)));
+                    executeCommand(new EnableBP3DV3Command());
                 }
                 else {
-                    executeCommand(new RemoveModelCommand(List.of(partof_v3, isa_v3)));
+//                    executeCommand(new RemoveModelCommand(List.of(partof_v3, isa_v3)));
+                    executeCommand(new DisableBP3DV3Command());
                 }
             }
         });
@@ -255,22 +272,16 @@ public class WindowPresenter {
             @Override
             public void invalidated(Observable observable) {
                 if (tabs.stream().filter(tab -> tab.getText().equals("BP3D 3.0 part-of") || tab.getText().equals("BP3D 3.0 is-a")).toList().size() == 2) {
-                    controller.getLoadBP3DV3checkMenu().setUserData(true);
-                    controller.getLoadBP3DV3checkMenu().setSelected(true);
+                    controller.getEnableBP3DV3checkMenu().setUserData(true);
+                    controller.getEnableBP3DV3checkMenu().setSelected(true);
                 } else {
-                    controller.getLoadBP3DV3checkMenu().setUserData(true);
-                    controller.getLoadBP3DV3checkMenu().setSelected(false);
+                    controller.getEnableBP3DV3checkMenu().setUserData(true);
+                    controller.getEnableBP3DV3checkMenu().setSelected(false);
                 }
-                controller.getLoadBP3DV3checkMenu().setUserData(false);
+                controller.getEnableBP3DV3checkMenu().setUserData(false);
             }
         });
 
-        controller.getEnableBP3DPartsCheckmenu().selectedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-
-            }
-        });
 
         //removed axes for now because it doesn't look good with the anatomy parts
         //controller.getMenuAddAxes().setOnAction(e -> executeCommand(new AddAxesCommand(innerGroup)));
@@ -337,8 +348,11 @@ public class WindowPresenter {
             @Override
             public void run() {
                 selectionMediatorTree3D_Selection.reloadDicts();
+                selectionMediatorTree_3D_Content.reloadDicts();
+                for (SelectionMediator_Tree_3D selectionMediatorTree3D : selectionMediatorTree3DS) selectionMediatorTree3D.reloadDicts();
             }
         });
+
 
         //---------enable the mediator------------------
         controller.getSelectIn3DButton().setOnAction(e -> {
@@ -890,7 +904,6 @@ public class WindowPresenter {
 
 
 
-
 //-----------------end of constructor----------------
     }
 
@@ -1297,6 +1310,84 @@ public class WindowPresenter {
         public void redo() {execute();}
         @Override
         public String name() {return "RemoveModelCommand";}
+    }
+
+    private class EnableBP3DV3Command implements Command {
+
+        private final AddModelCommand addModelCommand;
+
+        public EnableBP3DV3Command() {
+            this.addModelCommand = new AddModelCommand(List.of(partof_v3, isa_v3));
+        }
+
+        @Override
+        public void undo() {
+            addModelCommand.undo();
+            TreeView<ANode> mainModelTreeView = null;
+            for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
+            if (mainModelTreeView == null) return;
+            System.out.println("enable v3 command: found the tree view when removing");
+            EnableDisableBP3DV3Parts.removeV3FilesFromTree(mainModelTreeView.getRoot(), EnableDisableBP3DV3Parts.createIdToFileIDsMap());
+        }
+
+        @Override
+        public void execute() {
+            addModelCommand.execute();
+            TreeView<ANode> mainModelTreeView = null;
+            for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
+            if (mainModelTreeView == null) return;
+            System.out.println("enable v3 command: found the tree view when adding");
+            EnableDisableBP3DV3Parts.addV3FilesToTree(mainModelTreeView.getRoot(), EnableDisableBP3DV3Parts.createIdToFileIDsMap());
+        }
+
+        @Override
+        public void redo() {
+            addModelCommand.execute();
+        }
+
+        @Override
+        public String name() {
+            return "EnableBP3DV3Command";
+        }
+    }
+
+    private class DisableBP3DV3Command implements Command {
+
+        private final RemoveModelCommand removeModelCommand;
+
+        public DisableBP3DV3Command() {
+            this.removeModelCommand = new RemoveModelCommand(List.of(partof_v3, isa_v3));
+        }
+
+        @Override
+        public void undo() {
+            removeModelCommand.undo();
+            TreeView<ANode> mainModelTreeView = null;
+            for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
+            if (mainModelTreeView == null) return;
+            System.out.println("disable v3 command: found the tree view when removing");
+            EnableDisableBP3DV3Parts.addV3FilesToTree(mainModelTreeView.getRoot(), EnableDisableBP3DV3Parts.createIdToFileIDsMap());
+        }
+
+        @Override
+        public void execute() {
+            removeModelCommand.execute();
+            TreeView<ANode> mainModelTreeView = null;
+            for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
+            if (mainModelTreeView == null) return;
+            System.out.println("enable v3 command: found the tree view when adding");
+            EnableDisableBP3DV3Parts.removeV3FilesFromTree(mainModelTreeView.getRoot(), EnableDisableBP3DV3Parts.createIdToFileIDsMap());
+        }
+
+        @Override
+        public void redo() {
+            removeModelCommand.execute();
+        }
+
+        @Override
+        public String name() {
+            return "DisableBP3DV3Command";
+        }
     }
 
 
