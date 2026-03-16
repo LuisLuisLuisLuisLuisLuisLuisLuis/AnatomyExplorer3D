@@ -1,6 +1,5 @@
 package Project.SelectionModel.FXGroupDraw;
 
-import Project.SelectionModel.HasSelection;
 import Project.SelectionModel.SelectionContainer;
 import Project.SelectionModel.SelectionGroup;
 import Project.window.ThreeDPaneHandling.Coloring.FileGroupingScheme;
@@ -16,7 +15,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.*;
 
-public class HasFXGroupContentsContainer extends SelectionContainer<Node, String> {
+public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, String> {
 
     /**
      * Has a mapping of FileIDs (that come in as groupItems here) to anatomical group (String[]).
@@ -36,7 +35,7 @@ public class HasFXGroupContentsContainer extends SelectionContainer<Node, String
 
     @Override
     public Set<String> getSelectionFormatted() {
-        ObservableList<Node> selectedItems = hasSelection.getSelection();
+        ObservableList<MeshView> selectedItems = hasSelection.getSelection();
         Set<String> selectionFormatted = new HashSet<>();
         for (Node node : selectedItems) {
             selectionFormatted.add(node.getId());
@@ -51,7 +50,7 @@ public class HasFXGroupContentsContainer extends SelectionContainer<Node, String
      * @return MeshView with the FileID as id.
      */
     @Override
-    protected Collection<Node> transformGroupItemToSelectionItem(String groupItem) {
+    protected Collection<MeshView> transformGroupItemToSelectionItem(String groupItem) {
 
         MeshView mock = new MeshView();
         mock.setId(groupItem);
@@ -61,7 +60,7 @@ public class HasFXGroupContentsContainer extends SelectionContainer<Node, String
 
     public Node createMeshView(String groupItem) {
 
-        Node node = this.hasFXGroupContents.getNodeWithID(groupItem);
+        Node node = this.hasFXGroupContents.getMeshViewWithID(groupItem);
         if (node != null) return node;
 
 
@@ -88,13 +87,7 @@ public class HasFXGroupContentsContainer extends SelectionContainer<Node, String
         else {
             System.out.println("HasFXGroupContentsContainer: inputstream is null");
             return null;
-//
-//            Node meshView = new MeshView();
-//            meshView.setId(groupItem);  //returning this mock meshView with the groupItem as ID so that the downstream methods
-//            result.add(meshView);      // can still search for the groupitem
-//            return result;              //TODO: if else branch runs, nothing will be drawn but item will still be added
-        }                               // to selection.
-        // When does else-branch run?
+        }
     }
 
     /**
@@ -112,7 +105,7 @@ public class HasFXGroupContentsContainer extends SelectionContainer<Node, String
         this.fileDirs = new ArrayList<>(2);
         this.resourceLocations = new ArrayList<>(3);
 
-        //TODO: NOT VIA FILE! VIA STREAM OR STH
+        //TODO: NOT VIA FILE! VIA STREAM OR STH.
         try {
             this.fileGroupingScheme = new ObjectMapper().readValue(
                     new File(this.getClass().getResource("/Project/3DSupport/fileGroupingScheme_manual_V4.json").getFile().substring(1)),
@@ -168,28 +161,43 @@ public class HasFXGroupContentsContainer extends SelectionContainer<Node, String
         return null;
     }
 
-    /**
-     * Stores where the two folders with the .obj files are located.
-     */
+    private void loadOBJs(File file) {
+        File[] files = file.listFiles();
+        if (files == null) return; //TODO: UI notification?
+        for (File objfile : files) hasFXGroupContents.addOBJ(objfile.getName().substring(0, objfile.getName().lastIndexOf(".")));
+    }
+    private void loadOBJs(URL url) {
+        loadOBJs(new File(url.getFile()));
+    }
+
+    private void removeOBJs(File file) {
+        File[] files = file.listFiles();
+        if (files == null) return;
+        for (File objfile : files) hasFXGroupContents.removeOBJ(objfile.getName().substring(0, objfile.getName().lastIndexOf(".")));
+    }
+    private void removeOBJs(URL url) {
+        removeOBJs(new File(url.getFile()));
+    }
+
     private final ArrayList<File> fileDirs;
     public ArrayList<File> getFileDirs() {
         return fileDirs;
     }
     public void addFileDir(File dir) {
-        fileDirs.add(dir);
+        fileDirs.add(dir); loadOBJs(dir);
     }
-    public void removeFileDir(File dir) {fileDirs.remove(dir);}
+    public void removeFileDir(File dir) {
+        fileDirs.remove(dir); removeOBJs(dir);}
 
-
-    /**
-     * Stores where the two folders with the .obj files are located.
-     */
     private final ArrayList<URL> resourceLocations;
     public ArrayList<URL> getResourceLocationsLocations() {
         return resourceLocations;
     }
-    public void addResourceLocations(Collection<URL> urls) {resourceLocations.addAll(urls);}
-    public void addResourceLocation(URL url) {resourceLocations.add(url);}
-    public void removeResourceLocation(URL url) {resourceLocations.remove(url);}
+    public void addResourceLocation(URL url) {
+        for (URL url1: resourceLocations) if (url.getFile().equals(url1.getFile())) return;
+        resourceLocations.add(url); loadOBJs(url);
+    }
+    public void removeResourceLocation(URL url) {
+        resourceLocations.remove(url); removeOBJs(url);}
 
 }

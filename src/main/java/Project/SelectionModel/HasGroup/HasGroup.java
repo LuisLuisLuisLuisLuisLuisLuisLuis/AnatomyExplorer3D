@@ -41,7 +41,7 @@ public class HasGroup<groupSelection> implements HasSelection<groupSelection> {
     }
 
     @Override
-    public void setSelection(ObservableList<groupSelection> selection) {
+    public void setSelection(List<groupSelection> selection) {
         selectionGroup.changeSelection(makeSet(selection), true, false);
     }
 

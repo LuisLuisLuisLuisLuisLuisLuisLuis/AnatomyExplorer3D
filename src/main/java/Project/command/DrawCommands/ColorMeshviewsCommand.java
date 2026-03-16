@@ -42,7 +42,7 @@ public class ColorMeshviewsCommand implements Command {
         remember();
 
         for (String nodeID : nodeIDs) { // go thru nodeIDs and get the corresponding nodes
-            Node node = hasFXGroupContents.getNodeWithID(nodeID);
+            Node node = hasFXGroupContents.getMeshViewWithID(nodeID);
             if (node instanceof MeshView) {
                 if (((MeshView) node).getMaterial() instanceof PhongMaterial) {
                     // saturate or not, depending on selection

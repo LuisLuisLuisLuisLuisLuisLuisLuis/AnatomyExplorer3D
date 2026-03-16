@@ -5,9 +5,12 @@ import Project.SelectionModel.SelectionGroup;
 import Project.command.Command;
 import Project.command.Remember.RememberFXMeshViewColors;
 import javafx.scene.Node;
+import javafx.scene.shape.MeshView;
+import javafx.scene.shape.TriangleMesh;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,11 +20,12 @@ import java.util.Set;
  */
 public class RemoveObjFrom3DCommand implements Command {
 
-    private Set<String> removedNodes;
-    private SelectionGroup threeDContentGroup;
-    private SelectionGroup threeDSelectionGroup;
-    private HasFXGroupContents hasFXGroupContents;
-    private RememberFXMeshViewColors rememberFXMeshViewColors;
+    private final Set<String> removedNodes;
+    private final SelectionGroup threeDContentGroup;
+    private final SelectionGroup threeDSelectionGroup;
+    private final HasFXGroupContents hasFXGroupContents;
+
+    private final HashMap<String, TriangleMesh> idToMesh;   //will map MeshView ids to their TriangleMesh before they were undrawn.
 
     /**
      *
@@ -32,36 +36,43 @@ public class RemoveObjFrom3DCommand implements Command {
      */
     public RemoveObjFrom3DCommand(Set<String> nodesToRemove, SelectionGroup threeDContentGroup, HasFXGroupContents hasFXGroupContents, SelectionGroup threeDSelectionGroup) {
         this.removedNodes = nodesToRemove;
+        this.idToMesh = new HashMap<>(nodesToRemove.size());
         this.threeDContentGroup = threeDContentGroup;
         this.threeDSelectionGroup = threeDSelectionGroup;
 
         this.hasFXGroupContents = hasFXGroupContents;   //required to remember the coloring.
+
     }
 
     @Override
     public void undo() {
-        threeDContentGroup.changeSelection(removedNodes, false, false); // re-draw
-
-        rememberFXMeshViewColors.restoreSelection();    // re-color
-        threeDSelectionGroup.changeSelection(removedNodes, false, false);   //also reselect all removed nodes
+//        threeDContentGroup.changeSelection(removedNodes, false, false); // re-draw
+        for (String id : removedNodes) {
+            MeshView meshView = hasFXGroupContents.getMeshViewWithID(id);
+            hasFXGroupContents.select(meshView, idToMesh.get(id));
+        }
+//        rememberFXMeshViewColors.restoreSelection();  not necessary anymore since MeshViews keep existing and only their Mesh changes  // re-color
+//        threeDSelectionGroup.changeSelection(removedNodes, false, false); removed because it seems unintuitive  //also reselect all removed nodes
     }
 
     @Override
     public void execute() {
-        remember();
-        //was buggy when these two commands change order
+        idToMesh.clear();
+        //was buggy when undrawn happened before unselect. should not matter anymore tho since undraw should automatically unselect
         threeDSelectionGroup.changeSelection(removedNodes, false, true);
-        threeDContentGroup.changeSelection(removedNodes, false, true);  // undraw and then unselect
+        for (String id : removedNodes) {
+            MeshView meshView = hasFXGroupContents.getMeshViewWithID(id);
+            TriangleMesh triangleMesh = (TriangleMesh) meshView.getMesh();
+            idToMesh.put(id, triangleMesh);
+            hasFXGroupContents.unselect(meshView);
+        }
+//        threeDContentGroup.changeSelection(removedNodes, false, true);  // undraw and then unselect
 
     }
 
     @Override
     public void redo() {
         execute();
-    }
-
-    private void remember() {
-        this.rememberFXMeshViewColors = new RememberFXMeshViewColors(removedNodes, hasFXGroupContents, threeDSelectionGroup); //remember coloring
     }
 
     @Override

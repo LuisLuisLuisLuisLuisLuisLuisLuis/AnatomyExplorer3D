@@ -1,36 +1,40 @@
 package Project.command.DrawCommands;
 
+import Project.SelectionModel.FXGroupDraw.HasFXGroupContents;
 import Project.command.GroupCommand;
-import Project.command.Remember.RememberFXGroupContents;
+import Project.command.Remember.RememberHasFXGroupContents;
+import Project.command.Remember.RememberHasSelection;
 import Project.command.Remember.RememberFXPerspective;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
+import javafx.scene.shape.MeshView;
 
-public class ClearCommand extends GroupCommand {
+public class ClearCommand<T> extends GroupCommand {
 
-    private RememberFXGroupContents fxGroupSelection;
+    private RememberHasFXGroupContents rememberFXGroupContents;
     private RememberFXPerspective rememberFxPerspective;
-    private final Group innerGroup;
+    private final HasFXGroupContents hasFXGroupContents;
+
 
     /**
      * Clears view and resets perspective.
-     * @param innergroup Group to be cleared of contents.
+     * @param hasSelection Group to be cleared of contents.
      * @param contentGroup Group whose perspective is to be reset.
      */
-    public ClearCommand(Group contentGroup, Group innergroup) {
+    public ClearCommand(Group contentGroup, HasFXGroupContents hasSelection) {
         super(contentGroup);
-        this.innerGroup = innergroup;
+        this.hasFXGroupContents = hasSelection;
     }
 
     @Override
     public void execute() {
         remember();
-        innerGroup.getChildren().clear();
+        hasFXGroupContents.clearSelection();
     }
 
     @Override
     public void undo() {    //restore contents and perspective
-        this.fxGroupSelection.restoreSelection();
+        this.rememberFXGroupContents.restoreSelection();
         this.rememberFxPerspective.restorePerspective();
     }
     @Override
@@ -45,6 +49,6 @@ public class ClearCommand extends GroupCommand {
 
     private void remember() {
         this.rememberFxPerspective = new RememberFXPerspective(new PerspectiveCamera(), new Group[]{group});
-        this.fxGroupSelection = new RememberFXGroupContents(innerGroup);
+        this.rememberFXGroupContents = new RememberHasFXGroupContents(hasFXGroupContents);
     }
 }

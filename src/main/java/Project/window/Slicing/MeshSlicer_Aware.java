@@ -1,6 +1,7 @@
 package Project.window.Slicing;
 
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.shape.VertexFormat;
 
@@ -13,8 +14,11 @@ public class MeshSlicer_Aware {
             TriangleMesh input,
             double nx, double ny, double nz,
             double d,
+//            SimpleObjectProperty<MeshSliceState> meshSliceState
             SimpleBooleanProperty modified
     ) {
+//        meshSliceState.set(MeshSliceState.UNMODIFIED);
+        modified.set(false);
         VertexFormat vertexFormat = input.getVertexFormat();
 
         // --- Determine face layout ---
@@ -191,7 +195,17 @@ public class MeshSlicer_Aware {
             boolean in2 = s2 >= 0;
 
             int inside = (in0?1:0)+(in1?1:0)+(in2?1:0); // count how many of them are kept.
-            if (!modified.get()) if (inside != 3) modified.set(true);
+
+            if (!modified.get()) modified.set(inside != 3);
+//            if (meshSliceState.get().equals(MeshSliceState.UNMODIFIED)) if (inside != 3) meshSliceState.set(MeshSliceState.SLICED);
+//            if (inside != 3) {
+//                if (inside == 0) {
+//                    if (first round) {
+//                        meshSliceState.set(MeshSliceState.FULLY_REMOVED);
+//                    }
+//                } else meshSliceState.set(MeshSliceState.SLICED);
+//            } if (meshSliceState.get().equals(MeshSliceState.FULLY_REMOVED)) meshSliceState.set(MeshSliceState.SLICED);
+//
             if (inside == 0) continue;
 
             // This triangle can be kept entirely.
@@ -351,5 +365,11 @@ public class MeshSlicer_Aware {
             return a==e.a && b==e.b;
         }
         public int hashCode(){return 31*a+b;}
+    }
+
+    public enum MeshSliceState {
+        FULLY_REMOVED,
+        UNMODIFIED,
+        SLICED
     }
 }

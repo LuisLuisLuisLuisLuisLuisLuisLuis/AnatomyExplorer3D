@@ -1,11 +1,15 @@
 package Project.SelectionModel.FXGroupSelection;
 
+import Project.SelectionModel.FXGroupDraw.HasFXGroupContents;
 import Project.SelectionModel.HasSelection;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.shape.Mesh;
+import javafx.scene.shape.MeshView;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +17,7 @@ import java.util.List;
 /**
  * This class has a Group and maintains a selection of the group's contents (-> what Nodes of the group are selected).
  */
-public class HasFXGroupSelection implements HasSelection<Node> {
+public class HasFXGroupSelection implements HasSelection<MeshView> {
 
     private final String id;
 
@@ -25,46 +29,55 @@ public class HasFXGroupSelection implements HasSelection<Node> {
     /**
      * The group.
      */
-    private final Group group;
+    private final HasFXGroupContents hasFXGroupContents;
 
     /**
      * The selection.
      */
-    private final ObservableList<Node> selection = FXCollections.observableArrayList();
+    private final ObservableList<MeshView> selection = FXCollections.observableArrayList();
 
     /**
-     * Initialize by giving a group.
-     * @param group
+     * @param hasFXGroupContents HasFXGroupContents whose items may be selected by this.
      */
-    public HasFXGroupSelection(Group group, String id) {
+    public HasFXGroupSelection(HasFXGroupContents hasFXGroupContents, String id) {
         this.id = id;
-        this.group = group;
+        this.hasFXGroupContents = hasFXGroupContents;
+        this.hasFXGroupContents.getSelection().addListener(new ListChangeListener<MeshView>() {
+            @Override
+            public void onChanged(Change<? extends MeshView> c) {
+                while (c.next()) {
+                    for (MeshView meshView : c.getRemoved()) {
+                        unselect(meshView);
+                    }
+                }
+            }
+        });
     }
 
 
     @Override
-    public ObservableList<Node> getSelection() {
+    public ObservableList<MeshView> getSelection() {
         return selection;
     }
 
     @Override
-    public void setSelection(ObservableList<Node> selection) {
-        clearSelection();
+    public void setSelection(List<MeshView> selection) {
+        clearSelection();   //important so that things arent duplicated
         this.selection.addAll(selection);
     }
 
     @Override
-    public void select(Node item) {
+    public void select(MeshView item) {
         this.selection.add(item);
     }
 
-    public void unselect(Node item) {
+    public void unselect(MeshView item) {
         this.selection.remove(item);
     }
 
     public void selectAll() {
         clearSelection();
-        for (Node item : getAllItems()) {
+        for (MeshView item : this.getAllItems()) {
             select(item);
         }
     }
@@ -75,13 +88,16 @@ public class HasFXGroupSelection implements HasSelection<Node> {
         this.selection.clear();
     }
 
+    /**
+     * @return All items that this can possibly select. Meaning all items that are currently drawn by hasFXGroupContents.
+     */
     @Override
-    public List<Node> getAllItems() {
-        return new LinkedList<Node>(group.getChildren());
+    public List<MeshView> getAllItems() {
+        return new LinkedList<MeshView>(hasFXGroupContents.getSelection());
     }
 
-    public ObservableList<Node> getAllItemsObservable() {
-        return group.getChildren();
+    public ObservableList<MeshView> getAllItemsObservable() {
+        return hasFXGroupContents.getSelection();
     }
 
 }

@@ -113,6 +113,9 @@
               <goal>jlink</goal>
             </goals>
             <configuration>
+             <options>
+               <option>-Xmx8g</option>
+             </options>
               <mainClass>Project.AnatomyExplorer</mainClass>
               <launcher>anatomyExplorer</launcher>
               <stripDebug>true</stripDebug>

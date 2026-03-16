@@ -50,7 +50,7 @@ public class HasTreeView<T> implements HasSelection<TreeItem<T>> {
      * @param selection: set the selection of the treeView by giving the full list of selected items.
      */
     @Override
-    public void setSelection(ObservableList<TreeItem<T>> selection) {
+    public void setSelection(List<TreeItem<T>> selection) {
         treeView.getSelectionModel().getSelectedItems().clear();
         treeView.getSelectionModel().getSelectedItems().addAll(selection);
     }

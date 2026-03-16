@@ -23,14 +23,17 @@ public class EnableDisableBP3DV3Parts {
         return idToFileIDs;
     }
 
+
     /**
      * Takes a mapping of node id to fileID and adds those fileIDs to the matching ANodes in the tree.
      * @param root root of tree
      * @param idToFileID Mapping of node id to a set of fileIDs
      */
     public static void addV3FilesToTree(TreeItem<ANode> root, HashMap<String, Set<String>> idToFileID) {
-        if (idToFileID.containsKey(root.getValue().conceptId())) {
-            root.getValue().fileIds().addAll(idToFileID.get(root.getValue().conceptId()));
+//        if (idToFileID.containsKey(root.getValue().conceptId())) {
+        if (root.getValue().name().endsWith("BP3D 3.0)")) {
+//            root.getValue().fileIds().addAll(idToFileID.get(root.getValue().conceptId()));
+            root.getValue().fileIds().add(root.getValue().conceptId());
         }
         for (TreeItem<ANode> child : root.getChildren()) addV3FilesToTree(child, idToFileID);
     }
@@ -41,8 +44,10 @@ public class EnableDisableBP3DV3Parts {
      * @param idToFileIDs Mapping of node id to a set of fileIDs
      */
     public static void removeV3FilesFromTree(TreeItem<ANode> root, HashMap<String, Set<String>> idToFileIDs) {
-        if (idToFileIDs.containsKey(root.getValue().conceptId())) {
-            root.getValue().fileIds().removeAll(idToFileIDs.get(root.getValue().conceptId()));
+//        if (idToFileIDs.containsKey(root.getValue().conceptId())) {
+        if (root.getValue().name().endsWith("BP3D 3.0)")) {
+//            root.getValue().fileIds().removeAll(idToFileIDs.get(root.getValue().conceptId()));
+            root.getValue().fileIds().remove(root.getValue().conceptId());
         }
         for (TreeItem<ANode> child : root.getChildren()) removeV3FilesFromTree(child, idToFileIDs);
     }

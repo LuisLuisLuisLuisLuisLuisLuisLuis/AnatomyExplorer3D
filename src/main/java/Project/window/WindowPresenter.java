@@ -17,7 +17,8 @@ import Project.command.Command;
 import Project.command.DrawCommands.*;
 import Project.command.DrawCommands.DrawAnatomyCommands.DrawItemIn3DCommand;
 import Project.command.DrawCommands.DrawAnatomyCommands.RemoveObjFrom3DCommand;
-import Project.command.Remember.RememberFXGroupContents;
+import Project.command.Remember.RememberHasFXGroupContents;
+import Project.command.Remember.RememberHasSelection;
 import Project.command.Remember.RememberFXMeshViewColors;
 import Project.command.TreeCommands.CollapseTreeViewCommand;
 import Project.command.TreeCommands.ExpandTreeViewCommand;
@@ -165,26 +166,10 @@ public class WindowPresenter {
         //mouse scrolling functionality
         MouseScrolling3D mouseScrolling3D = new MouseScrolling3D(new Group3DRotation[] {contentGroupRotator, slicePlaneGroupRotator},controller.getThreeDPane());
 
-        innerGroup.getChildren().addListener((InvalidationListener) e -> centerGroupToItself(innerGroup));
 
         contentGroup.getChildren().add(innerGroup);
         contentGroup.getTransforms().setAll(initialTransform);
 
-
-        //little bug-avoidance in case i add some objects at some point and forget to give them an ID. null ID will throw exceptions.
-        //im not sure if this is ever called (it shouldnt be)
-        innerGroup.getChildren().addListener(new ListChangeListener<Node>() {
-            @Override
-            public void onChanged(Change<? extends Node> c) {
-                while (c.next()) {
-                    if (c.wasAdded()) {
-                        for (Node node : c.getAddedSubList()) {
-                            if (node.getId() == null) node.setId("null");
-                        }
-                    }
-                }
-            }
-        });
 
         //----------------create the models----------------
 
@@ -313,23 +298,24 @@ public class WindowPresenter {
         });
          */
 
-
-        //---------------initialize 3D selection model-----------
-        threeDSelectionGroup = new SelectionGroup<>("3dSelectionGroup");
-        HasFXGroupSelection hasInnerGroupSelectedItems = new HasFXGroupSelection(innerGroup, "hasInnerGroupSelectedItems");
-        FXGroupSelectionContainer threeDSelectionContainer = new FXGroupSelectionContainer(
-                hasInnerGroupSelectedItems, threeDSelectionGroup);
-        threeDSelectionGroup.addSelectionContainer(threeDSelectionContainer);
-        //-----------------------------------------------
-
-        //-------------initialize selection model for 3D contents (so not 3D selection but what meshViews are drawn)
+        //-------------initialize selection model for 3D contents (not 3D selection but what meshViews are drawn)
         this.hasInnerGroupContents = new HasFXGroupContents(innerGroup, "hasinnergroupMeshes");
         this.threeDContentGroup = new SelectionGroup<String>("3dContentGroup");
         this.hasTheeDContentsContainer = new HasFXGroupContentsContainer(hasInnerGroupContents, threeDContentGroup); //, new String[]{isAFilesLocation.getValue().getAbsolutePath(), partOfFilesLocation.getValue().getAbsolutePath()}
         this.hasInnerGroupContents.setHasFXGroupContentsContainer(hasTheeDContentsContainer);
         threeDContentGroup.addSelectionContainer(hasTheeDContentsContainer);
-        hasTheeDContentsContainer.addResourceLocations(models.stream().map(Model::getFilesDirURL).collect(Collectors.toList()));
         //---------------------------
+
+
+        //---------------initialize 3D selection model-----------
+        threeDSelectionGroup = new SelectionGroup<>("3dSelectionGroup");
+        HasFXGroupSelection hasInnerGroupSelectedItems = new HasFXGroupSelection(hasInnerGroupContents, "hasInnerGroupSelectedItems");
+        FXGroupSelectionContainer threeDSelectionContainer = new FXGroupSelectionContainer(
+                hasInnerGroupSelectedItems, threeDSelectionGroup);
+        threeDSelectionGroup.addSelectionContainer(threeDSelectionContainer);
+        //-----------------------------------------------
+
+
 
         //mediator between tree selection and 3D content
         this.selectionMediatorTree_3D_Content = new SelectionMediator_Tree_3D(treeViewSelectionGroup, threeDContentGroup);
@@ -339,8 +325,24 @@ public class WindowPresenter {
 
         //------------load main model------------
         loadModel(mainModel);
-        makeModelVisible(mainModel);
         //---------------------------------------
+
+        hasInnerGroupContents.getSelection().addListener((InvalidationListener) e -> centerGroupToItself(innerGroup));  //should be called after the command below, otherwise it'll fire every loop
+
+        //little bug-avoidance in case i add some objects at some point and forget to give them an ID. null ID will throw exceptions.
+        //im not sure if this is ever called (it shouldnt be)
+        hasInnerGroupContents.getSelection().addListener(new ListChangeListener<Node>() {
+            @Override
+            public void onChanged(Change<? extends Node> c) {
+                while (c.next()) {
+                    if (c.wasAdded()) {
+                        for (Node node : c.getAddedSubList()) {
+                            if (node.getId() == null) node.setId("null");
+                        }
+                    }
+                }
+            }
+        });
 
 
         //listen to TreeViewSetup for cut, paste and delete events.
@@ -387,8 +389,7 @@ public class WindowPresenter {
             }
             PickResult result = event.getPickResult();
             Node pickedNode = result.getIntersectedNode();
-            if (pickedNode instanceof MeshView) {
-                MeshView mesh = (MeshView) pickedNode;
+            if (pickedNode instanceof MeshView mesh) {
                 if (!hasInnerGroupSelectedItems.getSelection().contains(mesh)) {
                     hasInnerGroupSelectedItems.select(mesh);
                 } else {
@@ -428,14 +429,14 @@ public class WindowPresenter {
         //----------menu File: 3D
         controller.getMenuResetView().setOnAction(e -> executeCommand(new ResetViewDrawCommand(new Group[]{contentGroup, slicePlaneGroup}, camera, initialTransform, initialCameraPosition, setupMouseRotate3D)));
         controller.getMenuClearView().setOnAction(e -> {
-            executeCommand(new ClearCommand(contentGroup, innerGroup));
+            executeCommand(new ClearCommand(contentGroup, hasInnerGroupContents));
             threeDSelectionGroup.changeSelection(new HashSet<>(), true, false);
 
 
         });
         controller.getResetViewButton().setOnAction(e -> executeCommand(new ResetViewDrawCommand(new Group[]{contentGroup,slicePlaneGroup}, camera, initialTransform, initialCameraPosition, setupMouseRotate3D)));
         controller.getClearViewButton().setOnAction(e -> {
-            executeCommand(new ClearCommand(contentGroup, innerGroup));
+            executeCommand(new ClearCommand(contentGroup, hasInnerGroupContents));
             threeDSelectionGroup.changeSelection(new HashSet<>(), true, false);
         });
 
@@ -456,7 +457,8 @@ public class WindowPresenter {
         //----------------------------------
 
         //--------3D buttons for selection--------------
-        controller.getSelectAll3DButton().setOnAction(e -> hasInnerGroupSelectedItems.selectAll());
+//        controller.getSelectAll3DButton().setOnAction(e -> hasInnerGroupSelectedItems.selectAll());
+        controller.getSelectAll3DButton().setOnAction(e -> hasInnerGroupSelectedItems.setSelection(hasInnerGroupContents.getSelection()));
         controller.getUnselectAll3DButton().setOnAction(e -> {
             //hasInnerGroupSelectedItems.clearSelection();
             threeDSelectionGroup.changeSelection(new HashSet<>(), true, false);
@@ -491,6 +493,7 @@ public class WindowPresenter {
                     treeViewSelectionGroup.setNoUpdating(false);
                 }
             }
+            printMem();
         });
 
         controller.getRemoveFrom3DButton().setOnAction(e -> {
@@ -631,7 +634,7 @@ public class WindowPresenter {
 
 //        for (TreeView<ANode> treeView : treeViews) treeView.getSelectionModel().getSelectedItems().addListener((InvalidationListener) i -> updateTreeBotLabel());
 
-        hasInnerGroupSelectedItems.getSelection().addListener((InvalidationListener) i -> {
+        hasInnerGroupSelectedItems.getSelection().addListener((ListChangeListener<? super MeshView>) i -> {
             update3DBotLabel(hasInnerGroupSelectedItems.getSelection().size() + " items selected.");
             StringBuilder stringBuilder = new StringBuilder();
             for (Node node : hasInnerGroupSelectedItems.getSelection()) stringBuilder.append(node.getId() + ", ");
@@ -687,7 +690,7 @@ public class WindowPresenter {
             LinkedList<Node> nodesToExplode = new LinkedList<>();
             Set<String> nodesToExplodeByID = threeDSelectionGroup.getSelection().size() < 2 ? threeDContentGroup.getSelection() : threeDSelectionGroup.getSelection();
             for (String nodeID : nodesToExplodeByID) {
-                nodesToExplode.add(hasInnerGroupContents.getNodeWithID(nodeID));
+                nodesToExplode.add(hasInnerGroupContents.getMeshViewWithID(nodeID));
             }
             explode.explode(nodesToExplode, innerGroup, initialTransform);
         });
@@ -834,10 +837,13 @@ public class WindowPresenter {
 
         //------------------cutting-------------------------
         controller.getCutButt().setUserData(false);
-        InvalidationListener setupSlicePlaneListener = new InvalidationListener() {
+        ListChangeListener<Object> setupSlicePlaneListener = new ListChangeListener<>() {
             @Override
-            public void invalidated(Observable observable) {
-                setupSlicePlane();
+            public void onChanged(Change<?> c) {
+                while (c.next()) {
+                    if (c.wasRemoved()) continue;
+                    setupSlicePlane();
+                }
             }
         };
 
@@ -850,14 +856,14 @@ public class WindowPresenter {
                 controller.getCutSelectionButton().setDisable(true);
                 slicePlaneGroup.getChildren().clear();
                 contentGroupRotator.clearIsTransformForbidden();
-                innerGroup.getChildren().removeListener(setupSlicePlaneListener);
+                hasInnerGroupContents.getSelection().removeListener(setupSlicePlaneListener);
             } else {
-                if (innerGroup.getChildren().isEmpty()) return;
+                if (hasInnerGroupContents.getSelection().isEmpty()) return;
                 controller.getCutSelectionButton().setDisable(false);
                 controller.getCutButt().setText("Cancel");
                 controller.getCutButt().setUserData(true);      //size of the plane will be the size of the drawn 3D objects * 2
                 setupSlicePlane();
-                innerGroup.getChildren().addListener(setupSlicePlaneListener);
+                hasInnerGroupContents.getSelection().addListener(setupSlicePlaneListener);
             }
         });
         //cutSelectionButton will store the last clicked MenuItem under UserData.
@@ -876,7 +882,7 @@ public class WindowPresenter {
                 controller.getCutButt().setUserData(false);
                 controller.getCutButt().setText("Cut");
                 slicePlaneGroup.getChildren().clear();
-                innerGroup.getChildren().removeListener(setupSlicePlaneListener);
+                hasInnerGroupContents.getSelection().removeListener(setupSlicePlaneListener);
                 hasInnerGroupSelectedItems.clearSelection();
                 return true;
             }
@@ -885,8 +891,8 @@ public class WindowPresenter {
         //actions for the menuitems
         controller.getCutAllMenuItem().setOnAction(e -> {
             LinkedList<MeshView> meshViews = new LinkedList<>();
-            for (Node node : innerGroup.getChildren()) if (node instanceof MeshView) meshViews.add((MeshView) node);
-            executeCommand(new SliceCommand(meshViews, innerGroup, (Box) slicePlaneGroup.getChildren().getFirst()));
+            for (MeshView node : hasInnerGroupContents.getSelection()) if (node != null) meshViews.add(node);
+            executeCommand(new SliceCommand(meshViews, innerGroup, (Box) slicePlaneGroup.getChildren().getFirst(), hasInnerGroupContents, threeDSelectionGroup));
             postCutEvent.apply(controller.getCutAllMenuItem());
         });
         controller.getCutSelectedMenuItem().setOnAction(e -> {
@@ -894,7 +900,7 @@ public class WindowPresenter {
             System.out.println("cut selected");
             LinkedList<MeshView> meshViews = new LinkedList<>();
             for (Node node : hasInnerGroupSelectedItems.getSelection()) if (node instanceof MeshView) meshViews.add((MeshView) node);
-            executeCommand(new SliceCommand(meshViews, innerGroup, (Box) slicePlaneGroup.getChildren().getFirst()));
+            executeCommand(new SliceCommand(meshViews, innerGroup, (Box) slicePlaneGroup.getChildren().getFirst(), hasInnerGroupContents, threeDSelectionGroup));
             postCutEvent.apply(controller.getCutSelectedMenuItem());
         });
 
@@ -902,7 +908,7 @@ public class WindowPresenter {
         //---------------------------end cutting-------------------------
 
 
-        innerGroup.getChildren().addListener((ListChangeListener<? super Node>) i -> controller.getBotLabelDrawCount().setText(innerGroup.getChildren().size() + " items drawn."));
+        hasInnerGroupContents.getSelection().addListener((ListChangeListener<? super Node>) i -> controller.getBotLabelDrawCount().setText(hasInnerGroupContents.getSelection().size() + " items drawn."));
 
 
 
@@ -1062,8 +1068,10 @@ public class WindowPresenter {
      */
     private void executeCommand(Command command) {
         redoList.clear();
+        WindowPresenter.printMem();
         undoList.add(command);
         command.execute();
+        WindowPresenter.printMem();
         //System.out.println("Executing " + command.name());
     }
 
@@ -1095,7 +1103,7 @@ public class WindowPresenter {
      * making sure that they always overlap.</li>
      */
     private void setupSlicePlane() {
-        if (innerGroup.getChildren().isEmpty()) {
+        if (hasInnerGroupContents.getSelection().isEmpty()) {
             return;
         }
         slicePlaneGroup.getChildren().clear();
@@ -1149,6 +1157,10 @@ public class WindowPresenter {
      */
     public BooleanProperty getFullScreenCheckProperty() {return controller.getFullScreenCheck().selectedProperty();}
 
+    /**
+     * Makes the Tab visible and makes the model drawable.
+     * @param model
+     */
     private void makeModelVisible(Model model) {
         Tab tab = this.tabs.stream().filter(tab1 -> tab1.getText().equals(model.getName())).toList().getFirst();    //get the tab of the model
         controller.getTreeTabPane().getTabs().add(tab);     //make tab visible
@@ -1191,6 +1203,7 @@ public class WindowPresenter {
         Tab tab = new Tab(model.getName(), treeView);
         this.tabs.add(tab);
         tab.setContextMenu(contextMenu);
+        makeModelVisible(model);
         /*
         To add checklist:
         - create & setup treeview, set id. add to treeviews list
@@ -1257,10 +1270,10 @@ public class WindowPresenter {
         @Override
         public void undo() {for (Model model : models) forgetModel(model);}
         @Override
-        public void execute() {for (int m = 0; m < models.size(); m++) {
-            Model model = models.get(m);
-            loadModel(model, contextMenus.get(m));
-            makeModelVisible(model);
+        public void execute() {
+            for (int m = 0; m < models.size(); m++) {
+                Model model = models.get(m);
+                loadModel(model, contextMenus.get(m));
         }}
         @Override
         public void redo() {execute();}
@@ -1274,7 +1287,7 @@ public class WindowPresenter {
     private class RemoveModelCommand implements Command {
         private final List<Model> models;
         private final Set<String> meshViewIDsToRemove;  //meshviews that need to be undrawn when the model is removed
-        private RememberFXGroupContents rememberFXGroupContents;
+        private RememberHasFXGroupContents rememberFXGroupContents;
         private RememberFXMeshViewColors rememberFXMeshViewColors;
         private final List<ContextMenu> contextMenus;
 
@@ -1300,7 +1313,7 @@ public class WindowPresenter {
 
         @Override
         public void execute() {
-            this.rememberFXGroupContents = new RememberFXGroupContents(innerGroup);
+            this.rememberFXGroupContents = new RememberHasFXGroupContents(hasInnerGroupContents);
             this.rememberFXMeshViewColors = new RememberFXMeshViewColors(meshViewIDsToRemove, hasInnerGroupContents, threeDSelectionGroup);
             for (Model model : models) {forgetModel(model);}
         }
@@ -1308,7 +1321,7 @@ public class WindowPresenter {
         public void undo() {
             for (int m = 0; m < models.size(); m++) {
                 Model model = models.get(m);
-                loadModel(model, contextMenus.get(m));makeModelVisible(model);
+                loadModel(model, contextMenus.get(m));
             }
             this.rememberFXGroupContents.restoreSelection();
             this.rememberFXMeshViewColors.restoreSelection();
@@ -1333,8 +1346,10 @@ public class WindowPresenter {
             TreeView<ANode> mainModelTreeView = null;
             for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
             if (mainModelTreeView == null) return;
-            System.out.println("enable v3 command: found the tree view when removing");
             EnableDisableBP3DV3Parts.removeV3FilesFromTree(mainModelTreeView.getRoot(), EnableDisableBP3DV3Parts.createIdToFileIDsMap());
+
+            selectionMediatorTree3D_Selection.reloadDicts();
+            selectionMediatorTree_3D_Content.reloadDicts();
         }
 
         @Override
@@ -1343,13 +1358,16 @@ public class WindowPresenter {
             TreeView<ANode> mainModelTreeView = null;
             for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
             if (mainModelTreeView == null) return;
-            System.out.println("enable v3 command: found the tree view when adding");
+
             EnableDisableBP3DV3Parts.addV3FilesToTree(mainModelTreeView.getRoot(), EnableDisableBP3DV3Parts.createIdToFileIDsMap());
+
+            selectionMediatorTree3D_Selection.reloadDicts();
+            selectionMediatorTree_3D_Content.reloadDicts();
         }
 
         @Override
         public void redo() {
-            addModelCommand.execute();
+            execute();
         }
 
         @Override
@@ -1372,8 +1390,10 @@ public class WindowPresenter {
             TreeView<ANode> mainModelTreeView = null;
             for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
             if (mainModelTreeView == null) return;
-            System.out.println("disable v3 command: found the tree view when removing");
             EnableDisableBP3DV3Parts.addV3FilesToTree(mainModelTreeView.getRoot(), EnableDisableBP3DV3Parts.createIdToFileIDsMap());
+
+            selectionMediatorTree3D_Selection.reloadDicts();
+            selectionMediatorTree_3D_Content.reloadDicts();
         }
 
         @Override
@@ -1382,13 +1402,15 @@ public class WindowPresenter {
             TreeView<ANode> mainModelTreeView = null;
             for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
             if (mainModelTreeView == null) return;
-            System.out.println("enable v3 command: found the tree view when adding");
             EnableDisableBP3DV3Parts.removeV3FilesFromTree(mainModelTreeView.getRoot(), EnableDisableBP3DV3Parts.createIdToFileIDsMap());
+
+            selectionMediatorTree3D_Selection.reloadDicts();
+            selectionMediatorTree_3D_Content.reloadDicts();
         }
 
         @Override
         public void redo() {
-            removeModelCommand.execute();
+            execute();
         }
 
         @Override
@@ -1429,6 +1451,16 @@ public class WindowPresenter {
             LittlePopUp.showScrollableTextPopup("Info", "No duplicate IDs in the tree.");
             return true;
         }
+    }
+
+    public static void printMem() {
+        System.out.println(java.lang.management.ManagementFactory.getRuntimeMXBean().getInputArguments());
+        Runtime r = Runtime.getRuntime();
+        System.out.println(Runtime.getRuntime().maxMemory() / (1024 * 1024) + " MB max memory");
+        System.out.println(r.totalMemory()  / (1024*1024)+ " MB total memory");
+        System.out.println(r.freeMemory()  / (1024*1024)+ " MB free memory");
+        System.out.println("Used MB: " + (r.totalMemory() - r.freeMemory()) / (1024*1024));
+
     }
 
 }

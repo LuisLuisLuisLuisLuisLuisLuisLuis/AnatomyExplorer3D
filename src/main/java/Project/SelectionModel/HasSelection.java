@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface HasSelection<T> {
     ObservableList<T> getSelection();
-    void setSelection(ObservableList<T> selection);
+    void setSelection(List<T> selection);
     void select(T item);
     void unselect(T item);
     void clearSelection();
