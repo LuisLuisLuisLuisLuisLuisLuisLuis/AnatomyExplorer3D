@@ -500,13 +500,6 @@ public class WindowPresenter {
                 }
             }
             printMem();
-            int points = 0;
-            int normals = 0;
-            for (MeshView meshView : hasInnerGroupContents.getSelection()) {
-                points += ((TriangleMesh) meshView.getMesh()).getPoints().size();
-                normals += ((TriangleMesh) meshView.getMesh()).getNormals().size();
-            }
-            System.out.println(points + " points, " + normals + " normals");
         });
 
         controller.getRemoveFrom3DButton().setOnAction(e -> {

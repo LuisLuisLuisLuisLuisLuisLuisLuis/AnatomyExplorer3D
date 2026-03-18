@@ -88,8 +88,8 @@ public class OpenOBJ {
         if (inputStream != null) {
             File imgFile = new File(nameWithoutExtension + ".png");
             try {
-                //generate mesh from OBJ inputstream
-                MeshView meshView = createMeshWithIMG(ObjParser_V3.load(inputStream), imgFile, color);
+                //generate mesh from OBJ inputstream. For now I ignore normals to save RAM.
+                MeshView meshView = createMeshWithIMG(ObjParser_V3.load(inputStream, false), imgFile, color);
                 //set file name as ID
                 meshView.setId(nameWithoutExtension);
 

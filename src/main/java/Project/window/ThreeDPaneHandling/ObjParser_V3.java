@@ -10,9 +10,8 @@ import java.util.*;
 
 public class ObjParser_V3 {
 
-    public static TriangleMesh load(InputStream inputStream) throws IOException{
-        IntegerProperty integerProperty = new SimpleIntegerProperty(0);
-        IntegerProperty nosafe = new SimpleIntegerProperty(0);
+    public static TriangleMesh load(InputStream inputStream, boolean useNormals) throws IOException{
+
         // OBJ raw data
         var objVertices = new ArrayList<Float>();
         var objNormals = new ArrayList<Float>();
@@ -45,6 +44,7 @@ public class ObjParser_V3 {
                         break;
 
                     case "vn":
+                        if (!useNormals) break;
                         hasNormals = true;
                         objNormals.add(Float.parseFloat(tokens[1]));
                         objNormals.add(Float.parseFloat(tokens[2]));
@@ -85,17 +85,17 @@ public class ObjParser_V3 {
                             addFaceVertex(vIndices[0], tIndices[0], nIndices[0],
                                     objVertices, objTexCoords, objNormals,
                                     meshPoints, meshTexCoords, meshNormals,
-                                    meshFaces, vertexMap, hasNormals, hasTexCoords, integerProperty, nosafe);
+                                    meshFaces, vertexMap, hasNormals, hasTexCoords);
 
                             addFaceVertex(vIndices[i], tIndices[i], nIndices[i],
                                     objVertices, objTexCoords, objNormals,
                                     meshPoints, meshTexCoords, meshNormals,
-                                    meshFaces, vertexMap, hasNormals, hasTexCoords, integerProperty, nosafe);
+                                    meshFaces, vertexMap, hasNormals, hasTexCoords);
 
                             addFaceVertex(vIndices[i + 1], tIndices[i + 1], nIndices[i + 1],
                                     objVertices, objTexCoords, objNormals,
                                     meshPoints, meshTexCoords, meshNormals,
-                                    meshFaces, vertexMap, hasNormals, hasTexCoords, integerProperty, nosafe);
+                                    meshFaces, vertexMap, hasNormals, hasTexCoords);
                         }
                         break;
                 }
@@ -117,8 +117,6 @@ public class ObjParser_V3 {
             mesh.getNormals().setAll(toFloatArray(meshNormals));
             mesh.setVertexFormat(VertexFormat.POINT_NORMAL_TEXCOORD);
         }
-        System.err.println("Saved " + integerProperty.get() + " out of " + (nosafe.get() + integerProperty.get()) + " times");
-        System.err.println("unique vertices: " + vertexMap.size() + ". normals count: " + meshNormals.size() / 3);
 
         return mesh;
     }
@@ -134,16 +132,13 @@ public class ObjParser_V3 {
             List<Integer> meshFaces,
             Map<VertexKey, Integer> vertexMap,
             boolean hasNormals,
-            boolean hasTexCoords,
-            IntegerProperty dedup,
-            IntegerProperty nosafe
+            boolean hasTexCoords
     ) {
 
         VertexKey key = new VertexKey(v, hasTexCoords ? vt : -1, hasNormals ? vn : -1);
 
         Integer index = vertexMap.get(key);
         if (index == null) {
-            nosafe.set(nosafe.get()+1);
             index = vertexMap.size();
             vertexMap.put(key, index);
 
@@ -164,8 +159,6 @@ public class ObjParser_V3 {
                 meshNormals.add(objNormals.get(3 * vn + 1));
                 meshNormals.add(objNormals.get(3 * vn + 2));
             }
-        } else {
-            dedup.set(dedup.get()+1);
         }
 
         // JavaFX face format: (pointIndex, texCoordIndex)
