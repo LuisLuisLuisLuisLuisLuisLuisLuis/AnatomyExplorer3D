@@ -4,11 +4,13 @@ import Project.SelectionModel.SelectionContainer;
 import Project.SelectionModel.SelectionGroup;
 import Project.window.ThreeDPaneHandling.Coloring.FileGroupingScheme;
 import Project.window.ThreeDPaneHandling.OpenOBJ;
+import Project.window.WindowPresenter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.MeshView;
+import javafx.scene.shape.TriangleMesh;
 
 import java.io.*;
 import java.net.URL;
@@ -173,7 +175,10 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
     private void removeOBJs(File file) {
         File[] files = file.listFiles();
         if (files == null) return;
-        for (File objfile : files) hasFXGroupContents.removeOBJ(objfile.getName().substring(0, objfile.getName().lastIndexOf(".")));
+        for (File objfile : files) {
+            if (!objfile.getName().endsWith(".obj")) continue;
+            hasFXGroupContents.removeOBJ(objfile.getName().substring(0, objfile.getName().lastIndexOf(".")));
+        }
     }
     private void removeOBJs(URL url) {
         removeOBJs(new File(url.getFile()));
@@ -190,14 +195,23 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
         fileDirs.remove(dir); removeOBJs(dir);}
 
     private final ArrayList<URL> resourceLocations;
-    public ArrayList<URL> getResourceLocationsLocations() {
-        return resourceLocations;
-    }
+
+    public ArrayList<URL> getResourceLocationsLocations() {return resourceLocations;}
+
     public void addResourceLocation(URL url) {
         for (URL url1: resourceLocations) if (url.getFile().equals(url1.getFile())) return;
-        resourceLocations.add(url); loadOBJs(url);
+        resourceLocations.add(url);
+        loadOBJs(url);
     }
-    public void removeResourceLocation(URL url) {
-        resourceLocations.remove(url); removeOBJs(url);}
+    public void removeResourceLocation(URL url) {resourceLocations.remove(url); removeOBJs(url);}
+
+
+    public static void printNrFaces(List<MeshView> meshViews, String msg) {
+        int counter = 0;
+        for (MeshView meshView : meshViews) {
+            if (meshView.getMesh() instanceof TriangleMesh triangleMesh) counter += triangleMesh.getFaces().size();
+        }
+        System.out.println(counter + " faces " + msg);
+    }
 
 }
