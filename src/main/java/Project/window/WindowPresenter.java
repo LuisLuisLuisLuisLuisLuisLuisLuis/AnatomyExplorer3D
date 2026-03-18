@@ -18,7 +18,6 @@ import Project.command.DrawCommands.*;
 import Project.command.DrawCommands.DrawAnatomyCommands.DrawItemIn3DCommand;
 import Project.command.DrawCommands.DrawAnatomyCommands.RemoveObjFrom3DCommand;
 import Project.command.Remember.RememberHasFXGroupContents;
-import Project.command.Remember.RememberHasSelection;
 import Project.command.Remember.RememberFXMeshViewColors;
 import Project.command.TreeCommands.CollapseTreeViewCommand;
 import Project.command.TreeCommands.ExpandTreeViewCommand;
@@ -61,7 +60,9 @@ import javafx.scene.input.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
+import javafx.scene.shape.Mesh;
 import javafx.scene.shape.MeshView;
+import javafx.scene.shape.TriangleMesh;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
@@ -70,9 +71,9 @@ import javafx.scene.transform.Translate;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils.replaceANodeByCopy;
 
@@ -135,6 +136,10 @@ public class WindowPresenter {
     private final Model partof_v3;
     private final Model isa_v3;
 
+    private int sizeOfUserModels = 0;   // this counts the size of OBJ files associated with models loaded by the user; in MB. (excluding the anatomy models shipped with this software).
+                                        // The user is not allowed to load more than 400MB of OBJ files (~3-4GB of RAM when visualized).
+    private static final int maxSizeOfUserModels = 460;
+
     private final AIService aiService;  //implements AI support
 
     /**
@@ -195,8 +200,9 @@ public class WindowPresenter {
                 );
 
         this.models.add(mainModel);
-        this.models.add(partof_v3);
-        this.models.add(isa_v3);
+//        this.models.add(partof_v3);
+//        this.models.add(isa_v3);
+
         //--------initialize tree selection model----------
         this.treeViewSelectionGroup = new SelectionGroup<>("treeViewSelectionGroup");
         this.treeViewSelectionContainers = new ArrayList<>(this.models.size());
@@ -494,6 +500,13 @@ public class WindowPresenter {
                 }
             }
             printMem();
+            int points = 0;
+            int normals = 0;
+            for (MeshView meshView : hasInnerGroupContents.getSelection()) {
+                points += ((TriangleMesh) meshView.getMesh()).getPoints().size();
+                normals += ((TriangleMesh) meshView.getMesh()).getNormals().size();
+            }
+            System.out.println(points + " points, " + normals + " normals");
         });
 
         controller.getRemoveFrom3DButton().setOnAction(e -> {
@@ -546,20 +559,43 @@ public class WindowPresenter {
 
             InputStream relationsStream = findFileAndMakeStream.apply("Edge list");
             if (relationsStream == null) return;
-
+            long estOBJsSize = 0;
             InputStream filesListStream = null;
             File filesDir = null;
             if (LittlePopUp.showMsg("", "Add OBJ files?", "Yes", "No")) {
-                filesListStream = findFileAndMakeStream.apply("File List");
+                if (models.contains(partof_v3) || models.contains(isa_v3)) {
+                    if (!LittlePopUp.showMsg("Info", "To load custom OBJ files, BP3D 3.0 must be disabled to free up RAM.\n", "Continue", "Cancel")) return;
+                    else executeCommand(new DisableBP3DV3Command());
+                }
+                if (!LittlePopUp.showMsg("Info", "You may load up to " + (maxSizeOfUserModels - sizeOfUserModels) + " MB worth of OBJ files. Continue by providing the file list?", "Continue", "Cancel")) return;
+                filesListStream = findFileAndMakeStream.apply("Provide the File List");
                 if (filesListStream != null) {    //only ask for the directory if the files list is provided
-                    do {
+
+                    do {    // loop for finding a directory containing OBJ files. can be cancelled to avoid choosing OBJ files by setting fileListDir=null and breaking out.
+
                         filesDir = FileExplorerInteraction.findDir("Folder containing .obj files");
+
                         if (filesDir == null || !filesDir.isDirectory() || filesDir.list().length == 0) {
                             if (!LittlePopUp.showMsg("Error", "No valid directory", "Retry", "Cancel")) {
                                 filesListStream = null;
                                 break;
-                            }
+                            } else continue;
+                        }
+
+                        estOBJsSize = estimateSizeOfOBJsInDir(filesDir);
+                        if (sizeOfUserModels + estOBJsSize > maxSizeOfUserModels) {
+                            String wrnmsg1 = "The provided OBJ files (" + estOBJsSize + " MB) exceed the maximum capacity of " + maxSizeOfUserModels + " MB.";
+                            String actmsg1 = "Choose a different directory?";
+                            String wrnmsg2 = "You have already uploaded " + sizeOfUserModels + " MB of OBJ files. Uploading the provided OBJ files (" + estOBJsSize + " MB) will exceed the maximum capacity of " + maxSizeOfUserModels + " MB.";
+                            String actmsg2 = actmsg1; //"Choose a different directory or Cancel and remove other models first.";
+                            if (sizeOfUserModels == 0) {
+                                if (LittlePopUp.showMsg("Error", wrnmsg1 + "\n" + actmsg1, "Continue", "Cancel")) continue;
+                            } else if (LittlePopUp.showMsg("Error", wrnmsg2 + "\n" +  actmsg2, "Continue", "Cancel")) continue;
+                            filesListStream = null;
+                            break;
                         } else break;
+
+
                     } while (true);
                 }
             }
@@ -575,12 +611,20 @@ public class WindowPresenter {
             }
 
 
-            Model model = filesListStream == null ? new Model(relationsStream, name) : new Model(relationsStream, filesListStream, name, filesDir);
-            ContextMenu contextMenu = new ContextMenu();
-            MenuItem remove = new MenuItem("Remove");
-            remove.setOnAction(actionEvent -> executeCommand(new RemoveModelCommand(model)));
-            contextMenu.getItems().add(remove);
-            executeCommand(new AddModelCommand(model, contextMenu));
+            try {
+                Model model = filesListStream == null ? new Model(relationsStream, name) : new Model(relationsStream, filesListStream, name, filesDir);
+                ContextMenu contextMenu = new ContextMenu();
+                MenuItem remove = new MenuItem("Remove");
+                remove.setOnAction(actionEvent -> executeCommand(new RemoveModelCommand(model)));
+                contextMenu.getItems().add(remove);
+                executeCommand(new AddModelCommand(model, contextMenu));
+                sizeOfUserModels += estOBJsSize;
+            }
+            catch (Exception x) {
+                LittlePopUp.showMsg("Error", "Failed to parse model:\n" + x.getMessage(), "Ok");
+                return;
+            }
+
         });
         //-----------------------------------------
 
@@ -910,7 +954,19 @@ public class WindowPresenter {
 
         hasInnerGroupContents.getSelection().addListener((ListChangeListener<? super Node>) i -> controller.getBotLabelDrawCount().setText(hasInnerGroupContents.getSelection().size() + " items drawn."));
 
-
+        controller.getDrawEverythingButton().setOnAction(e -> {
+//            LinkedList<ANode> allNodes = new LinkedList<>();
+//            TreeAnalysisUtils.accumulateForEveryNodeBelow(treeViews.get(0).getRoot(), allNodes, TreeItem::getValue);
+//            long[] mems = new long[allNodes.size()];
+//            for (int a = 0; a < allNodes.size(); a++) {
+//                ANode aNode = allNodes.get(a);
+//                long memB4 = freeMemory();
+//                executeCommand(new DrawItemIn3DCommand(aNode.fileIds(), threeDContentGroup, threeDSelectionGroup));
+//                mems[a] = memB4 - freeMemory();
+//            }
+//            System.out.println("Average consumption(draw): " + Arrays.stream(mems).sum() / mems.length);
+            HasFXGroupContentsContainer.printNrFaces(hasInnerGroupContents.getSelection(), "");
+        });
 
 
 //-----------------end of constructor----------------
@@ -1069,8 +1125,8 @@ public class WindowPresenter {
     private void executeCommand(Command command) {
         redoList.clear();
         WindowPresenter.printMem();
-        undoList.add(command);
         command.execute();
+        undoList.add(command);
         WindowPresenter.printMem();
         //System.out.println("Executing " + command.name());
     }
@@ -1203,7 +1259,10 @@ public class WindowPresenter {
         Tab tab = new Tab(model.getName(), treeView);
         this.tabs.add(tab);
         tab.setContextMenu(contextMenu);
+        long memb4b4 = WindowPresenter.freeMemory();
+        long totb4 = Runtime.getRuntime().totalMemory();
         makeModelVisible(model);
+        System.out.println("Make visible consumed " + (memb4b4 - freeMemory() - (Runtime.getRuntime().totalMemory() - totb4) / (1024 * 1024)));
         /*
         To add checklist:
         - create & setup treeview, set id. add to treeviews list
@@ -1453,14 +1512,32 @@ public class WindowPresenter {
         }
     }
 
+    public static long freeMemory() {return Runtime.getRuntime().freeMemory()  / (1024*1024);}
+
     public static void printMem() {
-        System.out.println(java.lang.management.ManagementFactory.getRuntimeMXBean().getInputArguments());
         Runtime r = Runtime.getRuntime();
         System.out.println(Runtime.getRuntime().maxMemory() / (1024 * 1024) + " MB max memory");
         System.out.println(r.totalMemory()  / (1024*1024)+ " MB total memory");
         System.out.println(r.freeMemory()  / (1024*1024)+ " MB free memory");
         System.out.println("Used MB: " + (r.totalMemory() - r.freeMemory()) / (1024*1024));
+    }
 
+    public static long estimateSizeOfOBJsInDir(File dir) {
+        try {System.out.println("directory size: " + Files.size(dir.toPath()));}
+        catch (IOException i) {return 0;}
+
+        if (dir.isDirectory() && dir.listFiles() != null) {
+            File[] files = dir.listFiles();
+            long sumFileSizes = 0;
+            for (File file : files) {
+                try {sumFileSizes += Files.size(file.toPath());}
+                catch (IOException ignored) {System.out.println("skipping file");}
+            }
+            sumFileSizes /= (1024 * 1024);
+            System.out.println("file sizes: " + sumFileSizes );
+            return sumFileSizes;
+        }
+        return 0;
     }
 
 }

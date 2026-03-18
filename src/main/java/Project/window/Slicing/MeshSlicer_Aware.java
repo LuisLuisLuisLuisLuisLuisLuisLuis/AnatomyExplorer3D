@@ -14,10 +14,8 @@ public class MeshSlicer_Aware {
             TriangleMesh input,
             double nx, double ny, double nz,
             double d,
-//            SimpleObjectProperty<MeshSliceState> meshSliceState
             SimpleBooleanProperty modified
     ) {
-//        meshSliceState.set(MeshSliceState.UNMODIFIED);
         modified.set(false);
         VertexFormat vertexFormat = input.getVertexFormat();
 
@@ -82,7 +80,7 @@ public class MeshSlicer_Aware {
         // --- Add an original vertex to the list of outgoing points, but only if it's not already been added---
         Function<Integer, Integer> addPoint = new Function<>() {
             /**
-             * Retrieve a point of inPts and if not already present it outPts: add it to outPts and create an entry
+             * Retrieve a point of inPts and if not already present in outPts: add it to outPts and create an entry
              * [pIdx, new index of point in outPts] in pointMap.
              * @param pIdx index of a point in the list of inPts. Note that a point consists of three numbers and
              *             inPts stores for every point those three numbers one after another. Thus, the three numbers

@@ -17,7 +17,10 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.function.Function;
 
 public class LittlePopUp {
 
@@ -157,7 +160,7 @@ public class LittlePopUp {
         Label fileIDtext = new Label("- format: ");
         bullets.add(fileIDtext);
         TextFlow fileIDTextFlow = new TextFlow();
-        for (String txt : new String[]{"node id", "node name", "name of the .obj file (without \".obj\")"}) {
+        for (String txt : new String[]{"node id", "node name", "name of the .obj file"}) {
             Text text = new Text(txt);
             text.getStyleClass().add("text-normal");
             fileIDTextFlow.getChildren().add(text);
@@ -202,12 +205,28 @@ public class LittlePopUp {
     public static boolean showMsg(String title, String message, String okButtonText, String noButtonText) {
         Dialog<Boolean> dialog = new Dialog<>();
         dialog.setTitle(title);
-        dialog.setContentText(message);
+        Label label = new Label(message);
+        label.setWrapText(true);
+        label.setMaxWidth(200); // desired max width
+        dialog.getDialogPane().setContent(label);
+
         ButtonType okBType = new ButtonType(okButtonText, ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(okBType, new ButtonType(noButtonText, ButtonBar.ButtonData.CANCEL_CLOSE));
         dialog.setResultConverter(button -> button == okBType);
         return dialog.showAndWait().orElse(false);
     }
+
+    public static void showMsg(String title, String message, String okButtonText) {
+        Dialog<Boolean> dialog = new Dialog<>();
+        dialog.setTitle(title);
+        dialog.setContentText(message);
+        for (String s : message.split("\n")) {
+            if (dialog.getWidth() < s.length() * 3) dialog.setWidth(s.length() * 3);
+        }
+        dialog.getDialogPane().getButtonTypes().addAll(new ButtonType(okButtonText, ButtonBar.ButtonData.OK_DONE));
+        dialog.showAndWait();
+    }
+
 
     public static String askForString(String title, String message) {
         Dialog<String> dialog = new Dialog<>();

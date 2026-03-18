@@ -120,7 +120,7 @@ public class TreeLoader {
     }
 
 
-    private static HashMap<String, HashSet<String>> loadFileList(InputStream inputStream) {
+    private static HashMap<String, HashSet<String>> loadFileList(InputStream inputStream) throws IllegalArgumentException{
         HashMap<String, HashSet<String>> IDtoFilelist = new HashMap<>();
         String fileContents = readInputStream(inputStream);
         String[] lines = fileContents.split("\n");
@@ -128,9 +128,10 @@ public class TreeLoader {
             String line = lines[i];
             if (line.isBlank()) continue;
             String[] lineArr = line.split("\t");
+            if (lineArr.length != 3) throw new IllegalArgumentException("Required format for file list: ID\\tName\\tFileName\nFailed to parse line:  " + line);
             String conceptID = lineArr[0].trim();
             HashSet<String> fileList = IDtoFilelist.containsKey(conceptID) ? IDtoFilelist.get(conceptID) : new HashSet<>();
-            fileList.add(lineArr[2].trim());
+            fileList.add(lineArr[2].trim().replace(".obj", ""));
             IDtoFilelist.put(conceptID, fileList);
         }
         return IDtoFilelist;

@@ -11,7 +11,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -85,12 +89,14 @@ public class OpenOBJ {
             File imgFile = new File(nameWithoutExtension + ".png");
             try {
                 //generate mesh from OBJ inputstream
-                MeshView meshView = createMeshWithIMG(ObjParser_V2.load(inputStream), imgFile, color);
+                MeshView meshView = createMeshWithIMG(ObjParser_V3.load(inputStream), imgFile, color);
                 //set file name as ID
                 meshView.setId(nameWithoutExtension);
 
                 return meshView;
             } catch (Exception e) {
+                System.err.println(Arrays.toString(e.getStackTrace()));
+                System.err.println(e.getMessage());
                 System.err.println("Failed to parse Inputstream of .obj resource " + nameWithoutExtension + ".obj");
             }
         } return null;
@@ -108,31 +114,29 @@ public class OpenOBJ {
      */
     public static MeshView objFileToMeshViews(File objFile) {
         if (objFile != null) {
-            String objPath = objFile.getAbsolutePath();
-            File imgFile = new File(objPath.substring(0, objPath.length() - 3) + "png");
-            try {
-                //generate mesh from the OBJ file
-                MeshView meshView = createMeshWithIMG(ObjParser_V2.load(objPath), imgFile);
-                //set file name as ID
-                meshView.setId(removeFileExtension(objFile.getName()));
 
-                return meshView;
-            } catch (Exception e) {
-                System.err.println("Failed to parse OBJ file: " + objPath);
+            try {
+                return objInputStreamToMeshViews(objFile.toURI().toURL().openStream(), objFile.getName().replace(".obj", ""), null);
+            } catch (IOException m) {
+                return null;
             }
+
+//          Legacy
+//            String objPath = objFile.getAbsolutePath();
+//            File imgFile = new File(objPath.substring(0, objPath.length() - 3) + "png");
+//            try {
+//                //generate mesh from the OBJ file
+//                MeshView meshView = createMeshWithIMG(ObjParser_V2.load(objPath), imgFile);
+//                //set file name as ID
+//                meshView.setId(removeFileExtension(objFile.getName()));
+//
+//                return meshView;
+//            } catch (Exception e) {
+//                System.err.println("Failed to parse OBJ file: " + objPath);
+//            }
         } return null;
     }
 
-
-    /**
-     * Chains openOBJDialog() -> objFilesToMeshViews and adds the meshViews to the provided group.
-     */
-    public static void open(Group group) {
-        List<File> objFiles = openOBJDialog();
-        if (objFiles == null) return;
-        List<MeshView> meshViews = objFilesToMeshViews(objFiles);
-        group.getChildren().addAll(meshViews);
-    }
 
 
     private static String removeFileExtension(String fileName) {

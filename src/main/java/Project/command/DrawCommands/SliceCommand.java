@@ -31,7 +31,7 @@ public class SliceCommand implements Command {
     /**
      * Relies on every MeshView having a unique, consistent ID. Requires that when a MeshView is replaced by a new identical MeshView,
      * that ID is kept.
-     * Relies on MeshView.getUserData() == null ->
+     * Relies on MeshView.getUserData() == null -> MeshView's Mesh is the default one.
      * @param meshViews
      * @param meshViewGroup
      * @param box
@@ -88,7 +88,7 @@ public class SliceCommand implements Command {
 
             SimpleBooleanProperty meshIsCut = new SimpleBooleanProperty();
             TriangleMesh cutMesh = MeshSlicer_Aware.slicePositiveSide((TriangleMesh) meshView.getMesh(), nxyd[0], nxyd[1], nxyd[2], nxyd[3], meshIsCut);
-            if (meshIsCut.get()) {
+            if (meshIsCut.get()) {  //skipping meshes that aren't modified.
                 if (cutMesh.getFaces().size() > 0) {
                     if (meshView.getUserData() != null) meshViewIDToOgMesh.put(meshView.getId(), (TriangleMesh) meshView.getMesh());
                     else cutTheFirstTime.add(meshView.getId());

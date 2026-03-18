@@ -2,10 +2,12 @@ package Project.window.ThreeDPaneHandling;
 
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.shape.VertexFormat;
+import org.jetbrains.annotations.Contract;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * OBJ parser
@@ -43,44 +45,7 @@ public class ObjParser_V2 {
         }
         return mesh;
     }
-    
-    /**
-     * loads a 3D object from an OBJ file into a mesh, triangulating, if necessary.
-     * Does not support the full OBJ syntax, but suffices for the OBJ files used in the course
-     * @param filePath path to file
-     * @return mesh
-     * @throws IOException problem reading or parsing file
-     */
-    public static TriangleMesh load(String filePath) throws IOException {
-        var vertices = new ArrayList<Float>();
-        var normals = new ArrayList<Float>();
-        var texCoords = new ArrayList<Float>();
-        var faces = new ArrayList<Integer>();
 
-        var hasNormals=-1;
-
-        try (var br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                parseLine(line, vertices, normals, texCoords, faces, hasNormals);
-            }
-        }
-        if (texCoords.isEmpty()) {
-            texCoords.add(0.0f);
-            texCoords.add(0.0f);
-        }
-
-        var mesh = new TriangleMesh();
-        mesh.getPoints().setAll(toFloatArray(vertices));
-        mesh.getTexCoords().setAll(toFloatArray(texCoords));
-        mesh.getFaces().setAll(toIntArray(faces));
-
-        if(!normals.isEmpty()) {
-            mesh.getNormals().setAll(toFloatArray(normals));
-            mesh.setVertexFormat(VertexFormat.POINT_NORMAL_TEXCOORD);
-        }
-        return mesh;
-    }
 
     private static float[] toFloatArray(List<Float> list) {
         var array = new float[list.size()];
@@ -93,6 +58,7 @@ public class ObjParser_V2 {
         for (var i = 0; i < list.size(); i++) array[i] = list.get(i);
         return array;
     }
+
 
     private static void parseLine(String line, ArrayList<Float> vertices, ArrayList<Float> normals, ArrayList<Float> texCoords, ArrayList<Integer> faces, int hasNormals) throws IOException {
 
@@ -124,6 +90,7 @@ public class ObjParser_V2 {
                 for (var i = 0; i < n; i++) {
                     var parts = tokens[i + 1].split("/");
                     vIndices[i] = Integer.parseInt(parts[0]) - 1;
+
                     if (parts.length >= 2 && !parts[1].isEmpty()) {
                         tIndices[i] = Integer.parseInt(parts[1]) - 1;
                     } else {
@@ -173,6 +140,41 @@ public class ObjParser_V2 {
         }
     }
 
+    /**
+     * loads a 3D object from an OBJ file into a mesh, triangulating, if necessary.
+     * Does not support the full OBJ syntax, but suffices for the OBJ files used in the course
+     * @param filePath path to file
+     * @return mesh
+     * @throws IOException problem reading or parsing file
+     */
+    public static TriangleMesh load(String filePath) throws IOException {
+        var vertices = new ArrayList<Float>();
+        var normals = new ArrayList<Float>();
+        var texCoords = new ArrayList<Float>();
+        var faces = new ArrayList<Integer>();
 
+        var hasNormals=-1;
+
+        try (var br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                parseLine(line, vertices, normals, texCoords, faces, hasNormals);
+            }
+        }
+        if (texCoords.isEmpty()) {
+            texCoords.add(0.0f);
+            texCoords.add(0.0f);
+        }
+
+        var mesh = new TriangleMesh();
+        mesh.getPoints().setAll(toFloatArray(vertices));
+        mesh.getTexCoords().setAll(toFloatArray(texCoords));
+        mesh.getFaces().setAll(toIntArray(faces));
+
+        if(!normals.isEmpty()) {
+            mesh.getNormals().setAll(toFloatArray(normals));
+            mesh.setVertexFormat(VertexFormat.POINT_NORMAL_TEXCOORD);
+        }
+        return mesh;
+    }
 }
-

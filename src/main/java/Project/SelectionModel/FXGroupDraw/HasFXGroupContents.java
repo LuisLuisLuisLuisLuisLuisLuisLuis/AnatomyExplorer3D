@@ -118,7 +118,7 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
     }
 
     /**
-     * Sets the default TriangleMesh for the MeshView with the given ID.
+     * Sets the default TriangleMesh for the MeshView with the given ID and sets CullFace.BACK.
      * ONLY allowed for MeshViews that are currently drawn, i.e. who's Mesh is not null, i.e. who are selected by this.
      */
     public void resetTriangleMesh(String id) {
@@ -126,6 +126,7 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
         if (meshView == null) return;
         if (meshView.getMesh() == null) throw new IllegalArgumentException("resetTriangleMesh is only allowed for MeshViews that are already drawn.");
         meshView.setMesh(meshViewToOGMesh.get(meshView));
+        meshView.setCullFace(CullFace.BACK);
         meshView.setUserData(null);
     }
 
