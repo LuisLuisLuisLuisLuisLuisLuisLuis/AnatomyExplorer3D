@@ -1,7 +1,6 @@
 package Project.window.TreeView;
 
 import Project.model.ANode;
-import Project.model.FileIDCollector;
 import Project.model.TreeExport;
 import Project.window.PopUp.LittlePopUp;
 import Project.window.TreeView.AITreeIntegration.MVPattern.AITreeIntegration;
@@ -21,7 +20,7 @@ import java.io.*;
 import java.util.*;
 import java.util.function.Function;
 
-import static Project.model.FileIDCollector.collectFileIDsBelow;
+import static Project.model.FileUtil.collectFileIDsBelow;
 import static Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils.*;
 
 /**

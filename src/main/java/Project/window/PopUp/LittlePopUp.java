@@ -205,24 +205,25 @@ public class LittlePopUp {
     public static boolean showMsg(String title, String message, String okButtonText, String noButtonText) {
         Dialog<Boolean> dialog = new Dialog<>();
         dialog.setTitle(title);
-        Label label = new Label(message);
-        label.setWrapText(true);
-        label.setMaxWidth(200); // desired max width
-        dialog.getDialogPane().setContent(label);
-
+        dialog.setContentText(message);
+        dialog.setResizable(true);
         ButtonType okBType = new ButtonType(okButtonText, ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(okBType, new ButtonType(noButtonText, ButtonBar.ButtonData.CANCEL_CLOSE));
         dialog.setResultConverter(button -> button == okBType);
         return dialog.showAndWait().orElse(false);
     }
 
+    /**
+     * Display a message in a PopUp with only one Button.
+     * @param title Popup window title
+     * @param message Message
+     * @param okButtonText Text of button
+     */
     public static void showMsg(String title, String message, String okButtonText) {
         Dialog<Boolean> dialog = new Dialog<>();
         dialog.setTitle(title);
         dialog.setContentText(message);
-        for (String s : message.split("\n")) {
-            if (dialog.getWidth() < s.length() * 3) dialog.setWidth(s.length() * 3);
-        }
+        dialog.setResizable(true);
         dialog.getDialogPane().getButtonTypes().addAll(new ButtonType(okButtonText, ButtonBar.ButtonData.OK_DONE));
         dialog.showAndWait();
     }
@@ -247,6 +248,10 @@ public class LittlePopUp {
         dialog.showAndWait();
         return dialog.getResult();
     }
+
+//    public static boolean cancellableLoadingPopup(String title, String message) {
+//
+//    }
 
 
 }

@@ -172,7 +172,7 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
         return null;
     }
 
-    private void loadOBJsMulti(File file) {
+    private void loadOBJsMulti(File file, Set<String> whiteList) {
         File[] files = file.listFiles();
         if (files == null) return;
         Task<List<MeshView>> task = new Task() {
@@ -181,20 +181,23 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
                 ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
                 List<Future<MeshView>> meshViewF = new ArrayList<>(files.length);
                 for (File file1 : files) {
-                    meshViewF.add(executor.submit(() -> createMeshView(file1.getName().substring(0, file1.getName().lastIndexOf(".")))));
+                    if (!file1.isFile()) continue;
+                    if (!file1.getName().endsWith(".obj")) continue;
+                    String name = file1.getName().substring(0, file1.getName().lastIndexOf("."));
+                    if (!whiteList.contains(name)) continue;
+                    meshViewF.add(executor.submit(() -> createMeshView(name)));
                 }
                 executor.shutdown();
 
-                List<MeshView> result = new ArrayList<>();
+                List<MeshView> result = new ArrayList<>(meshViewF.size());
 
                 int total = meshViewF.size();
                 int done = 0;
 
                 for (Future<MeshView> f : meshViewF) {
-                    result.add(f.get()); // blocks, but NOT on UI thread
+                    result.add(f.get());
                     updateProgress(++done, total);
                 }
-
                 return result;
             }
         };
@@ -203,16 +206,16 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
         WindowPresenter.getWindowPresenter().runBlockingTask(task, true);
     }
 
-    private void loadOBJs(File file) {
-        loadOBJsMulti(file);
+    private void loadOBJs(File file, Set<String> whiteList) {
+        loadOBJsMulti(file, whiteList);
 //        if (true) return;
 //        File[] files = file.listFiles();
 //        if (files == null) return; //TODO: UI notification?
 //        for (File objfile : files) hasFXGroupContents.addOBJ(objfile.getName().substring(0, objfile.getName().lastIndexOf(".")));
     }
 
-    private void loadOBJs(URL url) {
-        loadOBJs(new File(url.getFile()));
+    private void loadOBJs(URL url, Set<String> whiteList) {
+        loadOBJs(new File(url.getFile()), whiteList);
     }
 
     private void removeOBJs(File file) {
@@ -231,8 +234,9 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
     public ArrayList<File> getFileDirs() {
         return fileDirs;
     }
-    public void addFileDir(File dir) {
-        fileDirs.add(dir); loadOBJs(dir);
+    public void addFileDir(File dir, Set<String> whiteList) {
+        fileDirs.add(dir);
+        loadOBJs(dir, whiteList);
     }
     public void removeFileDir(File dir) {
         fileDirs.remove(dir); removeOBJs(dir);}
@@ -241,11 +245,13 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
 
     public ArrayList<URL> getResourceLocationsLocations() {return resourceLocations;}
 
-    public void addResourceLocation(URL url) {
+    public void addResourceLocation(URL url, Set<String> whiteList) {
         for (URL url1: resourceLocations) if (url.getFile().equals(url1.getFile())) return;
         resourceLocations.add(url);
-        loadOBJs(url);
+        loadOBJs(url, whiteList);
     }
+
+
     public void removeResourceLocation(URL url) {resourceLocations.remove(url); removeOBJs(url);}
 
 

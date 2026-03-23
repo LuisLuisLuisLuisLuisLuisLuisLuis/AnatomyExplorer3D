@@ -23,10 +23,7 @@ import Project.command.TreeCommands.CollapseTreeViewCommand;
 import Project.command.TreeCommands.ExpandTreeViewCommand;
 import Project.command.TreeCommands.SelectAllTreeViewCommand;
 import Project.command.TreeCommands.SelectNoneTreeViewCommand;
-import Project.model.ANode;
-import Project.model.EnableDisableBP3DV3Parts;
-import Project.model.Model;
-import Project.model.TreeExport;
+import Project.model.*;
 import Project.window.PopUp.About;
 import Project.window.PopUp.Help;
 import Project.window.PopUp.InfoChart;
@@ -51,7 +48,6 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.event.Event;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point3D;
@@ -77,11 +73,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Function;
 
+import static Project.model.FileUtil.*;
 import static Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils.replaceANodeByCopy;
 
 
@@ -152,9 +146,15 @@ public class WindowPresenter {
     private final Model partof_v3;
     private final Model isa_v3;
 
-    private int sizeOfUserModels = 0;   // this counts the size of OBJ files associated with models loaded by the user; in MB. (excluding the anatomy models shipped with this software).
-                                        // The user is not allowed to load more than 400MB of OBJ files (~3-4GB of RAM when visualized).
-    private static final int maxSizeOfUserModels = 460;
+    private long sizeOfLoadedModels = 0;   // this counts the size of OBJ files associated with models loaded by the user; in MB. (excluding the anatomy models shipped with this software).
+                                        // The user is not allowed to load more than maxSizeOfUserModels MB of OBJ files.
+    private static final int maxSizeOfUserModels = 500 + 427;   // +427 is the size of the standard anatomy hierarchy
+
+    private static final double freeRamFractionThreshold = 0.1; // when freeMemory / totalMemory < threshold manageRAM() will try to free up RAM
+
+    private final Set<String> supportedFileExtensions = Set.of(".obj");   //may be expanded in the future
+    public Set<String> getSupportedFileExtensions() {return supportedFileExtensions;}
+
 
     private final AIService aiService;  //implements AI support
 
@@ -164,6 +164,7 @@ public class WindowPresenter {
      */
     public WindowPresenter(MainWindowController controller) {
 
+        if (windowPresenter != null) throw new RuntimeException("WindowPresenter instance already exists");
         windowPresenter = this;
 
         this.controller = controller;
@@ -257,6 +258,10 @@ public class WindowPresenter {
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 if ((boolean) controller.getEnableBP3DV3checkMenu().getUserData()) return;
                 if (newValue) {
+                    if (maxSizeOfUserModels - sizeOfLoadedModels < 430) {
+                        LittlePopUp.showMsg("Error", "Not enough RAM to load BP3D 3.0. Disable some other models first.", "Ok");
+                        return;
+                    }
                     if (!LittlePopUp.showMsg("Disclaimer", """
                             The BodyParts3D database comes in different versions. 
                             The versions share most anatomy parts, but there are some anatomy parts that are can only be found in one version.
@@ -269,7 +274,6 @@ public class WindowPresenter {
                             
                             If you wish to continue, press 'Ok'.
                             """, "Ok", "Cancel")) return;
-//                    executeCommand(new AddModelCommand(List.of(partof_v3, isa_v3)));
                     executeCommand(new EnableBP3DV3Command());
                 }
                 else {
@@ -550,38 +554,20 @@ public class WindowPresenter {
 
             if (!LittlePopUp.showLoadHierInfo()) return;
 
-            Function<String, InputStream> findFileAndMakeStream = new Function<String, InputStream>() {
-                @Override
-                public InputStream apply(String prompt) {
-                    File file = FileExplorerInteraction.findTxt(prompt);
-                    InputStream relationsStream = null;
-                    do {
-                        if (file == null) return null;
-                        try {
-                            relationsStream = file.toURI().toURL().openStream();
-                            break;
-                        } catch (IOException ex) {
-                            if (!LittlePopUp.showMsg("Error", "Failed to read file\n("+ex.getMessage()+")", "Retry", "Cancel")) break;
-                        }
-                    } while (true);
 
-                    return relationsStream;
-                }
-            };
-
-            InputStream relationsStream = findFileAndMakeStream.apply("Edge list");
+            InputStream relationsStream = makeStream(FileExplorerInteraction.findTxt("Edge list"));
             if (relationsStream == null) return;
             long estOBJsSize = 0;
-            InputStream filesListStream = null;
+            File filesListFile = null;
             File filesDir = null;
             if (LittlePopUp.showMsg("", "Add OBJ files?", "Yes", "No")) {
                 if (models.contains(partof_v3) || models.contains(isa_v3)) {
                     if (!LittlePopUp.showMsg("Info", "To load custom OBJ files, BP3D 3.0 must be disabled to free up RAM.\n", "Continue", "Cancel")) return;
                     else executeCommand(new DisableBP3DV3Command());
                 }
-                if (!LittlePopUp.showMsg("Info", "You may load up to " + (maxSizeOfUserModels - sizeOfUserModels) + " MB worth of OBJ files. Continue by providing the file list?", "Continue", "Cancel")) return;
-                filesListStream = findFileAndMakeStream.apply("Provide the File List");
-                if (filesListStream != null) {    //only ask for the directory if the files list is provided
+                if (!LittlePopUp.showMsg("Info", "You may load up to " + (maxSizeOfUserModels - sizeOfLoadedModels) + " MB worth of OBJ files. Continue by providing the file list?", "Continue", "Cancel")) return;
+                filesListFile = FileExplorerInteraction.findTxt("Provide the File List");
+                if (filesListFile != null) {    //only ask for the directory if the files list is provided
 
                     do {    // loop for finding a directory containing OBJ files. can be cancelled to avoid choosing OBJ files by setting fileListDir=null and breaking out.
 
@@ -589,21 +575,21 @@ public class WindowPresenter {
 
                         if (filesDir == null || !filesDir.isDirectory() || filesDir.list().length == 0) {
                             if (!LittlePopUp.showMsg("Error", "No valid directory", "Retry", "Cancel")) {
-                                filesListStream = null;
+                                filesListFile = null;
                                 break;
                             } else continue;
                         }
 
-                        estOBJsSize = estimateSizeOfOBJsInDir(filesDir);
-                        if (sizeOfUserModels + estOBJsSize > maxSizeOfUserModels) {
+                        estOBJsSize = estimateSizeOfOBJsInDir(filesDir, FileUtil.extractFileIDsFromFileList(makeStream(filesListFile)));
+                        if (sizeOfLoadedModels + estOBJsSize > maxSizeOfUserModels) {
                             String wrnmsg1 = "The provided OBJ files (" + estOBJsSize + " MB) exceed the maximum capacity of " + maxSizeOfUserModels + " MB.";
                             String actmsg1 = "Choose a different directory?";
-                            String wrnmsg2 = "You have already uploaded " + sizeOfUserModels + " MB of OBJ files. Uploading the provided OBJ files (" + estOBJsSize + " MB) will exceed the maximum capacity of " + maxSizeOfUserModels + " MB.";
+                            String wrnmsg2 = "You have already uploaded " + sizeOfLoadedModels + " MB of OBJ files. Uploading the provided OBJ files (" + estOBJsSize + " MB) will exceed the maximum capacity of " + maxSizeOfUserModels + " MB.";
                             String actmsg2 = actmsg1; //"Choose a different directory or Cancel and remove other models first.";
-                            if (sizeOfUserModels == 0) {
+                            if (sizeOfLoadedModels == 0) {
                                 if (LittlePopUp.showMsg("Error", wrnmsg1 + "\n" + actmsg1, "Continue", "Cancel")) continue;
                             } else if (LittlePopUp.showMsg("Error", wrnmsg2 + "\n" +  actmsg2, "Continue", "Cancel")) continue;
-                            filesListStream = null;
+                            filesListFile = null;
                             break;
                         } else break;
 
@@ -624,13 +610,12 @@ public class WindowPresenter {
 
 
             try {
-                Model model = filesListStream == null ? new Model(relationsStream, name) : new Model(relationsStream, filesListStream, name, filesDir);
+                Model model = filesListFile == null ? new Model(relationsStream, name) : new Model(relationsStream, makeStream(filesListFile), name, filesDir);
                 ContextMenu contextMenu = new ContextMenu();
                 MenuItem remove = new MenuItem("Remove");
                 remove.setOnAction(actionEvent -> executeCommand(new RemoveModelCommand(model)));
                 contextMenu.getItems().add(remove);
                 executeCommand(new AddModelCommand(model, contextMenu));
-                sizeOfUserModels += estOBJsSize;
             }
             catch (Exception x) {
                 LittlePopUp.showMsg("Error", "Failed to parse model:\n" + x.getMessage(), "Ok");
@@ -1230,23 +1215,6 @@ public class WindowPresenter {
      */
     public BooleanProperty getFullScreenCheckProperty() {return controller.getFullScreenCheck().selectedProperty();}
 
-    /**
-     * Makes the Tab visible and makes the model drawable.
-     * @param model
-     */
-    private void makeModelVisible(Model model) {
-        List<Tab> tabs = this.tabs.stream().filter(tab1 -> tab1.getText().equals(model.getName())).toList();    //get the tab of the model
-        if (tabs.isEmpty()) return;
-        controller.getTreeTabPane().getTabs().add(tabs.getFirst());     //make tab visible
-    }
-
-    private void makeModelInvisible(Model model) {
-        Tab tab = this.tabs.stream().filter(tab1 -> tab1.getText().equals(model.getName())).toList().getFirst();    //get the tab of the model
-        controller.getTreeTabPane().getTabs().remove(tab);     //make tab visible
-        if (model.getFilesDirURL() != null) this.hasTheeDContentsContainer.removeResourceLocation(model.getFilesDirURL()); // make the model drawable by adding the file location
-        else if (model.getFilesDir() != null) this.hasTheeDContentsContainer.removeFileDir(model.getFilesDir());
-    }
-
     private void loadModel(Model model) {
         loadModel(model, null);
     }
@@ -1275,28 +1243,21 @@ public class WindowPresenter {
         Tab tab = new Tab(model.getName(), treeView);
         this.tabs.add(tab);
         tab.setContextMenu(contextMenu);
-        if (model.getFilesDirURL() != null) this.hasTheeDContentsContainer.addResourceLocation(model.getFilesDirURL()); // make the model drawable by adding the file location
-        else if (model.getFilesDir() != null) this.hasTheeDContentsContainer.addFileDir(model.getFilesDir());
-//        makeModelVisible(model);
+        if (model.getFilesDirURL() != null) this.hasTheeDContentsContainer.addResourceLocation(model.getFilesDirURL(), FileUtil.collectFileIDsBelowToSet(model.getRoot())); // make the model drawable by adding the file location
+        else if (model.getFilesDir() != null) this.hasTheeDContentsContainer.addFileDir(model.getFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot()));
         controller.getTreeTabPane().getTabs().add(tab);
-        /*
-        To add checklist:
-        - create & setup treeview, set id. add to treeviews list
-        - create tab with name, add to tabs list
-        - create selectionContainer, add to list. add to selectiongroup
-        - add root to mediators
-        - create searchtree
-         */
+        sizeOfLoadedModels += model.getFilesDir() != null ? estimateSizeOfOBJsInDir(model.getFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot())) : (model.getFilesDirURL() != null ? estimateSizeOfOBJsInDir(new File(model.getFilesDirURL().getFile()), collectFileIDsBelowToSet(model.getRoot())) : 0);
     }
 
     /**
      * Remove the model's Container, TreeView, Searchtree and Tab. Undraw all items from the model.
      * Relies on HasTreeView, TreeViewSelectionContainer and SearchTree .getId() == model.getName() and tab.getText() == model.getName().
-     * CALLS makeModelInvisible() !
      * @param model The model to remove
      */
     private void forgetModel(Model model) {
-        makeModelInvisible(model);
+        if (model.getFilesDirURL() != null) this.hasTheeDContentsContainer.removeResourceLocation(model.getFilesDirURL()); // make the model drawable by adding the file location
+        else if (model.getFilesDir() != null) this.hasTheeDContentsContainer.removeFileDir(model.getFilesDir());
+
         TreeViewSelectionContainer modelTreeViewSelectionContainer = treeViewSelectionContainers.stream().filter(treeViewSelectionContainer -> treeViewSelectionContainer.getId().equals(model.getName())).toList().get(0);
 
         TreeView<ANode> modelTreeView = this.treeViews.stream().filter(treeView -> treeView.getId().equals(model.getName())).toList().getFirst();
@@ -1317,6 +1278,7 @@ public class WindowPresenter {
         this.tabs.removeIf(tab -> tab.getText().equals(model.getName()));
         controller.getTreeTabPane().getTabs().removeIf(tab -> tab.getText().equals(model.getName()));
         this.models.remove(model);
+        sizeOfLoadedModels -= model.getFilesDir() != null ? estimateSizeOfOBJsInDir(model.getFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot())) : (model.getFilesDirURL() != null ? estimateSizeOfOBJsInDir(new File(model.getFilesDirURL().getFile()), FileUtil.collectFileIDsBelowToSet(model.getRoot())) : 0);
     }
 
     // This class sits here and not in Command because it depends entirely on the implementation of WindowPresenter.
@@ -1334,14 +1296,17 @@ public class WindowPresenter {
             this.models = models;
             this.contextMenus = contextMenus;
         }
+
         public AddModelCommand(List<Model> models) {
             this.models = models;
             this.contextMenus = new ArrayList<>(models.size());
-            for (int i = 0; i < models.size(); i++) contextMenus.add(null);
+            for (Model model : models) this.contextMenus.add(null);
         }
+
         public AddModelCommand(Model model, ContextMenu contextMenu) {
             this(List.of(model), List.of(contextMenu));
         }
+
         @Override
         public void undo() {for (Model model : models) forgetModel(model);}
         @Override
@@ -1558,16 +1523,13 @@ public class WindowPresenter {
      */
     private void manageRAM() {
         Set<Class> expensiveCommands = Set.of(SliceCommand.class, AddModelCommand.class, EnableBP3DV3Command.class);
-        if (undoList.size() > 60 || (double) freeMemory() / totalMemory() < 0.2) {
+        if (undoList.size() > 60 || (double) freeMemory() / totalMemory() < freeRamFractionThreshold) {
             int us = undoList.size();
             Iterator<Command> iterator = undoList.listIterator();
             while (iterator.hasNext()) {
-                Command command = iterator.next();
-                if (expensiveCommands.contains(command.getClass())) {
-                    iterator.remove();
-                    break;
-                }
+                iterator.next();
                 iterator.remove();
+                if (!( (double) freeMemory() / totalMemory() < freeRamFractionThreshold)) break;
             }
             System.out.println("Removed " + (us - undoList.size()) + " commands");
         }
@@ -1576,9 +1538,14 @@ public class WindowPresenter {
     }
 
 
-
-    //TODO: only count OBJs
-    public static long estimateSizeOfOBJsInDir(File dir) {
+    /**
+     * Estimates the sum of sizes of all OBJ files in the directory.
+     * @param dir A directory.
+     * @param whiteList WhiteList of file names without file extension (like '.obj')
+     * @return Size in MB. 0 if dir does not specify a directory or an exception is thrown.
+     */
+    public long estimateSizeOfOBJsInDir(File dir, Set<String> whiteList) {
+        System.out.println(Arrays.toString(whiteList.toArray()));
         try {System.out.println("directory size: " + Files.size(dir.toPath()));}
         catch (IOException i) {return 0;}
 
@@ -1586,7 +1553,14 @@ public class WindowPresenter {
             File[] files = dir.listFiles();
             long sumFileSizes = 0;
             for (File file : files) {
-                try {sumFileSizes += Files.size(file.toPath());}
+                try {
+                    if (!file.isFile()) continue;
+                    if (!file.getName().contains(".")) continue; //so that the next statement can safely run
+                    String extension = file.getName().substring(file.getName().lastIndexOf("."));
+                    if (!supportedFileExtensions.contains(extension)) continue;
+                    if (!whiteList.contains(file.getName().substring(0, file.getName().lastIndexOf(".")))) continue;
+                    sumFileSizes += Files.size(file.toPath());
+                }
                 catch (IOException ignored) {System.out.println("skipping file");}
             }
             sumFileSizes /= (1024 * 1024);
@@ -1596,7 +1570,7 @@ public class WindowPresenter {
         return 0;
     }
 
-    public void runBlockingTask(Task task, boolean knowsProgress) {
+    public <T> void runBlockingTask(Task<T> task, boolean knowsProgress) {
         bindBlockingProgress(task, knowsProgress);
         new Thread(task).start();
     }
@@ -1607,7 +1581,7 @@ public class WindowPresenter {
      * @param task The task
      * @param knowsProgress Can the task report progress or is progress indetermined.
      */
-    private void bindBlockingProgress(Task task, boolean knowsProgress) {
+    private <T> void bindBlockingProgress(Task<T> task, boolean knowsProgress) {
         Function<Boolean, Boolean> blockingEffect = new Function<Boolean, Boolean>() {
             @Override
             public Boolean apply(Boolean flag) {
@@ -1633,7 +1607,6 @@ public class WindowPresenter {
             controller.getBlockingProgressBar().setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
         }
         task.stateProperty().addListener((obs, oldState, newState) -> {
-            System.out.println("state change to " + newState);
             if (newState == Worker.State.CANCELLED || newState == Worker.State.SUCCEEDED || newState == Worker.State.FAILED) blockingEffect.apply(false);
             if (newState == Worker.State.RUNNING) blockingEffect.apply(true);
         });

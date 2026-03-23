@@ -49,7 +49,7 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
     protected void addMeshViews(List<MeshView> meshViews) {
         LinkedList<MeshView> newOnes = new LinkedList<>();
         for (MeshView meshView : meshViews) {
-            if (meshViewToOGMesh.containsKey(meshView)) continue;
+            if (meshViewToOGMesh.containsKey(meshView) || meshView == null) continue;
             newOnes.add(meshView);
             meshViewToOGMesh.put(meshView, (TriangleMesh) meshView.getMesh());
             meshView.setMesh(null);
