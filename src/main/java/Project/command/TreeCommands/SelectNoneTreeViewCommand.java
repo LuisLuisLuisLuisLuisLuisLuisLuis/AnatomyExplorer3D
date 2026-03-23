@@ -16,9 +16,8 @@ public class SelectNoneTreeViewCommand extends TreeCommand {
      */
     @Override
     public void execute() {
-        remember();
-
         if (treeView == null || treeView.getRoot() == null) return;
+        remember();
         treeView.getSelectionModel().clearSelection();
     }
 

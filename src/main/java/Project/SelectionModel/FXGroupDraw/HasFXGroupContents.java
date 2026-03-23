@@ -46,6 +46,16 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
     private final ObservableMap<MeshView, TriangleMesh> meshViewToOGMesh = FXCollections.observableHashMap();
     private final ObservableList<MeshView> availableMeshViews = FXCollections.observableArrayList();
 
+    protected void addMeshViews(List<MeshView> meshViews) {
+        LinkedList<MeshView> newOnes = new LinkedList<>();
+        for (MeshView meshView : meshViews) {
+            if (meshViewToOGMesh.containsKey(meshView)) continue;
+            newOnes.add(meshView);
+            meshViewToOGMesh.put(meshView, (TriangleMesh) meshView.getMesh());
+            meshView.setMesh(null);
+        }
+        this.group.getChildren().addAll(newOnes);
+    }
 
     protected void addOBJ(String fileName) {
         if (getMeshViewWithID(fileName) != null) return;
@@ -112,6 +122,11 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
         this.selection.remove(target);
     }
 
+    /**
+     * Looks up the MeshView with the given ID out of all MeshViews (selected or unselected) of this; i.e. out of getAllItems().
+     * @param id
+     * @return
+     */
     public MeshView getMeshViewWithID(String id) {
         for (MeshView meshView : meshViewToOGMesh.keySet()) if (meshView.getId().equals(id)) return meshView;
         return null;

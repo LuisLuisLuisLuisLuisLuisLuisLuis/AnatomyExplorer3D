@@ -6,16 +6,25 @@ import Project.window.ThreeDPaneHandling.Coloring.FileGroupingScheme;
 import Project.window.ThreeDPaneHandling.OpenOBJ;
 import Project.window.WindowPresenter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, String> {
 
@@ -60,10 +69,10 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
 
     }
 
-    public Node createMeshView(String groupItem) {
+    public MeshView createMeshView(String groupItem) {
 
-        Node node = this.hasFXGroupContents.getMeshViewWithID(groupItem);
-        if (node != null) return node;
+        MeshView meshView = this.hasFXGroupContents.getMeshViewWithID(groupItem);
+        if (meshView != null) return meshView;
 
 
         InputStream inputStream = findTreeFileInResource(groupItem);    // try to find the item first in the resources
@@ -80,7 +89,7 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
                 anatomicalGroup = null;
             }
             //fileGroupingScheme.groupToColor returns hex values of the color (String) which must be converted to Color using Color.web(string)
-            Node result = OpenOBJ.objInputStreamToMeshViews(inputStream, groupItem, getColorForGroup(anatomicalGroup));
+            MeshView result = OpenOBJ.objInputStreamToMeshViews(inputStream, groupItem, getColorForGroup(anatomicalGroup));
             long endTime = System.nanoTime();
             long durationMillis = (endTime - startTime) / 1000000;
             System.out.println("transformGroupItemToSelecitonItem took " + durationMillis);
@@ -163,11 +172,45 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
         return null;
     }
 
-    private void loadOBJs(File file) {
+    private void loadOBJsMulti(File file) {
         File[] files = file.listFiles();
-        if (files == null) return; //TODO: UI notification?
-        for (File objfile : files) hasFXGroupContents.addOBJ(objfile.getName().substring(0, objfile.getName().lastIndexOf(".")));
+        if (files == null) return;
+        Task<List<MeshView>> task = new Task() {
+            @Override
+            protected Object call() throws Exception {
+                ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+                List<Future<MeshView>> meshViewF = new ArrayList<>(files.length);
+                for (File file1 : files) {
+                    meshViewF.add(executor.submit(() -> createMeshView(file1.getName().substring(0, file1.getName().lastIndexOf(".")))));
+                }
+                executor.shutdown();
+
+                List<MeshView> result = new ArrayList<>();
+
+                int total = meshViewF.size();
+                int done = 0;
+
+                for (Future<MeshView> f : meshViewF) {
+                    result.add(f.get()); // blocks, but NOT on UI thread
+                    updateProgress(++done, total);
+                }
+
+                return result;
+            }
+        };
+
+        task.setOnSucceeded(e -> hasFXGroupContents.addMeshViews(task.getValue()));
+        WindowPresenter.getWindowPresenter().runBlockingTask(task, true);
     }
+
+    private void loadOBJs(File file) {
+        loadOBJsMulti(file);
+//        if (true) return;
+//        File[] files = file.listFiles();
+//        if (files == null) return; //TODO: UI notification?
+//        for (File objfile : files) hasFXGroupContents.addOBJ(objfile.getName().substring(0, objfile.getName().lastIndexOf(".")));
+    }
+
     private void loadOBJs(URL url) {
         loadOBJs(new File(url.getFile()));
     }

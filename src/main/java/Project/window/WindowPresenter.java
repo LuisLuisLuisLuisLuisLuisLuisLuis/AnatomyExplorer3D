@@ -49,6 +49,10 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.Event;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
@@ -56,13 +60,13 @@ import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.input.*;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
-import javafx.scene.shape.Mesh;
 import javafx.scene.shape.MeshView;
-import javafx.scene.shape.TriangleMesh;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
@@ -73,6 +77,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 
 import static Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils.replaceANodeByCopy;
@@ -83,10 +90,19 @@ import static Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils.replaceANod
  */
 public class WindowPresenter {
 
+    private static WindowPresenter windowPresenter = null;
+
+    public static WindowPresenter getWindowPresenter() {
+        return windowPresenter;
+    }
+
+
     private final MainWindowController controller; //holds all components of the UI (buttons etc)
     private final ObservableList<Command> undoList = FXCollections.observableList(new LinkedList<>()); //undo-redo
     private final ObservableList<Command> redoList = FXCollections.observableList(new LinkedList<>());
 
+    private final LinkedList<Long> ramConsumOfCommands = new LinkedList<>();
+    long deltaMemOfLastCommand = 0;
 
     private static final PerspectiveCamera camera = new PerspectiveCamera(true); //camera in 3D view
     private static final Point3D initialCameraPosition = new Point3D(0,-10,-1500);
@@ -147,6 +163,8 @@ public class WindowPresenter {
      * @param controller Holds all UI FXML components used by this presenter.
      */
     public WindowPresenter(MainWindowController controller) {
+
+        windowPresenter = this;
 
         this.controller = controller;
 
@@ -331,6 +349,7 @@ public class WindowPresenter {
 
         //------------load main model------------
         loadModel(mainModel);
+//        makeModelVisible(mainModel);
         //---------------------------------------
 
         hasInnerGroupContents.getSelection().addListener((InvalidationListener) e -> centerGroupToItself(innerGroup));  //should be called after the command below, otherwise it'll fire every loop
@@ -684,9 +703,12 @@ public class WindowPresenter {
         // ------------------------
         // bind things that depend on which tree is selected. i need to do it once in the beginning and then again every time the tree tab switches
         bindTreeDependantThings(treeBotLabelUpdater);
-        controller.getTreeTabPane().getSelectionModel().selectedItemProperty().addListener((InvalidationListener) e -> {
-            bindTreeDependantThings(treeBotLabelUpdater);  // stuff in here needs to be rebound every time the tree tab switches because getSelectedTree..() doesn't dynamically react to tab-switching
-            updateTreeBotLabel(); // update the bottom label
+        controller.getTreeTabPane().getSelectionModel().selectedItemProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                bindTreeDependantThings(treeBotLabelUpdater);  // stuff in here needs to be rebound every time the tree tab switches because getSelectedTree..() doesn't dynamically react to tab-switching
+                updateTreeBotLabel(); // update the bottom label
+            }
         });
         // -------------------
 
@@ -1117,10 +1139,12 @@ public class WindowPresenter {
      */
     private void executeCommand(Command command) {
         redoList.clear();
-        WindowPresenter.printMem();
+//        WindowPresenter.printMem();
+        manageRAM();
         command.execute();
         undoList.add(command);
         WindowPresenter.printMem();
+        System.out.println("undolist: " + undoList.size());
         //System.out.println("Executing " + command.name());
     }
 
@@ -1211,10 +1235,9 @@ public class WindowPresenter {
      * @param model
      */
     private void makeModelVisible(Model model) {
-        Tab tab = this.tabs.stream().filter(tab1 -> tab1.getText().equals(model.getName())).toList().getFirst();    //get the tab of the model
-        controller.getTreeTabPane().getTabs().add(tab);     //make tab visible
-        if (model.getFilesDirURL() != null) this.hasTheeDContentsContainer.addResourceLocation(model.getFilesDirURL()); // make the model drawable by adding the file location
-        else if (model.getFilesDir() != null) this.hasTheeDContentsContainer.addFileDir(model.getFilesDir());
+        List<Tab> tabs = this.tabs.stream().filter(tab1 -> tab1.getText().equals(model.getName())).toList();    //get the tab of the model
+        if (tabs.isEmpty()) return;
+        controller.getTreeTabPane().getTabs().add(tabs.getFirst());     //make tab visible
     }
 
     private void makeModelInvisible(Model model) {
@@ -1252,10 +1275,10 @@ public class WindowPresenter {
         Tab tab = new Tab(model.getName(), treeView);
         this.tabs.add(tab);
         tab.setContextMenu(contextMenu);
-        long memb4b4 = WindowPresenter.freeMemory();
-        long totb4 = Runtime.getRuntime().totalMemory();
-        makeModelVisible(model);
-        System.out.println("Make visible consumed " + (memb4b4 - freeMemory() - (Runtime.getRuntime().totalMemory() - totb4) / (1024 * 1024)));
+        if (model.getFilesDirURL() != null) this.hasTheeDContentsContainer.addResourceLocation(model.getFilesDirURL()); // make the model drawable by adding the file location
+        else if (model.getFilesDir() != null) this.hasTheeDContentsContainer.addFileDir(model.getFilesDir());
+//        makeModelVisible(model);
+        controller.getTreeTabPane().getTabs().add(tab);
         /*
         To add checklist:
         - create & setup treeview, set id. add to treeviews list
@@ -1297,7 +1320,7 @@ public class WindowPresenter {
     }
 
     // This class sits here and not in Command because it depends entirely on the implementation of WindowPresenter.
-    // (so do the other commands kind of but this one only calls addModel() / forgetModel() which work with so many
+    // (so do the other commands but this one only calls loadModel(), makeModelVisible(), forgetModel() which work with so many
     // lists it would be a pain to pass them all in the constructor).
 
     /**
@@ -1326,7 +1349,8 @@ public class WindowPresenter {
             for (int m = 0; m < models.size(); m++) {
                 Model model = models.get(m);
                 loadModel(model, contextMenus.get(m));
-        }}
+            }
+        }
         @Override
         public void redo() {execute();}
         @Override
@@ -1374,6 +1398,7 @@ public class WindowPresenter {
             for (int m = 0; m < models.size(); m++) {
                 Model model = models.get(m);
                 loadModel(model, contextMenus.get(m));
+//                makeModelVisible(model); now done by loadmodel
             }
             this.rememberFXGroupContents.restoreSelection();
             this.rememberFXMeshViewColors.restoreSelection();
@@ -1400,8 +1425,8 @@ public class WindowPresenter {
             if (mainModelTreeView == null) return;
             EnableDisableBP3DV3Parts.removeV3FilesFromTree(mainModelTreeView.getRoot(), EnableDisableBP3DV3Parts.createIdToFileIDsMap());
 
-            selectionMediatorTree3D_Selection.reloadDicts();
-            selectionMediatorTree_3D_Content.reloadDicts();
+//            selectionMediatorTree3D_Selection.reloadDicts();
+//            selectionMediatorTree_3D_Content.reloadDicts();
         }
 
         @Override
@@ -1413,8 +1438,8 @@ public class WindowPresenter {
 
             EnableDisableBP3DV3Parts.addV3FilesToTree(mainModelTreeView.getRoot(), EnableDisableBP3DV3Parts.createIdToFileIDsMap());
 
-            selectionMediatorTree3D_Selection.reloadDicts();
-            selectionMediatorTree_3D_Content.reloadDicts();
+//            selectionMediatorTree3D_Selection.reloadDicts();
+//            selectionMediatorTree_3D_Content.reloadDicts();
         }
 
         @Override
@@ -1506,6 +1531,7 @@ public class WindowPresenter {
     }
 
     public static long freeMemory() {return Runtime.getRuntime().freeMemory()  / (1024*1024);}
+    public static long totalMemory() {return Runtime.getRuntime().totalMemory()  / (1024*1024);}
 
     public static void printMem() {
         Runtime r = Runtime.getRuntime();
@@ -1515,6 +1541,43 @@ public class WindowPresenter {
         System.out.println("Used MB: " + (r.totalMemory() - r.freeMemory()) / (1024*1024));
     }
 
+    private void computeMemOfLastCommand() {
+        if (undoList.isEmpty()) return;
+
+        while (!(ramConsumOfCommands.size() == undoList.size() -1)) {ramConsumOfCommands.removeLast();}
+
+        Runtime runtime = Runtime.getRuntime();
+        ramConsumOfCommands.add((deltaMemOfLastCommand + runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024));
+        System.out.println("Last command consumed " + ramConsumOfCommands.getLast());
+    }
+
+    /**
+     * This tries to keep the heap from maxing out.
+     * Should be improved to account for the expensiveness of expensive commands, which depends largely on the number
+     * and size of new TriangleMeshes they create.
+     */
+    private void manageRAM() {
+        Set<Class> expensiveCommands = Set.of(SliceCommand.class, AddModelCommand.class, EnableBP3DV3Command.class);
+        if (undoList.size() > 60 || (double) freeMemory() / totalMemory() < 0.2) {
+            int us = undoList.size();
+            Iterator<Command> iterator = undoList.listIterator();
+            while (iterator.hasNext()) {
+                Command command = iterator.next();
+                if (expensiveCommands.contains(command.getClass())) {
+                    iterator.remove();
+                    break;
+                }
+                iterator.remove();
+            }
+            System.out.println("Removed " + (us - undoList.size()) + " commands");
+        }
+
+
+    }
+
+
+
+    //TODO: only count OBJs
     public static long estimateSizeOfOBJsInDir(File dir) {
         try {System.out.println("directory size: " + Files.size(dir.toPath()));}
         catch (IOException i) {return 0;}
@@ -1531,6 +1594,49 @@ public class WindowPresenter {
             return sumFileSizes;
         }
         return 0;
+    }
+
+    public void runBlockingTask(Task task, boolean knowsProgress) {
+        bindBlockingProgress(task, knowsProgress);
+        new Thread(task).start();
+    }
+
+    /**
+     * Binds the blocking, progress showing UI to a Task.
+     * Does NOT schedule or run or cancel the task.
+     * @param task The task
+     * @param knowsProgress Can the task report progress or is progress indetermined.
+     */
+    private void bindBlockingProgress(Task task, boolean knowsProgress) {
+        Function<Boolean, Boolean> blockingEffect = new Function<Boolean, Boolean>() {
+            @Override
+            public Boolean apply(Boolean flag) {
+                VBox blockingVBox = controller.getBlockingProgressVBox();
+
+                blockingVBox.setManaged(flag);
+                blockingVBox.setVisible(flag);
+                if (flag) blockingVBox.addEventFilter(KeyEvent.ANY, Event::consume);
+                else blockingVBox.removeEventFilter(KeyEvent.ANY, Event::consume);
+
+                controller.getMainBorderpain().setEffect(flag ? new GaussianBlur(10) : null);
+
+                return null;
+            }
+        };
+
+        controller.getBlockingProgressLabel().textProperty().bind(task.messageProperty());
+        if (knowsProgress) {
+            controller.getBlockingProgressBar().progressProperty().bind(task.progressProperty());
+            controller.getBlockingProgressInd().progressProperty().bind(task.progressProperty());
+        } else {
+            controller.getBlockingProgressInd().setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+            controller.getBlockingProgressBar().setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+        }
+        task.stateProperty().addListener((obs, oldState, newState) -> {
+            System.out.println("state change to " + newState);
+            if (newState == Worker.State.CANCELLED || newState == Worker.State.SUCCEEDED || newState == Worker.State.FAILED) blockingEffect.apply(false);
+            if (newState == Worker.State.RUNNING) blockingEffect.apply(true);
+        });
     }
 
 }

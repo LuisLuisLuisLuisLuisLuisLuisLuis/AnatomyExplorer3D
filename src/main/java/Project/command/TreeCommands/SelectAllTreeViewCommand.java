@@ -6,6 +6,7 @@ import Project.model.ANode;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,7 +16,8 @@ public class SelectAllTreeViewCommand extends TreeCommand {
     public SelectAllTreeViewCommand(TreeView<ANode> treeView) {
         super(treeView);
     }
-    private LinkedList<TreeItem<ANode>> itemsToSelect = new LinkedList<>();
+    private HashSet<TreeItem<ANode>> itemsToSelect = new HashSet<>();   // using a Set so that the same item is not added twice
+                                                                        // and thus also not selected twice. HUGE time saving.
 
     /**
      * select all children of selected nodes or all nodes in the tree if none are selected.
@@ -26,13 +28,13 @@ public class SelectAllTreeViewCommand extends TreeCommand {
         remember();
 
         if (treeView.getSelectionModel().getSelectedItems().isEmpty()) {
-            selectAllRecursive(treeView.getRoot());
+            collectAllRecursive(treeView.getRoot());
         } else {
             for (TreeItem<ANode> treeItem : treeView.getSelectionModel().getSelectedItems()) {
-                selectAllRecursive(treeItem);
+                collectAllRecursive(treeItem);
             }
         }
-        bulkSelect();
+        bulkSelect(this.itemsToSelect, this.treeView);
     }
 
 
@@ -65,27 +67,29 @@ public class SelectAllTreeViewCommand extends TreeCommand {
 
 
     /**
-     * Recursively selects a given TreeItem and all its children in the provided selection model.
-     *
-     * @param item the TreeItem to start the selection process from, including its sub-items
+     * Recursively adds the subtree of item to itemsToSelect.
      */
-    private void selectAllRecursive(TreeItem<ANode> item) {
-        //item.setExpanded(true);
+    private void collectAllRecursive(TreeItem<ANode> item) {
         itemsToSelect.add(item);
         for (TreeItem<ANode> child : item.getChildren()) {
-            selectAllRecursive(child);
+            collectAllRecursive(child);
         }
     }
-    private void bulkSelect() {
+
+    public static void bulkSelect(HashSet<TreeItem<ANode>> itemsToSelect, TreeView<ANode> treeView) {
         if (itemsToSelect.isEmpty()) return;
         for (TreeItem<ANode> treeItem : itemsToSelect) treeItem.setExpanded(true);
-        int[] indicesToSelect = new int[itemsToSelect.size()];
         if (itemsToSelect.size() == 1) {
-            treeView.getSelectionModel().select(treeView.getRow(itemsToSelect.getFirst()));
+            treeView.getSelectionModel().select(treeView.getRow(itemsToSelect.iterator().next()));
             return;
         }
-        for (int i = 1; i < itemsToSelect.size(); i++) indicesToSelect[i] = treeView.getRow(itemsToSelect.get(i));
-        treeView.getSelectionModel().selectIndices(treeView.getRow(itemsToSelect.getFirst()), indicesToSelect);
+        int[] indicesToSelect = new int[itemsToSelect.size()];
+        int i = 0;
+        for (TreeItem<ANode> treeItem : itemsToSelect) {
+            indicesToSelect[i] = treeView.getRow(treeItem);
+            i++;
+        }
+        treeView.getSelectionModel().selectIndices(indicesToSelect[0], indicesToSelect);
     }
 
 }

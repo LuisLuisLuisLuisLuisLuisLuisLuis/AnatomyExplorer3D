@@ -1,8 +1,13 @@
 package Project.command.Remember;
 
+import Project.AnatomyExplorer;
+import Project.command.TreeCommands.SelectAllTreeViewCommand;
+import Project.model.ANode;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,21 +15,18 @@ import java.util.List;
  * A group to remember the tree selection.
  */
 public class RememberTreeViewSelection {
-    private final TreeView treeView;
-    private final List<TreeItem> previousSelection = new LinkedList<>();  // save
+    private final TreeView<ANode> treeView;
+    private final HashSet<TreeItem<ANode>> previousSelection;  // save
 
-    public RememberTreeViewSelection(TreeView treeView) {
-        previousSelection.addAll(treeView.getSelectionModel().getSelectedItems());
+    public RememberTreeViewSelection(TreeView<ANode> treeView) {
         this.treeView = treeView;
+        this.previousSelection = new HashSet<>(treeView.getSelectionModel().getSelectedItems().size());
+        previousSelection.addAll(treeView.getSelectionModel().getSelectedItems());
     }
 
     public void restoreSelection() {
+        if (previousSelection.isEmpty()) return;
         treeView.getSelectionModel().clearSelection();  // clear and restore
-        for (TreeItem treeItem : previousSelection) {
-            treeView.getSelectionModel().select(treeItem);
-        }
-    }
-    public List<TreeItem> getPreviousSelection() {
-        return previousSelection;
+        SelectAllTreeViewCommand.bulkSelect(previousSelection, treeView);
     }
 }

@@ -1,13 +1,14 @@
 package Project.window.ThreeDPaneHandling;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.shape.VertexFormat;
 
 import java.io.*;
 import java.util.*;
 
+/*
+Adapted from Huson (2025) to include deduplication.
+ */
 public class ObjParser_V3 {
 
     public static TriangleMesh load(InputStream inputStream, boolean useNormals) throws IOException{

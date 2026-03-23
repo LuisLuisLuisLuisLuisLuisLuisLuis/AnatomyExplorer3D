@@ -22,12 +22,15 @@ public class AnatomyExplorer extends Application {
         InputStream isA_parts_list_file = getClass().getResourceAsStream("/Project/anatomy/isa_parts_list_e.txt");
 
 
-        WindowPresenter windowPresenter = new WindowPresenter(view.getController());
-
         primaryStage.setTitle("Anatomy Viewer");
         Scene primaryScene = new javafx.scene.Scene(view.getRoot(), 800, 600);
-        windowPresenter.setKeyControls(primaryScene);
+
         primaryStage.setScene(primaryScene);
+        primaryStage.show();
+
+        WindowPresenter windowPresenter = new WindowPresenter(view.getController());
+        windowPresenter.setKeyControls(primaryScene);
+
 
         primaryScene.getStylesheets().add(getClass().getResource("/Project/Styles/fonts.css").toExternalForm());
 
@@ -43,7 +46,7 @@ public class AnatomyExplorer extends Application {
             primaryStage.setFullScreen(newValue);
         }));
 
-        primaryStage.show();
+
 
     }
 

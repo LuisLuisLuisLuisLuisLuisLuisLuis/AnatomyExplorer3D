@@ -4,11 +4,22 @@ import Project.AI.QnA;
 import Project.model.ANode;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 public class MainWindowController {
 
+    @FXML
+    private BorderPane mainBorderpain;
+    @FXML
+    private ProgressIndicator blockingProgressInd;
+    @FXML
+    private ProgressBar blockingProgressBar;
+    @FXML
+    private Label blockingProgressLabel;
+    @FXML
+    private VBox blockingProgressVBox;
     @FXML
     private MenuItem loadHierarchyMenu;
     @FXML
@@ -453,4 +464,13 @@ public class MainWindowController {
 
     public MenuItem getLoadHierarchyMenu() {return loadHierarchyMenu;}
 
+    public VBox getBlockingProgressVBox() {return blockingProgressVBox;}
+
+    public Label getBlockingProgressLabel() {return blockingProgressLabel;}
+
+    public ProgressBar getBlockingProgressBar() {return blockingProgressBar;}
+
+    public ProgressIndicator getBlockingProgressInd() {return blockingProgressInd;}
+
+    public BorderPane getMainBorderpain() {return mainBorderpain;}
 }
