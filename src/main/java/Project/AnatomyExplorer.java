@@ -1,5 +1,6 @@
 package Project;
 
+import Project.Util.LoggingConfig;
 import Project.window.WindowView;
 import Project.window.WindowPresenter;
 import javafx.application.Application;
@@ -15,6 +16,7 @@ public class AnatomyExplorer extends Application {
 
     public void start(Stage primaryStage) throws Exception {
         Locale.setDefault(Locale.ENGLISH);  // all default texts are in ENG
+        LoggingConfig.init();
 
         WindowView view = new WindowView();
 
@@ -23,7 +25,7 @@ public class AnatomyExplorer extends Application {
 
 
         primaryStage.setTitle("Anatomy Viewer");
-        Scene primaryScene = new javafx.scene.Scene(view.getRoot(), 800, 600);
+        Scene primaryScene = new javafx.scene.Scene(view.getRoot(), 900, 600);
 
         primaryStage.setScene(primaryScene);
         primaryStage.show();

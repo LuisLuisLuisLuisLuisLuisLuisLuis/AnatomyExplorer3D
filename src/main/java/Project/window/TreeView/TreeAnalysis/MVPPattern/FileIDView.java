@@ -6,12 +6,12 @@ import javafx.scene.Parent;
 import java.io.IOException;
 import java.net.URL;
 
-public class TreeAnalysisView {
+public class FileIDView {
     private final TreeAnalysisController controller;
     private final Parent root;
 
-    public TreeAnalysisView() throws IOException {
-        URL fxmlUrl = getClass().getResource("/Project/FXML/TreeAnalysis.fxml");
+    public FileIDView() throws IOException {
+        URL fxmlUrl = getClass().getResource("/Project/FXML/FileIDInfo.fxml");
         FXMLLoader loader = new FXMLLoader(fxmlUrl);
         root = loader.load();
         controller = loader.getController();

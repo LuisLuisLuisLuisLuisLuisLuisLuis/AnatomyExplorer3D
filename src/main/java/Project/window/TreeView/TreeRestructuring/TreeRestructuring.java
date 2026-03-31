@@ -1,18 +1,24 @@
-package Project.window.TreeView.AITreeIntegration.MVPattern;
+package Project.window.TreeView.TreeRestructuring;
 
+import Project.command.Command;
+import Project.command.TreeCommands.TreeEditorMockCommand;
 import Project.model.ANode;
+import Project.window.PopUp.LegendItem;
 import Project.window.PopUp.LittlePopUp;
 import Project.window.SupportingUI.TextSearch.SearchTree;
 import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
-import Project.window.TreeView.TreeAnalysis.TreeViewEditing.TreeViewEditor;
-import Project.window.TreeView.TreeViewSetup;
+import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
+import Project.window.TreeView.TreeViewEditing.TreeViewSetup;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Scene;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 
 import java.io.IOException;
 import java.util.*;
@@ -20,18 +26,17 @@ import java.util.*;
 import static Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils.replaceANodeByCopy;
 
 
-public class AITreeIntegration {
+public class TreeRestructuring {
 
     private final TreeItem<ANode> realTreeMasterRoot;
     private TreeItem<ANode> realTreeRoot; // root of the subtree being worked on. NOT the master root of the tree the subtree belongs to.
-    private TreeItem<ANode> aiTreeRoot;         // this tree's master root, which is usually equivalent to realTreeRoot.
-    private final AITreeIntegrationController controller;
+    private final TreeRestructuringController controller;
     private final TableView<TreeItemRelationShip> tableView;
-    private final TreeView<ANode> aiTreeView;
+    private final TreeView<ANode> restrucTreeView;
     private final TreeViewSetup treeViewSetup;
-    private final TreeViewEditor<ANode> treeViewEditor;
-    private final HashMap<TreeItem<ANode>, String> treeCellColorMap = new HashMap<>();  //maps some TreeItems of the AI generated tree to css colors
-    private LinkedList<TreeItem<ANode>> missingTreeItems = new LinkedList<>();        //holds TreeItems of the original Tree that are not part of the AI tree
+    private final UndoableANodeTreeViewEditor treeViewEditor;
+    private final HashMap<TreeItem<ANode>, String> treeCellColorMap = new HashMap<>();  //maps some TreeItems of the restructured tree to css colors
+    private LinkedList<TreeItem<ANode>> missingTreeItems = new LinkedList<>();        //holds TreeItems of the original Tree that are not part of the restructured
     private LinkedList<TreeItem<ANode>> nonUniqueIDTreeItems = new LinkedList<>();
     private final String missingNodeColor = "lightSalmon";
     private final String newTwinCellColor = "peachPuff";        //css colors found in treeCellColorMap
@@ -39,35 +44,89 @@ public class AITreeIntegration {
     private final String newNameCellColor = "paleGoldenRod";
     private final String noUniqueCellColor = "darkSalmon";
 
+    private final LinkedList<Runnable> onAcceptedRunnables = new LinkedList<>();
+    private void runOnAccepted() {for (Runnable runnable : onAcceptedRunnables) runnable.run();}
+    public void addOnAcceptedRunnable(Runnable runnable) {onAcceptedRunnables.add(runnable);}
+    public void removeOnAcceptedRunnable(Runnable runnable) {onAcceptedRunnables.remove(runnable);}
+
+    public TreeItem<ANode> result = null;
+    private void setResult(TreeItem<ANode> result) {this.result = result;}
+    public TreeItem<ANode> getResultNow() {return result;}
+
+    private final Project.window.PopUp.LittlePopUp.ShowPopup showPopup;
+
+    private final ObservableList<Command> undoList = FXCollections.observableList(new LinkedList<>());
+    private final ObservableList<Command> redoList = FXCollections.observableList(new LinkedList<>());
     /**
-     * @param masterRoot Master root of the tree that contains realTreeRoot.
-     * @param realTreeRoot Root of the subtree that is being worked on. Will be deleted if the new tree is accepted.
-     * @param treeViewEditor TreeViewEditor instance used by the real tree.
-     * @throws IOException
+     * First clear the Redo-list. Then execute a command and add it to the stack of commands.
      */
-    public AITreeIntegration(TreeItem<ANode> masterRoot, TreeItem<ANode> realTreeRoot, TreeViewEditor<ANode> treeViewEditor) throws IOException {
+    private void executeCommand(Command command) {
+        redoList.clear();
+        command.execute();
+        undoList.add(command);
+    }
+    /**
+     * Undo the last command from the undo-list and add it to the redo-list.
+     */
+    private void undoCommand() {
+        if (!undoList.isEmpty()) {
+            undoList.getLast().undo();
+            redoList.add(undoList.removeLast());
+        }
+    }
+    /**
+     * Redo the last command from the undo-list and add it to the redo-list.
+     */
+    private void redoCommand() {
+        if (!redoList.isEmpty()) {
+            redoList.getLast().redo();
+            undoList.add(redoList.removeLast());
+        }
+    }
+
+    /**
+     *
+     * @param root Root of the tree that is to be restructured. Is the root of TreeView.
+     * @throws IOException if loading goes wrong
+     * @throws IllegalArgumentException If root has a parent.
+     */
+    public TreeRestructuring(TreeItem<ANode> root) throws IOException{
+        this(null, root);
+    }
+
+    public TreeRestructuring(TreeItem<ANode> masterRoot, TreeItem<ANode> realTreeRoot) throws IOException, IllegalArgumentException {
         //create the window
-        AITreeIntegrationView aiTreeIntegrationView = new AITreeIntegrationView();
-        this.controller = aiTreeIntegrationView.getController();
+
+        if (masterRoot == null && realTreeRoot.getParent() != null) throw new IllegalArgumentException("root has a parent but no master root is provided.");
+        if (masterRoot != null) if (TreeAnalysisUtils.getTreeItemWANodeId(realTreeRoot.getValue().conceptId(), masterRoot) == null) throw new IllegalArgumentException("Master root and subtree are not from the same tree.");
+
+        TreeRestructuringView treeRestructuringView = new TreeRestructuringView();
+        this.controller = treeRestructuringView.getController();
         this.tableView = controller.getTableView();
 
-        this.aiTreeView = controller.getTreeView();
-        this.treeViewEditor = treeViewEditor;
+        this.restrucTreeView = controller.getTreeView();
+        this.treeViewEditor = new UndoableANodeTreeViewEditor();
         this.treeViewSetup = new TreeViewSetup(treeViewEditor);
         this.realTreeRoot = realTreeRoot;
-        this.realTreeMasterRoot = masterRoot;
+        this.realTreeMasterRoot = masterRoot != null ? masterRoot : realTreeRoot;
 
+        controller.getUndoButton().setOnAction(e -> undoCommand());
+        controller.getRedoButton().setOnAction(e -> redoCommand());
+        controller.getUndoButton().disableProperty().bind(Bindings.isEmpty(undoList));
+        controller.getRedoButton().disableProperty().bind(Bindings.isEmpty(redoList));
 
-        Scene scene = LittlePopUp.showPopup(aiTreeIntegrationView.getRoot(), "Modify tree via AI", 1000, 500);
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+        treeViewEditor.addOnExecute(() -> executeCommand(new TreeEditorMockCommand<>(treeViewEditor)));
+
+        this.showPopup = new LittlePopUp.ShowPopup(treeRestructuringView.getRoot(), "Modify tree via AI", 1000, 500);
+
+        showPopup.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.isControlDown() && event.getCode() == KeyCode.F) controller.getTreeSearchField().requestFocus();
         });
 
         controller.getParseButton().setOnAction(e -> {
             controller.getTableView().getColumns().clear();
-            analyzeReply(controller.getAiTextArea().getText());
-            treeViewSetup.setCellFactory(aiTreeView, treeViewEditor, aiTreeRoot.getValue());
-            aiTreeView.setRoot(aiTreeRoot);
+            analyzeReply(controller.getEdgeTextArea().getText());
+            treeViewSetup.setCellFactory(restrucTreeView, treeViewEditor, restrucTreeView.getRoot().getValue(), true);
             controller.getAcceptButton().setDisable(false);
         });
 
@@ -87,31 +146,37 @@ public class AITreeIntegration {
         controller.getTreeSearchPrevButton().setOnAction(e -> searchTree.previous());
         controller.getTreeSearchPrevButton().disableProperty().bind(searchTree.getHasPreviousObservable());
 
-        controller.getSearchForDupIDsButton().setOnAction(e -> searchForDupIDs(aiTreeRoot));    // wanna check if any IDs within aiTree are duplicate
+        controller.getSearchForDupIDsButton().setOnAction(e -> searchForDupIDs(restrucTreeView.getRoot(), "There are duplicate IDs in the tree.", "No duplicate IDs in the tree."));    // wanna check if any IDs within aiTree are duplicate
 
         controller.getAddMissingToTreeButton().setOnAction(e -> {
-            if (aiTreeRoot == null || missingTreeItems.isEmpty()) return;
+            TreeItem<ANode> restructRoot = restrucTreeView.getRoot();
+            if (restructRoot == null || missingTreeItems.isEmpty()) return;
             LinkedList<TreeItem<ANode>> twinsOfMissing = new LinkedList<>();
             LinkedList<TreeItem<ANode>> mock = new LinkedList<>();
             for (TreeItem<ANode> missingTreeItem : missingTreeItems) {
                 TreeItem<ANode> twin = makeTwin(missingTreeItem, missingTreeItem.getValue().conceptId(), missingTreeItem.getValue().name(), twinsOfMissing, mock, false);
                 twinsOfMissing.add(twin);
-                aiTreeRoot.getChildren().add(twin);
-                aiTreeRoot.getValue().children().add(twin.getValue());
+                restructRoot.getChildren().add(twin);
+                restructRoot.getValue().children().add(twin.getValue());
             }
-
-
         });
+
+        controller.getLegend().getChildren().addAll(
+                new LegendItem(missingNodeColor, "Removed"),
+                new LegendItem(newTwinCellColor, "New Node"),
+                new LegendItem(newEdgeCellColor, "New Edge"),
+                new LegendItem(newNameCellColor, "New Name"),
+                new LegendItem(noUniqueCellColor, "No unique ID")
+        );
+        controller.getLegend().setSpacing(LegendItem.DEFAULT_SPACING);
+        controller.getLegend().setAlignment(LegendItem.DEFAULT_ALIGNMENT_POS);
+        controller.getLegend().setPadding(LegendItem.DEFAULT_PADDING);
+
     }
 
-    /**
-     *
-     * @param root
-     * @return
-     */
-    private boolean searchForDupIDs(TreeItem<ANode> root) {
+    private boolean searchForDupIDs(TreeItem<ANode> root, String errmsg, String goodmsg) {
         LinkedList<TreeItem<ANode>> allAITreeItems = new LinkedList<>();
-        TreeAnalysisUtils.accumulateForEveryNodeBelow(aiTreeRoot, allAITreeItems, t -> t);
+        TreeAnalysisUtils.accumulateForEveryNodeBelow(restrucTreeView.getRoot(), allAITreeItems, t -> t);
         HashMap<TreeItem<ANode>, Collection<TreeItem<ANode>>> duplicateItemsMap = TreeAnalysisUtils.lookForDuplicateIDsInTree(allAITreeItems, root, false, realTreeRoot);
 
 
@@ -123,42 +188,56 @@ public class AITreeIntegration {
                     stringBuilder.append("ID: " + dupTreeItem.getValue().conceptId() + " Name: " + dupTreeItem.getValue().name() + "  |  ID: " + aNode.getValue().conceptId() + " Name: " + aNode.getValue().name() + "\n");
             }
 
-            String popupText = """
-                The followings nodes share the same IDs with at least one other node.
-                Assign new IDs to duplicated nodes and continue?
+//            String popupText = """
+//                The followings nodes share the same IDs with at least one other node.
+//                Assign new IDs to duplicated nodes and continue?
+//
+//                Node  |  Other node with same ID
+//
+//                """ + stringBuilder.toString();
+            String popupText = errmsg + """
                 
-                Node  |  Other node with same ID
+                
+                Item to paste | already present item with same ID
                 
                 """ + stringBuilder.toString();
-
-            if (LittlePopUp.showScrollableTextPopup("Warning", popupText)) {
-                for (TreeItem<ANode> itemWDuplicateANode : duplicateItemsMap.keySet()) replaceANodeByCopy(itemWDuplicateANode, root);
-                return true;
-            } else return false;
+            LittlePopUp.showScrollableTextPopup("Error", popupText, false);    // i dont want to implement this as undoable..
+            return false;
+//            if (LittlePopUp.showScrollableTextPopup("Warning", popupText)) {
+//                for (TreeItem<ANode> itemWDuplicateANode : duplicateItemsMap.keySet()) replaceANodeByCopy(itemWDuplicateANode, root);
+//                return true;
+//            } else return false;
         } else {
-            LittlePopUp.showScrollableTextPopup("Info", "No duplicate IDs in the tree.");
+            LittlePopUp.showScrollableTextPopup("Info", goodmsg, false);
             return true;
         }
     }
 
     private void acceptTree() {
-        if (!searchForDupIDs(aiTreeRoot) || !searchForDupIDs(realTreeMasterRoot)) return;   //want to check if any of the IDs of aiTree already occur anywhere in the full real tree
-        TreeItem<ANode> realTreeParent = realTreeRoot.getParent();
-        treeViewSetup.delete(realTreeRoot);
-        treeViewSetup.cut(aiTreeRoot);
-        treeViewSetup.paste(realTreeParent, realTreeMasterRoot);
-        aiTreeView.setRoot(null);
-        realTreeRoot = aiTreeRoot;
+        if (!searchForDupIDs(restrucTreeView.getRoot(), "Cannot accept. There are duplicate IDs in the tree.", "No duplicate IDs in the tree.") || !searchForDupIDs(realTreeMasterRoot, "Cannot accept. Some IDs already exist in the real tree.", "No overlapping IDs with the real tree.")) return;   //want to check if any of the IDs of aiTree already occur anywhere in the full real tree
+//        executeCommand(new AcceptCommand(realTreeRoot, restructRoot));
+//        treeViewSetup.cut(aiTreeRoot);
+//        treeViewSetup.paste(realTreeParent, realTreeMasterRoot);
+//        aiTreeView.setRoot(null);
+//        realTreeRoot = aiTreeRoot; if you do this you can keep on working here, otherwise not bcuz this does not know about the new real subtree anymore
+        setResult(restrucTreeView.getRoot());
+        restrucTreeView.setRoot(null);
+        runOnAccepted();
+        this.showPopup.getStage().close();  // but i choose to close this after accepting once. this means if its opened recursively, the windows working on this tree will be useless.
     }
 
 
-    private void analyzeReply(String aiReply) {
-
-        LinkedList<TreeItem<ANode>> twins = new LinkedList<>();
-        LinkedList<TreeItem<ANode>> newTwins = new LinkedList<>(); //twins that weren't created from existing TreeItems
+    /**
+     * Creates the tree from the edgeList and sets its root as root of the TreeView.
+     */
+    private void analyzeReply(String edgeList) {
+        // the treeItems of the tree defined in edgeList
+        LinkedList<TreeItem<ANode>> twins = new LinkedList<>();     //treeItems that are created from already existing ones (so they're 'twins').
+                                                                    //they are NEITHER the same treeItem NOR do they have the same ANode instance.
+        LinkedList<TreeItem<ANode>> newTwins = new LinkedList<>();  //treeItems that weren't created from existing TreeItems (not twins of anything actually)
 
         //for every line of the written edge list
-        for (String line : aiReply.split("\n")) {
+        for (String line : edgeList.split("\n")) {
             String[] fields = line.split("\t");
             if (fields.length != 4) continue;
             String parentID = fields[0].trim();
@@ -166,8 +245,8 @@ public class AITreeIntegration {
             String parentName = fields[1].trim();
             String childName = fields[3].trim();
 
-            TreeItem<ANode> parent = findTreeItemWithConceptID(parentID, realTreeRoot); //try to find an existing treeItem with that conceptID
-            TreeItem<ANode> child = findTreeItemWithConceptID(childID, realTreeRoot);   //for partent and child (or return null)
+            TreeItem<ANode> parent = findTreeItemWithConceptID(parentID, realTreeMasterRoot); //try to find an existing treeItem with that conceptID
+            TreeItem<ANode> child = findTreeItemWithConceptID(childID, realTreeMasterRoot);   //for parent and child (or return null)
             TreeItem<ANode> parentTwin = makeTwin(parent, parentID, parentName, twins, newTwins, false);   //create the twins (i.e. corresponding TreeItem
             TreeItem<ANode> childTwin = makeTwin(child, childID, childName, twins, newTwins, false);       //in this TreeView
 
@@ -190,21 +269,23 @@ public class AITreeIntegration {
 
 
         //now find the root of the new tree
-        LinkedList<TreeItem<ANode>> aiTreeRoots = new LinkedList<>();
+        LinkedList<TreeItem<ANode>> roots = new LinkedList<>();
         for (TreeItem<ANode> treeItemTwin : twins) {
             if (treeItemTwin.getParent() == null) {
                 System.out.println("root found: " + treeItemTwin.getValue().name());
-                aiTreeRoots.add(treeItemTwin);
+                roots.add(treeItemTwin);
             }
         }
-        if (aiTreeRoots.size() == 1) aiTreeRoot = aiTreeRoots.get(0);   //if there's one root its straightforward
+
+        if (roots.size() == 1) restrucTreeView.setRoot(roots.getFirst()); // if there's one root its straightforward
         else {                                                          // if there's many roots, create a root and make them children of it
 //            aiTreeRoot = new TreeItem<ANode>(treeViewSetup.makeAnode("AIRoot", realTreeRoot.getValue())); this would be wrong because the new ai root does not correspond to that anode.
-            aiTreeRoot = new TreeItem<ANode>(treeViewSetup.makeAnode("AIRoot", new ANode("aiRoot", "aiRoot", new HashSet<>(), new HashSet<>())));
-            for (TreeItem<ANode> possibleRoot : aiTreeRoots) {
-                aiTreeRoot.getChildren().add(possibleRoot);
-                aiTreeRoot.getValue().children().add(possibleRoot.getValue());
+            TreeItem<ANode> restructRoot = new TreeItem<ANode>(TreeAnalysisUtils.makeAnode("New Root", new ANode("newRoot", "newRoot", new HashSet<>(), new HashSet<>())));
+            for (TreeItem<ANode> possibleRoot : roots) {
+                restructRoot.getChildren().add(possibleRoot);
+                restructRoot.getValue().children().add(possibleRoot.getValue());
             }
+            restrucTreeView.setRoot(restructRoot);
         }
         // all the new 'twins' who don't have corresponding treeItems in the real tree get a color
         for (TreeItem<ANode> newTwin : newTwins) treeCellColorMap.put(newTwin, newTwinCellColor);
@@ -301,7 +382,7 @@ public class AITreeIntegration {
             }
         });
         ObservableList<TreeItemRelationShip> treeItemRelationShips = FXCollections.observableList(new LinkedList<>());
-        createTreeItemRelationList(aiTreeRoot, treeItemRelationShips);  //add all TreeItems of the AI tree to the table
+        createTreeItemRelationList(restrucTreeView.getRoot(), treeItemRelationShips);  //add all TreeItems of the restructure tree to the table
                                                                         //then add all missing TreeItems from the original table
         for (TreeItem<ANode> missingTreeItem : missingTreeItems) {
             if (missingTreeItem.getChildren().isEmpty()) treeItemRelationShips.add(new TreeItemRelationShip(new TreeItem<>(new ANode("", "", new HashSet<>(), new HashSet<>())), missingTreeItem));

@@ -80,46 +80,21 @@ public class SelectionMediator_Tree_3D extends SelectionMediator<ANode, String> 
     }
 
     /**
-     * Initialize the Maps with ANode roots from the trees.
-     * @param root
+     * Add all mappings of fileIDs to the ANodes that hold them to fileIDtoANode.
      */
     private void initializeDicts(ANode root) {
-        /*
-        INFO:
-         - what to select / (draw) when internal nodes are selected?
-         - all their children basically? or nothing
-         -> comes down to: do i want to select all children if i select an internal root?
-            - because internal nodes dont have (only one) corresponding body part.
-            -> this logic is handled by the tree . i only add leaf to fileID mapping here.
 
-          UPDATE: for TreeEditor, I also map internal nodes to their FileIDs, as it turns out
-          that there are few FileIDs that are only mapped to internal nodes
-         */
-        Collection<ANode> children = root.children();
-//        if (children.isEmpty()) {
-//            for (String fileID : root.fileIds()) {
-//                Collection<String> list = fileIDtoName.getOrDefault(fileID, new LinkedList<>());
-//                list.add(root.name());
-//                fileIDtoName.put(fileID, list);
-//            }
-//            nameToFileID.put(root.name(), root.fileIds());
-//            } else {
-//            for (ANode child : children) {
-//                initializeDicts(child);
-//            }
-//        }
         for (String fileID : root.getFileIds()) {
                 Collection<ANode> list = fileIDtoANode.getOrDefault(fileID, new LinkedList<>());
                 list.add(root);
                 fileIDtoANode.put(fileID, list);
             }
-//        anodeToFileID.put(root, root.fileIds());
-        for (ANode child : children) {
+
+        for (ANode child : root.children()) {
                 initializeDicts(child);
             }
     }
 
     private String id = "";
-
     public String getId() {return id;}
 }

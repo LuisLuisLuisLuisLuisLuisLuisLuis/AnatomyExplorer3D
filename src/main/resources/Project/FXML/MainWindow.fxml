@@ -62,7 +62,6 @@
                                                 <Separator orientation="VERTICAL" />
                                                 <Button fx:id="drawIn3DButton" mnemonicParsing="false" text="Draw in 3D" />
                                                 <Button fx:id="removeFrom3DButton" mnemonicParsing="false" text="Remove from 3D" />
-                                                <Button fx:id="drawEverythingButton" mnemonicParsing="false" text="Draw Everything" />
                                             </items>
                                           </ToolBar>
                                        </bottom>
@@ -198,18 +197,19 @@
                               <items>
                                     <MenuItem fx:id="loadHierarchyMenu" mnemonicParsing="false" text="Load hierarchy" />
                                     <CheckMenuItem fx:id="enableBP3DV3checkMenu" mnemonicParsing="false" text="Enable BP3D 3.0" />
+                                  <CheckMenuItem fx:id="enableTreeEditingCheckMenu" mnemonicParsing="false" text="Enable Tree Editing"/>
                                     <MenuItem fx:id="menuSaveTree" mnemonicParsing="false" text="Save Trees" />
-                                  <MenuItem fx:id="menuClose" mnemonicParsing="false" text="Close" />
-                                    <MenuItem fx:id="menuClearView" mnemonicParsing="false" text="Clear View" />
-                                    <MenuItem fx:id="menuResetView" mnemonicParsing="false" text="Reset View" />
+                                  <MenuItem fx:id="menuClose" mnemonicParsing="false" text="Quit" />
                               </items>
                             </Menu>
                               <Menu mnemonicParsing="false" text="View">
                                 <items>
                                     <CheckMenuItem fx:id="darkModeMenuItem" mnemonicParsing="false" text="Dark Mode" />
                                     <CheckMenuItem fx:id="fullScreenCheck" mnemonicParsing="false" text="Fullscreen" />
-                                    <MenuItem fx:id="menuAddAxes" mnemonicParsing="false" text="Add Axes" />
-                                    <MenuItem fx:id="menuRmAxes" mnemonicParsing="false" text="Add Axes" />
+                                    <MenuItem fx:id="menuAddAxes" mnemonicParsing="false" text="Add Axes" visible="false"/>
+                                    <MenuItem fx:id="menuRmAxes" mnemonicParsing="false" text="Add Axes" visible="false"/>
+                                    <MenuItem fx:id="menuClearView" mnemonicParsing="false" text="Clear View" visible="false"/>
+                                    <MenuItem fx:id="menuResetView" mnemonicParsing="false" text="Reset View" visible="false"/>
                                 </items>
                               </Menu>
                             <Menu mnemonicParsing="false" text="Help">

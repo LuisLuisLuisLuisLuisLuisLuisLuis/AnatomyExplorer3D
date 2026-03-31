@@ -51,6 +51,24 @@ public class LittlePopUp {
         return scene;   // so that the invoker may set key_pressed event listener
     }
 
+    /**
+     * Thought this would be needed but it may not be.
+     */
+    public static class ShowPopup {
+        private final Scene scene;
+        private final Stage stage;
+        public Scene getScene() {return scene;}
+        public Stage getStage() {return stage;}
+
+        public ShowPopup(Parent root, String title, int x, int y) {
+            this.scene = new Scene(root, x, y);
+            this.stage = new Stage();
+            stage.setTitle(title);
+            stage.setScene(scene);
+            stage.show();
+        }
+    }
+
     public static Integer askForGreater0Int() {
         Dialog<Integer> dialog = new Dialog<>();
         dialog.setTitle("Choose n");
@@ -95,15 +113,25 @@ public class LittlePopUp {
     }
 
     public static boolean showScrollableTextPopup(String title, String text) {
+        return showScrollableTextPopup(title, text, true);
+    }
+    /**
+     * @param title Window title
+     * @param text Text to show
+     * @param choice If yes -> OK and Cancel button. Else only OK button.
+     * @return Button clicked == OK Button
+     */
+    public static boolean showScrollableTextPopup(String title, String text, boolean choice) {
 
         Dialog<Boolean> dialog = new Dialog<>();
+        dialog.setResizable(true);
         dialog.setTitle(title);
 
         ButtonType okType =
                 new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
 
-        dialog.getDialogPane().getButtonTypes()
-                .addAll(okType, ButtonType.CANCEL);
+        if (choice) dialog.getDialogPane().getButtonTypes().addAll(okType, ButtonType.CANCEL);
+        else dialog.getDialogPane().getButtonTypes().add(okType);
 
         // Scrollable text area (best for long lists)
         TextArea textArea = new TextArea(text);

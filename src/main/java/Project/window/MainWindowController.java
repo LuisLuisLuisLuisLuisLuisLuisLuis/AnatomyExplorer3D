@@ -11,6 +11,8 @@ import javafx.scene.layout.VBox;
 public class MainWindowController {
 
     @FXML
+    private CheckMenuItem enableTreeEditingCheckMenu;
+    @FXML
     private BorderPane mainBorderpain;
     @FXML
     private ProgressIndicator blockingProgressInd;
@@ -38,8 +40,6 @@ public class MainWindowController {
     private Label botLabelDrawCount;
     @FXML
     private Button cutButt;
-    @FXML
-    private Button drawEverythingButton;
     @FXML
     private TextField fileIDTextfield;
     @FXML
@@ -444,8 +444,6 @@ public class MainWindowController {
 
     public TextField getFileIDTextfield() {return fileIDTextfield;}
 
-    public Button getDrawEverythingButton() {return drawEverythingButton;}
-
     public Button getCutButt(){return cutButt;}
 
     public Label getBotLabelDrawCount() {return botLabelDrawCount;}
@@ -473,4 +471,6 @@ public class MainWindowController {
     public ProgressIndicator getBlockingProgressInd() {return blockingProgressInd;}
 
     public BorderPane getMainBorderpain() {return mainBorderpain;}
+
+    public CheckMenuItem getEnableTreeEditingCheckMenu() {return enableTreeEditingCheckMenu;}
 }

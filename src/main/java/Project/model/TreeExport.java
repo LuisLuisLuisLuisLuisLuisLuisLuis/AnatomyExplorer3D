@@ -77,10 +77,10 @@ public class TreeExport {
     public static String printSubtreeBelow(TreeItem<ANode> root, boolean inclID) {
         StringBuilder stringBuilder = new StringBuilder();
         if (inclID) {
-            stringBuilder.append("parent ID\tparent name\tchild ID\tchild name\n");
+//            stringBuilder.append("parent ID\tparent name\tchild ID\tchild name\n");
             printSubtreeBelowRecIncID(root, stringBuilder);
         } else {
-            stringBuilder.append("parent\tchild\n");
+//            stringBuilder.append("parent\tchild\n");
             printSubtreeBelowRec(root, stringBuilder);
         }
         return stringBuilder.toString();

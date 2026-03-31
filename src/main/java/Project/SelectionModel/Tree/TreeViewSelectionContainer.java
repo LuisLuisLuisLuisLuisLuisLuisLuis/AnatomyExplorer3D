@@ -59,7 +59,7 @@ public class TreeViewSelectionContainer extends SelectionContainer<TreeItem<ANod
     /**
      * Set up the quickAccessMap.
      */
-    private void setupQuickAccessMap() {
+    public void setupQuickAccessMap() {
         for (TreeItem<ANode> treeItem : hasSelection.getAllItems()) {
             //maps concept id (instead of anode) to treeitem, so that the treeviews can be synced (their anodes may be equivalent but still different objects)
             quickAccessMap.put(treeItem.getValue().conceptId(), treeItem);

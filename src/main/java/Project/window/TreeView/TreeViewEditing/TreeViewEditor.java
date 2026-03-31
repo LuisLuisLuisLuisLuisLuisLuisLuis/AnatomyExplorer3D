@@ -1,4 +1,4 @@
-package Project.window.TreeView.TreeAnalysis.TreeViewEditing;
+package Project.window.TreeView.TreeViewEditing;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -47,7 +47,7 @@ public class TreeViewEditor<T> {
         this.trashParent = toDelete.getParent();
         toDelete.getParent().getChildren().remove(toDelete);
         trashCan.getChildren().add(toDelete);
-        System.out.println("trashparent: " + trashParent.getValue().toString());
+        System.out.println("trash parent: " + trashParent.getValue().toString());
         return true;
     }
 

@@ -35,7 +35,9 @@ import Project.window.ThreeDPaneHandling.*;
 import Project.SelectionModel.*;
 
 import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
-import Project.window.TreeView.TreeViewSetup;
+import Project.command.TreeCommands.TreeEditorMockCommand;
+import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
+import Project.window.TreeView.TreeViewEditing.TreeViewSetup;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -72,8 +74,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static Project.model.FileUtil.*;
 import static Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils.replaceANodeByCopy;
@@ -89,6 +95,8 @@ public class WindowPresenter {
     public static WindowPresenter getWindowPresenter() {
         return windowPresenter;
     }
+
+    private static final Logger logger = Logger.getLogger(WindowPresenter.class.getName());
 
 
     private final MainWindowController controller; //holds all components of the UI (buttons etc)
@@ -137,7 +145,10 @@ public class WindowPresenter {
     private final SelectionMediator_Tree_3D selectionMediatorTree3D_Selection;
     private final SelectionMediator_Tree_3D selectionMediatorTree_3D_Content;
 
-    private final TreeViewSetup treeViewSetup = new TreeViewSetup();
+    private final UndoableANodeTreeViewEditor treeViewEditor = new UndoableANodeTreeViewEditor();
+    private final TreeViewSetup treeViewSetup = new TreeViewSetup(treeViewEditor);
+
+    private final BooleanProperty treeEditingEnabled;
 
     private final ArrayList<Tab> tabs;
 
@@ -239,18 +250,25 @@ public class WindowPresenter {
         controller.getRedoButton().disableProperty().bind(Bindings.isEmpty(redoList));
 
         //select all, select none button
-        controller.getTreeSelectAllButton().setOnAction(e -> executeCommand(new SelectAllTreeViewCommand(getSelectedTreeView())));
-        controller.getTreeSelectNoneButton().setOnAction(e -> executeCommand(new SelectNoneTreeViewCommand(getSelectedTreeView())));
+        controller.getTreeSelectAllButton().setOnAction(e -> new SelectAllTreeViewCommand(getSelectedTreeView()).execute());
+        controller.getTreeSelectNoneButton().setOnAction(e -> new SelectNoneTreeViewCommand(getSelectedTreeView()).execute());
 
         //menu: File
-        MenuItem searchForDups = new MenuItem("Search for Dups");
-        searchForDups.setOnAction(e -> {searchForDupIDs( treeViews.get(controller.getTreeTabPane().getSelectionModel().getSelectedIndex()).getRoot());});
-        controller.getTopMenuBar().getMenus().getFirst().getItems().add(searchForDups);
         controller.getMenuClose().setOnAction(e -> Platform.exit());
 //        controller.getMenuSaveTree().setOnAction(e -> TreeExport.writeToFiles(getSelectedTreeView(), new File(partOfFilesLocation.get()).getParent()));
         controller.getMenuSaveTree().setOnAction(e -> {
             TreeExport.saveTrees(treeViews.stream().toList(), treeViews.stream().map(TreeView::getId).toList());
         });
+        controller.getEnableTreeEditingCheckMenu().selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                for (TreeView<ANode> treeView : treeViews) {
+                    Model model = models.stream().filter(m -> m.getName().equals(treeView.getId())).toList().getFirst();
+                    treeViewSetup.setCellFactory(treeView, treeViewEditor, model.getRoot(), newValue);
+                }
+            }
+        });
+        this.treeEditingEnabled = controller.getEnableTreeEditingCheckMenu().selectedProperty();
 
         controller.getEnableBP3DV3checkMenu().setUserData(false); //a flag to prevent this listener from actioning
         controller.getEnableBP3DV3checkMenu().selectedProperty().addListener(new ChangeListener<Boolean>() {
@@ -273,12 +291,14 @@ public class WindowPresenter {
                             Version 3.0 will always be drawn in default green to always make them distinguishable.
                             
                             If you wish to continue, press 'Ok'.
-                            """, "Ok", "Cancel")) return;
+                            """, "Ok", "Cancel")) {
+                        controller.getEnableBP3DV3checkMenu().setSelected(false);
+                        return;
+                    }
                     executeCommand(new EnableBP3DV3Command());
                 }
                 else {
-//                    executeCommand(new RemoveModelCommand(List.of(partof_v3, isa_v3)));
-                    executeCommand(new DisableBP3DV3Command());
+                    if (tabs.stream().filter(tab -> tab.getText().equals("BP3D 3.0 part-of") || tab.getText().equals("BP3D 3.0 is-a")).toList().size() == 2) executeCommand(new DisableBP3DV3Command());
                 }
             }
         });
@@ -375,15 +395,27 @@ public class WindowPresenter {
 
 
         //listen to TreeViewSetup for cut, paste and delete events.
-        //these necessitate that the mediator reloads his mapping of FileIDs to ANodes.
-        treeViewSetup.setOnEvent(new Runnable() {
+        //these necessitate that
+        // - the mediator reloads his mapping of FileIDs to ANodes.
+        // - the TreeViewSelectionContainers check what new TreeItems they might have
+        treeViewEditor.addOnEvent(new Runnable() {
             @Override
             public void run() {
                 selectionMediatorTree3D_Selection.reloadDicts();
                 selectionMediatorTree_3D_Content.reloadDicts();
                 for (SelectionMediator_Tree_3D selectionMediatorTree3D : selectionMediatorTree3DS) selectionMediatorTree3D.reloadDicts();
+                for (TreeViewSelectionContainer treeViewSelectionContainer : treeViewSelectionContainers) treeViewSelectionContainer.setupQuickAccessMap();
+                updateTreeBotLabel();
             }
         });
+
+        treeViewEditor.addOnExecute(new Runnable() {
+            @Override
+            public void run() {
+                executeCommand(new TreeEditorMockCommand<>(treeViewEditor));
+            }
+        });
+
 
 
         //---------enable the mediator------------------
@@ -403,6 +435,7 @@ public class WindowPresenter {
             selectionMediatorTree3D = selectionMediatorTree3D != null ? selectionMediatorTree3D : selectionMediatorTree3D_Selection;
             treeViewSelectionContainer.changeSelection(selectionMediatorTree3D.transformBSelectionToASelection(threeDSelectionGroup.getSelection()), true, false);
             treeViewSelectionContainer.updateGroup();
+            if (!getSelectedTreeView().getSelectionModel().getSelectedIndices().isEmpty()) getSelectedTreeView().scrollTo(getSelectedTreeView().getSelectionModel().getSelectedIndices().getFirst());   //scroll to selection
         });
 
         controller.getSelectIn3DButton().disableProperty().bind(controller.getSelectionSynchCheck().selectedProperty());
@@ -456,13 +489,12 @@ public class WindowPresenter {
         //---------------------------------------------------
 
         //----------menu File: 3D
-        controller.getMenuResetView().setOnAction(e -> executeCommand(new ResetViewDrawCommand(new Group[]{contentGroup, slicePlaneGroup}, camera, initialTransform, initialCameraPosition, setupMouseRotate3D)));
-        controller.getMenuClearView().setOnAction(e -> {
-            executeCommand(new ClearCommand(contentGroup, hasInnerGroupContents));
-            threeDSelectionGroup.changeSelection(new HashSet<>(), true, false);
+//        controller.getMenuResetView().setOnAction(e -> executeCommand(new ResetViewDrawCommand(new Group[]{contentGroup, slicePlaneGroup}, camera, initialTransform, initialCameraPosition, setupMouseRotate3D)));
+//        controller.getMenuClearView().setOnAction(e -> {
+//            executeCommand(new ClearCommand(contentGroup, hasInnerGroupContents));
+//            threeDSelectionGroup.changeSelection(new HashSet<>(), true, false);
+//        });
 
-
-        });
         controller.getResetViewButton().setOnAction(e -> executeCommand(new ResetViewDrawCommand(new Group[]{contentGroup,slicePlaneGroup}, camera, initialTransform, initialCameraPosition, setupMouseRotate3D)));
         controller.getClearViewButton().setOnAction(e -> {
             executeCommand(new ClearCommand(contentGroup, hasInnerGroupContents));
@@ -473,13 +505,13 @@ public class WindowPresenter {
         //------expand and collapse button for the tree view-----------------
         controller.getTreeExpandButton().setOnAction(e -> {
             treeViewSelectionGroup.setNoUpdating(true);
-            executeCommand(new ExpandTreeViewCommand(getSelectedTreeView()));
+            new ExpandTreeViewCommand(getSelectedTreeView()).execute();
             treeViewSelectionGroup.setNoUpdating(false);
             treeViewSelectionGroup.changeSelection(new HashSet<>(), true, false);
         });
         controller.getTreeCollapseButton().setOnAction(e -> {
             treeViewSelectionGroup.setNoUpdating(true);
-            executeCommand(new CollapseTreeViewCommand(getSelectedTreeView()));
+            new CollapseTreeViewCommand(getSelectedTreeView()).execute();
             treeViewSelectionGroup.setNoUpdating(false);
             treeViewSelectionGroup.changeSelection(new HashSet<>(), true, false);
         });
@@ -492,6 +524,7 @@ public class WindowPresenter {
             //hasInnerGroupSelectedItems.clearSelection();
             threeDSelectionGroup.changeSelection(new HashSet<>(), true, false);
         });
+
         //-------------------------------------------------
 
         //-----------------buttons to draw / undraw------------------------------
@@ -546,6 +579,8 @@ public class WindowPresenter {
 //            executeCommand(new RemoveObjFrom3DCommand(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionGroup.getSelection()), threeDContentGroup, hasInnerGroupContents, threeDSelectionGroup));
         });
         controller.getRemoveFrom3DButton().disableProperty().bind(Bindings.isEmpty(hasInnerGroupContents.getSelection()));
+
+        controller.getShowInTreeButton().disableProperty().bind(Bindings.isEmpty(hasInnerGroupSelectedItems.getSelection()));
         //-----------------------------------------------------------
 
 
@@ -670,7 +705,6 @@ public class WindowPresenter {
             public void invalidated(Observable observable) {
                 updateTreeBotLabel();
             }
-
         };
 
 //        for (TreeView<ANode> treeView : treeViews) treeView.getSelectionModel().getSelectedItems().addListener((InvalidationListener) i -> updateTreeBotLabel());
@@ -954,20 +988,6 @@ public class WindowPresenter {
 
         hasInnerGroupContents.getSelection().addListener((ListChangeListener<? super Node>) i -> controller.getBotLabelDrawCount().setText(hasInnerGroupContents.getSelection().size() + " items drawn."));
 
-        controller.getDrawEverythingButton().setOnAction(e -> {
-//            LinkedList<ANode> allNodes = new LinkedList<>();
-//            TreeAnalysisUtils.accumulateForEveryNodeBelow(treeViews.get(0).getRoot(), allNodes, TreeItem::getValue);
-//            long[] mems = new long[allNodes.size()];
-//            for (int a = 0; a < allNodes.size(); a++) {
-//                ANode aNode = allNodes.get(a);
-//                long memB4 = freeMemory();
-//                executeCommand(new DrawItemIn3DCommand(aNode.fileIds(), threeDContentGroup, threeDSelectionGroup));
-//                mems[a] = memB4 - freeMemory();
-//            }
-//            System.out.println("Average consumption(draw): " + Arrays.stream(mems).sum() / mems.length);
-            HasFXGroupContentsContainer.printNrFaces(hasInnerGroupContents.getSelection(), "");
-        });
-
 
 //-----------------end of constructor----------------
     }
@@ -1123,14 +1143,13 @@ public class WindowPresenter {
      * First clear the Redo-list. Then execute a command and add it to the stack of commands.
      */
     private void executeCommand(Command command) {
+        logger.log(Level.INFO, "Executing " + command.name());
         redoList.clear();
 //        WindowPresenter.printMem();
         manageRAM();
         command.execute();
         undoList.add(command);
-        WindowPresenter.printMem();
-        System.out.println("undolist: " + undoList.size());
-        //System.out.println("Executing " + command.name());
+//        WindowPresenter.printMem();
     }
 
     /**
@@ -1138,8 +1157,8 @@ public class WindowPresenter {
      */
     private void undoCommand() {
         if (!undoList.isEmpty()) {
+            logger.log(Level.INFO, "Undo " + undoList.getLast().name());
             undoList.getLast().undo();
-            //System.out.println("Undoing " + undoList.getLast().name());
             redoList.add(undoList.removeLast());
         }
     }
@@ -1149,8 +1168,8 @@ public class WindowPresenter {
      */
     private void redoCommand() {
         if (!redoList.isEmpty()) {
+            logger.log(Level.INFO, "Redo " + redoList.getLast().name());
             redoList.getLast().redo();
-            //System.out.println("Redoing " + redoList.getLast().name());
             undoList.add(redoList.removeLast());
         }
     }
@@ -1231,7 +1250,7 @@ public class WindowPresenter {
         this.models.add(model);
         TreeView<ANode> treeView = new TreeView<>();
         treeView.setId(model.getName());
-        treeViewSetup.setupTree(treeView, model.getRoot());
+        treeViewSetup.setupTree(treeView, model.getRoot(), this.treeEditingEnabled.get());
         TreeViewSelectionContainer treeViewSelectionContainer = new TreeViewSelectionContainer(new HasTreeView<ANode>(treeView), this.treeViewSelectionGroup);
         this.treeViewSelectionGroup.addSelectionContainer(treeViewSelectionContainer);
         this.treeViewSelectionContainers.add(treeViewSelectionContainer);
@@ -1255,7 +1274,7 @@ public class WindowPresenter {
      * @param model The model to remove
      */
     private void forgetModel(Model model) {
-        if (model.getFilesDirURL() != null) this.hasTheeDContentsContainer.removeResourceLocation(model.getFilesDirURL()); // make the model drawable by adding the file location
+        if (model.getFilesDirURL() != null) this.hasTheeDContentsContainer.removeResourceLocation(model.getFilesDirURL());
         else if (model.getFilesDir() != null) this.hasTheeDContentsContainer.removeFileDir(model.getFilesDir());
 
         TreeViewSelectionContainer modelTreeViewSelectionContainer = treeViewSelectionContainers.stream().filter(treeViewSelectionContainer -> treeViewSelectionContainer.getId().equals(model.getName())).toList().get(0);
@@ -1274,6 +1293,7 @@ public class WindowPresenter {
         this.selectionMediatorTree_3D_Content.removeRoot(model.getRoot());
         this.selectionMediatorTree3DS.remove(getSelectionMediatorTree3D(model.getName()));
         this.treeViews.remove(modelTreeView);
+        treeViewEditor.removeTreeView(modelTreeView);
         this.searchTrees.removeIf(searchTree -> searchTree.getId().equals(model.getName()));
         this.tabs.removeIf(tab -> tab.getText().equals(model.getName()));
         controller.getTreeTabPane().getTabs().removeIf(tab -> tab.getText().equals(model.getName()));
@@ -1388,10 +1408,8 @@ public class WindowPresenter {
             TreeView<ANode> mainModelTreeView = null;
             for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
             if (mainModelTreeView == null) return;
-            EnableDisableBP3DV3Parts.removeV3FilesFromTree(mainModelTreeView.getRoot(), EnableDisableBP3DV3Parts.createIdToFileIDsMap());
+            EnableDisableBP3DV3Parts.removeV3FilesFromTree(mainModelTreeView.getRoot());
 
-//            selectionMediatorTree3D_Selection.reloadDicts();
-//            selectionMediatorTree_3D_Content.reloadDicts();
         }
 
         @Override
@@ -1401,10 +1419,8 @@ public class WindowPresenter {
             for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
             if (mainModelTreeView == null) return;
 
-            EnableDisableBP3DV3Parts.addV3FilesToTree(mainModelTreeView.getRoot(), EnableDisableBP3DV3Parts.createIdToFileIDsMap());
+            EnableDisableBP3DV3Parts.addV3FilesToTree(mainModelTreeView.getRoot());
 
-//            selectionMediatorTree3D_Selection.reloadDicts();
-//            selectionMediatorTree_3D_Content.reloadDicts();
         }
 
         @Override
@@ -1432,7 +1448,7 @@ public class WindowPresenter {
             TreeView<ANode> mainModelTreeView = null;
             for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
             if (mainModelTreeView == null) return;
-            EnableDisableBP3DV3Parts.addV3FilesToTree(mainModelTreeView.getRoot(), EnableDisableBP3DV3Parts.createIdToFileIDsMap());
+            EnableDisableBP3DV3Parts.addV3FilesToTree(mainModelTreeView.getRoot());
 
             selectionMediatorTree3D_Selection.reloadDicts();
             selectionMediatorTree_3D_Content.reloadDicts();
@@ -1444,7 +1460,7 @@ public class WindowPresenter {
             TreeView<ANode> mainModelTreeView = null;
             for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
             if (mainModelTreeView == null) return;
-            EnableDisableBP3DV3Parts.removeV3FilesFromTree(mainModelTreeView.getRoot(), EnableDisableBP3DV3Parts.createIdToFileIDsMap());
+            EnableDisableBP3DV3Parts.removeV3FilesFromTree(mainModelTreeView.getRoot());
 
             selectionMediatorTree3D_Selection.reloadDicts();
             selectionMediatorTree_3D_Content.reloadDicts();
@@ -1462,39 +1478,6 @@ public class WindowPresenter {
     }
 
 
-
-    private boolean searchForDupIDs(TreeItem<ANode> root) {
-        LinkedList<TreeItem<ANode>> allAITreeItems = new LinkedList<>();
-        TreeAnalysisUtils.accumulateForEveryNodeBelow(root, allAITreeItems, t -> t);
-        HashMap<TreeItem<ANode>, Collection<TreeItem<ANode>>> duplicateItemsMap = TreeAnalysisUtils.lookForDuplicateIDsInTree(allAITreeItems, root, false);
-
-
-        if (!duplicateItemsMap.isEmpty()) {
-
-            StringBuilder stringBuilder = new StringBuilder();
-            for (TreeItem<ANode> dupTreeItem : duplicateItemsMap.keySet()) {
-                for (TreeItem<ANode> aNode : duplicateItemsMap.get(dupTreeItem))
-                    stringBuilder.append("ID: " + dupTreeItem.getValue().conceptId() + " Name: " + dupTreeItem.getValue().name() + "  |  ID: " + aNode.getValue().conceptId() + " Name: " + aNode.getValue().name() + "\n");
-            }
-
-            String popupText = """
-                The followings nodes share the same IDs with at least one other node.
-                Assign new IDs to duplicated nodes and continue?
-                
-                Node  |  Other node with same ID
-                
-                """ + stringBuilder.toString();
-
-            if (LittlePopUp.showScrollableTextPopup("Warning", popupText)) {
-                for (TreeItem<ANode> itemWDuplicateANode : duplicateItemsMap.keySet()) replaceANodeByCopy(itemWDuplicateANode, root);
-                return true;
-            } else return false;
-        } else {
-            LittlePopUp.showScrollableTextPopup("Info", "No duplicate IDs in the tree.");
-            return true;
-        }
-    }
-
     public static long freeMemory() {return Runtime.getRuntime().freeMemory()  / (1024*1024);}
     public static long totalMemory() {return Runtime.getRuntime().totalMemory()  / (1024*1024);}
 
@@ -1506,15 +1489,6 @@ public class WindowPresenter {
         System.out.println("Used MB: " + (r.totalMemory() - r.freeMemory()) / (1024*1024));
     }
 
-    private void computeMemOfLastCommand() {
-        if (undoList.isEmpty()) return;
-
-        while (!(ramConsumOfCommands.size() == undoList.size() -1)) {ramConsumOfCommands.removeLast();}
-
-        Runtime runtime = Runtime.getRuntime();
-        ramConsumOfCommands.add((deltaMemOfLastCommand + runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024));
-        System.out.println("Last command consumed " + ramConsumOfCommands.getLast());
-    }
 
     /**
      * This tries to keep the heap from maxing out.
@@ -1522,7 +1496,6 @@ public class WindowPresenter {
      * and size of new TriangleMeshes they create.
      */
     private void manageRAM() {
-        Set<Class> expensiveCommands = Set.of(SliceCommand.class, AddModelCommand.class, EnableBP3DV3Command.class);
         if (undoList.size() > 60 || (double) freeMemory() / totalMemory() < freeRamFractionThreshold) {
             int us = undoList.size();
             Iterator<Command> iterator = undoList.listIterator();
@@ -1533,8 +1506,6 @@ public class WindowPresenter {
             }
             System.out.println("Removed " + (us - undoList.size()) + " commands");
         }
-
-
     }
 
 

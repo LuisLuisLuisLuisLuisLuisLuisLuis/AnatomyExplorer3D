@@ -1,14 +1,19 @@
 package Project.window.TreeView.TreeAnalysis.MVPPattern;
 
-import Project.window.TreeView.TreeViewSetup;
+import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
+import Project.window.TreeView.TreeViewEditing.TreeViewSetup;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 
 public class TreeAnalysisController {
 
+    @FXML
+    private TextField nameTextfield;
+    @FXML
+    private HBox legend;
+    @FXML
+    private ToolBar botToolBar;
     @FXML
     private Button searchButton;
 
@@ -46,4 +51,10 @@ public class TreeAnalysisController {
     public Button getSearchButton() {return searchButton;}
 
     public Label getBotlabel() {return botlabel;}
+
+    public ToolBar getBotToolBar() {return botToolBar;}
+
+    public HBox getLegend() {return legend;}
+
+    public TextField getNameTextfield() {return nameTextfield;}
 }

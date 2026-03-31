@@ -14,6 +14,8 @@ module com.anatomyExplorer {
     requires java.net.http;
     requires org.jetbrains.annotations;
     requires java.management;
+    requires jdk.compiler;
+    requires java.logging;
 
     exports Project.AI.Format to com.fasterxml.jackson.databind;
     exports Project.window.ThreeDPaneHandling.Coloring to com.fasterxml.jackson.databind;
@@ -22,10 +24,9 @@ module com.anatomyExplorer {
     opens Project.window.TreeView.TreeAnalysis.MVPPattern to javafx.fxml;
 
     exports Project;
-    opens Project.window.TreeView to javafx.fxml;
     opens Project.window.TreeView.TreeAnalysis to javafx.fxml;
     opens Project.model to javafx.fxml;
-    opens Project.window.TreeView.AITreeIntegration.MVPattern to javafx.fxml;
-    opens Project.window.TreeView.TreeAnalysis.TreeViewEditing to javafx.fxml;
+    opens Project.window.TreeView.TreeRestructuring to javafx.fxml;
+    opens Project.window.TreeView.TreeViewEditing to javafx.fxml;
 
 }

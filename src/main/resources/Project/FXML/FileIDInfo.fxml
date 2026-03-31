@@ -2,10 +2,12 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Project.window.TreeView.TreeAnalysis.MVPPattern.TreeAnalysisController">
@@ -17,13 +19,17 @@
                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN" />
                </columnResizePolicy>
             </TableView>
-            <ToolBar>
+            <ToolBar fx:id="botToolBar">
               <items>
                   <TextField fx:id="addFileIDTextField" />
                   <Button fx:id="addFileIDButton" mnemonicParsing="false" text="Add FileID" />
                   <Button fx:id="removeFileIDButton" mnemonicParsing="false" text="Remove FileID" />
                   <Button fx:id="searchButton" mnemonicParsing="false" text="Search" />
                   <Label fx:id="botlabel" text="Label" />
+                  <HBox fx:id="legend" />
+                  <Separator orientation="VERTICAL" />
+                  <Label text="This node:" />
+                  <TextField fx:id="nameTextfield" editable="false" />
               </items>
             </ToolBar>
          </children>

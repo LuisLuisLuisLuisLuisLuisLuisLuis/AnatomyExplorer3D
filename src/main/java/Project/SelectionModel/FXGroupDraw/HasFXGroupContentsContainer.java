@@ -32,6 +32,10 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
      * Has a mapping of FileIDs (that come in as groupItems here) to anatomical group (String[]).
      * -> one fileID may be mapped to multiple anatomical groups.
      * Is set on Construction by loading resource .json.
+     *
+     * You will still need this when you implement diff selection visualization modes, specifically color visualization
+     * (e.g. intense Red for selected) because you will need to be able to go back to default.
+     * Also, this schema may be needed for loading/saving sessions IF you still allow user to change colors.
      */
     private FileGroupingScheme fileGroupingScheme;
     /**
