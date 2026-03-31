@@ -3,6 +3,7 @@ package Project.window.TreeView.TreeViewEditing.Command;
 
 import Project.command.Command;
 import Project.model.ANode;
+import Project.window.PopUp.LittlePopUp;
 import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import Project.window.TreeView.TreeRestructuring.TreeRestructuring;
 import javafx.beans.binding.Bindings;
@@ -37,6 +38,11 @@ public class UndoableANodeTreeViewEditor {
 
 
     private final HashMap<String, TreeView<ANode>> treeViews = new HashMap<>();
+
+    /**
+     * Before this class can work on a TreeView, the TreeView must be provided. This class relies on the .getId() of the
+     * TreeView.
+     */
     public void addTreeView(TreeView<ANode> treeView) {if (!treeViews.containsKey(treeView.getId())) this.treeViews.put(treeView.getId(), treeView);}
     public void removeTreeView(TreeView<ANode> treeView) {this.treeViews.remove(treeView.getId());}
     public boolean knowsTreeViewID(String treeViewID) {return treeViews.containsKey(treeViewID);}
@@ -99,10 +105,10 @@ public class UndoableANodeTreeViewEditor {
     public BooleanBinding canPaste() {
         return Bindings.isEmpty(clipboardHolder.getChildren()).not();
     }
-//    public BooleanBinding canCut() {return canPaste().not();}
+//    public BooleanBinding canCut() {return canPaste().not();} not doing this. cutting while theres stuff on clipboard
+    //simply overrides the clipboard as it does anyhwere else. also, else i would need to solve some other hassles.
 
     public void cut(TreeItem<ANode> mover, String treeViewID) {
-//        if (!canCut().get()) return;
         execute(new CutTreeItemCommand(mover, treeViewID));
     }
 
@@ -142,7 +148,16 @@ public class UndoableANodeTreeViewEditor {
             TreeRestructuring treeRestructuring;
             if (subtree.getParent() == null) treeRestructuring = new TreeRestructuring(subtree);  //assuming it is the root then
             else treeRestructuring = new TreeRestructuring(treeView.getRoot(), subtree);
-            treeRestructuring.addOnAcceptedRunnable(() -> execute(new RestructureTreeCommand(subtree, treeRestructuring.getResultNow(), treeView.getId())));
+            treeRestructuring.addOnAcceptedRunnable(() -> {
+                try {
+                    execute(new RestructureTreeCommand(subtree, treeRestructuring.getResultNow(), treeView.getId()));
+                } catch (NullPointerException n) {
+                    LittlePopUp.showMsg("Error", """
+                Failed to accept. Possible reasons:
+                    - The TreeItem you were working on does no longer exist
+                    - The TreeView you were working on has been closed""", "OK");
+                }
+            });
         } catch (IOException ignored) {
         }
     }
@@ -164,6 +179,9 @@ public class UndoableANodeTreeViewEditor {
         return targetParent.getChildren().add(mover);
     }
 
+    // all commands use this pattern: don't rely on an instance, but know how to get what you need
+    // thus, everyone who works with this editor needs to provide the treeview and MUST NOT RENAME IT (bcuz String keys in dicts aren't passed by reference are they?? anyway better be safe).
+    // because adding / removing models (and thus also treeviews) means that the instances will no longer be the correct ones.
     private abstract class TreeViewEditorCommand implements Command {
 
         private final String treeViewID;
@@ -416,7 +434,7 @@ public class UndoableANodeTreeViewEditor {
         public String name() {return "ExtractChildrenCommand";}
     }
 
-    class RestructureTreeCommand extends TreeViewEditorCommand {
+    private class RestructureTreeCommand extends TreeViewEditorCommand {
 
         private final String beforeID;
         private final TreeItem<ANode> after;

@@ -215,15 +215,10 @@ public class TreeRestructuring {
 
     private void acceptTree() {
         if (!searchForDupIDs(restrucTreeView.getRoot(), "Cannot accept. There are duplicate IDs in the tree.", "No duplicate IDs in the tree.") || !searchForDupIDs(realTreeMasterRoot, "Cannot accept. Some IDs already exist in the real tree.", "No overlapping IDs with the real tree.")) return;   //want to check if any of the IDs of aiTree already occur anywhere in the full real tree
-//        executeCommand(new AcceptCommand(realTreeRoot, restructRoot));
-//        treeViewSetup.cut(aiTreeRoot);
-//        treeViewSetup.paste(realTreeParent, realTreeMasterRoot);
-//        aiTreeView.setRoot(null);
-//        realTreeRoot = aiTreeRoot; if you do this you can keep on working here, otherwise not bcuz this does not know about the new real subtree anymore
         setResult(restrucTreeView.getRoot());
         restrucTreeView.setRoot(null);
         runOnAccepted();
-        this.showPopup.getStage().close();  // but i choose to close this after accepting once. this means if its opened recursively, the windows working on this tree will be useless.
+        this.showPopup.getStage().close();  // I choose to close this after accepting. much less of a hassle and entirely acceptable behaviour. this means if restructure is opened recursively, the windows working on this tree will be useless?
     }
 
 
