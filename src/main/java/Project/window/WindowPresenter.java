@@ -38,7 +38,6 @@ import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import Project.command.TreeCommands.TreeEditorMockCommand;
 import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
 import Project.window.TreeView.TreeViewEditing.TreeViewSetup;
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -74,15 +73,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Function;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static Project.model.FileUtil.*;
-import static Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils.replaceANodeByCopy;
 
 
 /**
@@ -254,7 +250,7 @@ public class WindowPresenter {
         controller.getTreeSelectNoneButton().setOnAction(e -> new SelectNoneTreeViewCommand(getSelectedTreeView()).execute());
 
         //menu: File
-        controller.getMenuClose().setOnAction(e -> Platform.exit());
+        controller.getMenuClose().setOnAction(e -> requestExit());
 //        controller.getMenuSaveTree().setOnAction(e -> TreeExport.writeToFiles(getSelectedTreeView(), new File(partOfFilesLocation.get()).getParent()));
         controller.getMenuSaveTree().setOnAction(e -> {
             TreeExport.saveTrees(treeViews.stream().toList(), treeViews.stream().map(TreeView::getId).toList());
@@ -1312,6 +1308,8 @@ public class WindowPresenter {
         private final List<Model> models;
         private final List<ContextMenu> contextMenus;
 
+        public List<String> getModelIDs() {return models.stream().map(Model::getName).toList();}
+
         public AddModelCommand(List<Model> models, List<ContextMenu> contextMenus) {
             this.models = models;
             this.contextMenus = contextMenus;
@@ -1351,6 +1349,7 @@ public class WindowPresenter {
         private RememberHasFXGroupContents rememberFXGroupContents;
         private RememberFXMeshViewColors rememberFXMeshViewColors;
         private final List<ContextMenu> contextMenus;
+        public List<String> getModelIDs() {return models.stream().map(Model::getName).toList();}
 
         public RemoveModelCommand(List<Model> models) {
             this.models = models;
@@ -1394,17 +1393,15 @@ public class WindowPresenter {
         public String name() {return "RemoveModelCommand";}
     }
 
-    private class EnableBP3DV3Command implements Command {
-
-        private final AddModelCommand addModelCommand;
+    private class EnableBP3DV3Command extends AddModelCommand {
 
         public EnableBP3DV3Command() {
-            this.addModelCommand = new AddModelCommand(List.of(partof_v3, isa_v3));
+            super(List.of(partof_v3, isa_v3));
         }
 
         @Override
         public void undo() {
-            addModelCommand.undo();
+            super.undo();
             TreeView<ANode> mainModelTreeView = null;
             for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
             if (mainModelTreeView == null) return;
@@ -1414,7 +1411,7 @@ public class WindowPresenter {
 
         @Override
         public void execute() {
-            addModelCommand.execute();
+            super.execute();
             TreeView<ANode> mainModelTreeView = null;
             for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
             if (mainModelTreeView == null) return;
@@ -1434,17 +1431,15 @@ public class WindowPresenter {
         }
     }
 
-    private class DisableBP3DV3Command implements Command {
-
-        private final RemoveModelCommand removeModelCommand;
+    private class DisableBP3DV3Command extends RemoveModelCommand {
 
         public DisableBP3DV3Command() {
-            this.removeModelCommand = new RemoveModelCommand(List.of(partof_v3, isa_v3));
+            super(List.of(partof_v3, isa_v3));
         }
 
         @Override
         public void undo() {
-            removeModelCommand.undo();
+            super.undo();
             TreeView<ANode> mainModelTreeView = null;
             for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
             if (mainModelTreeView == null) return;
@@ -1456,7 +1451,7 @@ public class WindowPresenter {
 
         @Override
         public void execute() {
-            removeModelCommand.execute();
+            super.execute();
             TreeView<ANode> mainModelTreeView = null;
             for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
             if (mainModelTreeView == null) return;
@@ -1475,6 +1470,11 @@ public class WindowPresenter {
         public String name() {
             return "DisableBP3DV3Command";
         }
+    }
+
+    //TODO
+    public void requestExit() {
+        System.exit(0);
     }
 
 

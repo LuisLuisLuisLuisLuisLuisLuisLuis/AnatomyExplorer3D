@@ -28,9 +28,14 @@ public class AnatomyExplorer extends Application {
         Scene primaryScene = new javafx.scene.Scene(view.getRoot(), 900, 600);
 
         primaryStage.setScene(primaryScene);
+
         primaryStage.show();
 
         WindowPresenter windowPresenter = new WindowPresenter(view.getController());
+        primaryStage.setOnCloseRequest(e -> {
+            e.consume();
+            windowPresenter.requestExit();
+        });
         windowPresenter.setKeyControls(primaryScene);
 
 
