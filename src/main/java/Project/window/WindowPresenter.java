@@ -38,10 +38,12 @@ import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import Project.command.TreeCommands.TreeEditorMockCommand;
 import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
 import Project.window.TreeView.TreeViewEditing.TreeViewSetup;
+import com.sun.source.tree.Tree;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -63,6 +65,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.MeshView;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
@@ -131,6 +134,8 @@ public class WindowPresenter {
     private final ArrayList<SearchTree> searchTrees;
     private final SelectionGroup<ANode> treeViewSelectionGroup;
     private final ArrayList<TreeViewSelectionContainer> treeViewSelectionContainers;
+    private final HashMap<String, BooleanProperty> isModelUnsaved = new HashMap<>();
+    private final LinkedList<Circle> unsavedCircle = new LinkedList<>();
 
     private final HasFXGroupContents hasInnerGroupContents;
     private final SelectionGroup<String> threeDContentGroup;
@@ -251,8 +256,9 @@ public class WindowPresenter {
 
         //menu: File
         controller.getMenuClose().setOnAction(e -> requestExit());
-//        controller.getMenuSaveTree().setOnAction(e -> TreeExport.writeToFiles(getSelectedTreeView(), new File(partOfFilesLocation.get()).getParent()));
+
         controller.getMenuSaveTree().setOnAction(e -> {
+            //purposefully save all and not skip unchanged ones.
             TreeExport.saveTrees(treeViews.stream().toList(), treeViews.stream().map(TreeView::getId).toList());
         });
         controller.getEnableTreeEditingCheckMenu().selectedProperty().addListener(new ChangeListener<Boolean>() {
@@ -368,8 +374,7 @@ public class WindowPresenter {
         this.selectionMediatorTree3D_Selection = new SelectionMediator_Tree_3D(treeViewSelectionGroup, threeDSelectionGroup);
 
         //------------load main model------------
-        loadModel(mainModel);
-//        makeModelVisible(mainModel);
+        loadModel(mainModel); //not as command because it should not be undoable / removable
         //---------------------------------------
 
         hasInnerGroupContents.getSelection().addListener((InvalidationListener) e -> centerGroupToItself(innerGroup));  //should be called after the command below, otherwise it'll fire every loop
@@ -408,7 +413,7 @@ public class WindowPresenter {
         treeViewEditor.addOnExecute(new Runnable() {
             @Override
             public void run() {
-                executeCommand(new TreeEditorMockCommand<>(treeViewEditor));
+                executeCommand(new TreeEditorMockCommand(treeViewEditor, treeViewEditor.treeViewIDOfLastExecuted()));
             }
         });
 
@@ -644,12 +649,29 @@ public class WindowPresenter {
                 Model model = filesListFile == null ? new Model(relationsStream, name) : new Model(relationsStream, makeStream(filesListFile), name, filesDir);
                 ContextMenu contextMenu = new ContextMenu();
                 MenuItem remove = new MenuItem("Remove");
-                remove.setOnAction(actionEvent -> executeCommand(new RemoveModelCommand(model)));
+                MenuItem save = new MenuItem("Save");
+                remove.setOnAction(actionEvent -> {
+                    while (isModelUnsaved.get(model.getName()).get()) {
+                        int r = LittlePopUp.showMsg("Info", "The tree has unsaved changes. Save before removing?", "Yes","No", "Cancel");
+                        if (r==-1) return;
+                        if (r==0) break;
+                        if (r==1) {
+                            if (tryToSaveTree(treeViews.stream().filter(t -> t.getId().equals(model.getName())).toList().getFirst())){
+                                break;
+                            }
+                        }
+                    }
+                    executeCommand(new RemoveModelCommand(model));
+                });
                 contextMenu.getItems().add(remove);
                 executeCommand(new AddModelCommand(model, contextMenu));
+                // can only bind disable property once the boolean property exists
+                save.setOnAction(actionEvent -> tryToSaveTree(treeViews.stream().filter(t -> t.getId().equals(model.getName())).toList().getFirst()));
+                save.disableProperty().bind(isModelUnsaved.get(model.getName()).not());
+                contextMenu.getItems().add(save);
             }
             catch (Exception x) {
-                LittlePopUp.showMsg("Error", "Failed to parse model:\n" + x.getMessage(), "Ok");
+                LittlePopUp.showMsg("Error", "Failed to parse model:\n" + x.getMessage(), "OK");
                 return;
             }
 
@@ -1135,6 +1157,30 @@ public class WindowPresenter {
         return null;
     }
 
+
+    private void updateOnUndo(Command command) {
+        if (command instanceof TreeEditorMockCommand treeEditorMockCommand) {
+            boolean hasBeenModifiedB4 = false;
+            for (Command command1 : undoList.reversed()) {
+                if (command1 instanceof AddModelCommand addModelCommand) if (addModelCommand.getModelIDs().contains(treeEditorMockCommand.getTreeViewID())) break;
+                if (command1 instanceof TreeEditorMockCommand treeEditorMockCommand1) {
+                    if (treeEditorMockCommand1.getTreeViewID().equals(treeEditorMockCommand.getTreeViewID())) {
+                        hasBeenModifiedB4 = true;
+                        break;
+                    }
+                }
+            }
+            isModelUnsaved.get(treeEditorMockCommand.getTreeViewID()).set(hasBeenModifiedB4);
+        }
+    }
+
+    private void updateOnExecRedo(Command command) {
+        if (command instanceof TreeEditorMockCommand treeEditorMockCommand) {
+            if (isModelUnsaved.containsKey(treeEditorMockCommand.getTreeViewID())) isModelUnsaved.get(treeEditorMockCommand.getTreeViewID()).set(true);
+        }
+        for (String s : isModelUnsaved.keySet()) System.out.println(s + ": " + isModelUnsaved.get(s).get());
+    }
+
     /**
      * First clear the Redo-list. Then execute a command and add it to the stack of commands.
      */
@@ -1145,6 +1191,7 @@ public class WindowPresenter {
         manageRAM();
         command.execute();
         undoList.add(command);
+        updateOnExecRedo(command);
 //        WindowPresenter.printMem();
     }
 
@@ -1156,6 +1203,7 @@ public class WindowPresenter {
             logger.log(Level.INFO, "Undo " + undoList.getLast().name());
             undoList.getLast().undo();
             redoList.add(undoList.removeLast());
+            updateOnUndo(redoList.getLast());
         }
     }
 
@@ -1167,6 +1215,7 @@ public class WindowPresenter {
             logger.log(Level.INFO, "Redo " + redoList.getLast().name());
             redoList.getLast().redo();
             undoList.add(redoList.removeLast());
+            updateOnExecRedo(undoList.getLast());
         }
     }
 
@@ -1262,6 +1311,12 @@ public class WindowPresenter {
         else if (model.getFilesDir() != null) this.hasTheeDContentsContainer.addFileDir(model.getFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot()));
         controller.getTreeTabPane().getTabs().add(tab);
         sizeOfLoadedModels += model.getFilesDir() != null ? estimateSizeOfOBJsInDir(model.getFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot())) : (model.getFilesDirURL() != null ? estimateSizeOfOBJsInDir(new File(model.getFilesDirURL().getFile()), collectFileIDsBelowToSet(model.getRoot())) : 0);
+        this.isModelUnsaved.put(model.getName(), new SimpleBooleanProperty(false));
+        Circle circle = new Circle(3,Color.GRAY);
+        this.isModelUnsaved.get(model.getName()).addListener((observable, oldValue, newValue) -> {
+            if (newValue) tab.setGraphic(circle);
+            else tab.setGraphic(null);
+        });
     }
 
     /**
@@ -1295,6 +1350,8 @@ public class WindowPresenter {
         controller.getTreeTabPane().getTabs().removeIf(tab -> tab.getText().equals(model.getName()));
         this.models.remove(model);
         sizeOfLoadedModels -= model.getFilesDir() != null ? estimateSizeOfOBJsInDir(model.getFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot())) : (model.getFilesDirURL() != null ? estimateSizeOfOBJsInDir(new File(model.getFilesDirURL().getFile()), FileUtil.collectFileIDsBelowToSet(model.getRoot())) : 0);
+        this.isModelUnsaved.remove(model.getName());
+//        this.unsavedCircle.removeLast();
     }
 
     // This class sits here and not in Command because it depends entirely on the implementation of WindowPresenter.
@@ -1350,11 +1407,14 @@ public class WindowPresenter {
         private RememberFXMeshViewColors rememberFXMeshViewColors;
         private final List<ContextMenu> contextMenus;
         public List<String> getModelIDs() {return models.stream().map(Model::getName).toList();}
+        private final boolean[] isUnsaved;  //remember if any model has unsaved changed.
 
         public RemoveModelCommand(List<Model> models) {
             this.models = models;
             this.contextMenus = new ArrayList<>(models.size());
             this.meshViewIDsToRemove = new HashSet<>();
+            this.isUnsaved = new boolean[models.size()];
+            int i = 0;
             for (Model model : models) {
                 TreeView<ANode> modelTreeView = treeViews.stream().filter(treeView -> treeView.getId().equals(model.getName())).toList().getFirst();
                 TreeViewSelectionContainer modelTreeViewSelectionContainer = treeViewSelectionContainers.stream().filter(treeViewSelectionContainer -> treeViewSelectionContainer.getId().equals(model.getName())).toList().get(0);
@@ -1367,6 +1427,8 @@ public class WindowPresenter {
                     if (tab.getText().equals(model.getName())) {contextMenus.add(tab.getContextMenu()); tab_ = tab; break;}
                 }
                 if (tab_ == null) contextMenus.add(null);
+
+                isUnsaved[i] = isModelUnsaved.get(model.getName()).get();
             }
         }
         public RemoveModelCommand(Model model) {this(List.of(model));}
@@ -1382,7 +1444,7 @@ public class WindowPresenter {
             for (int m = 0; m < models.size(); m++) {
                 Model model = models.get(m);
                 loadModel(model, contextMenus.get(m));
-//                makeModelVisible(model); now done by loadmodel
+                isModelUnsaved.get(model.getName()).set(this.isUnsaved[m]);
             }
             this.rememberFXGroupContents.restoreSelection();
             this.rememberFXMeshViewColors.restoreSelection();
@@ -1472,9 +1534,46 @@ public class WindowPresenter {
         }
     }
 
-    //TODO
+
+    /**
+     * Shuts down the application in an orderly manner. (saves things that need saving)
+     */
     public void requestExit() {
+
+        // save the trees
+        List<TreeView<ANode>> unsavedTreeViews = new LinkedList<>();
+        for (TreeView<ANode> treeView : this.treeViews) if (isModelUnsaved.get(treeView.getId()).get()) unsavedTreeViews.add(treeView);
+        if (!tryToSaveTrees(unsavedTreeViews)) return;
+
         System.exit(0);
+    }
+
+    /**
+     * @param unsavedTreeViews TreeViews to save.
+     * @return False if aborted by the user.
+     */
+    private boolean tryToSaveTrees(List<TreeView<ANode>> unsavedTreeViews) {
+        if (!unsavedTreeViews.isEmpty()) {
+            List<String> idsToSave = LittlePopUp.scrollableListPopup(unsavedTreeViews.stream().map(TreeView::getId).toList(), "Unsaved changes", "The following trees have unsaved changes. Select the ones you want to save:");
+            if (idsToSave == null) return false;
+
+            if (!idsToSave.isEmpty()) {
+                unsavedTreeViews.removeIf(t -> !idsToSave.contains(t.getId()));
+                if (TreeExport.saveTrees(unsavedTreeViews, idsToSave) == null) return false;  //abort if cancelled by the user
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Tries to save the given tree.
+     * @return True if the tree has been saved or does not need saving. Set isModelSaved accordingly.
+     */
+    private boolean tryToSaveTree(TreeView<ANode> treeView) {
+        if (!isModelUnsaved.get(treeView.getId()).get()) return true;
+        boolean result =TreeExport.saveTree(treeView, treeView.getId());
+        isModelUnsaved.get(treeView.getId()).set(!result);
+        return result;
     }
 
 

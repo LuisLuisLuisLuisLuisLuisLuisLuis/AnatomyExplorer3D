@@ -177,6 +177,17 @@ public class TreeAnalysisUtils {
         return lookForDuplicateIDsInTree(itemsToCheck, root, checkSameANodeInstance, null);
     }
 
+    public static void accumulateAllTreeItemsBelow(TreeItem<ANode> root, Collection<TreeItem<ANode>> dump) {
+        dump.add(root);
+        for (TreeItem<ANode> child : root.getChildren()) accumulateAllTreeItemsBelow(child, dump);
+    }
+
+    public static Collection<TreeItem<ANode>> accumulateAllTreeItemsBelow(TreeItem<ANode> root) {
+        LinkedList<TreeItem<ANode>> result = new LinkedList<>();
+        accumulateAllTreeItemsBelow(root, result);
+        return result;
+    }
+
     public static boolean doesNodeWFilesContainName(TreeItem<ANode> root, String name) {
         if (!root.getValue().fileIds().isEmpty() && root.getValue().name().contains(name)) return true;
         for (TreeItem<ANode> child : root.getChildren()) {

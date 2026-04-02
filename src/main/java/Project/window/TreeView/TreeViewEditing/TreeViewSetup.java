@@ -6,6 +6,7 @@ import Project.window.PopUp.LegendItem;
 import Project.window.PopUp.LittlePopUp;
 import Project.window.TreeView.TreeAnalysis.MVPPattern.FileIDView;
 import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
+import Project.window.TreeView.TreeRestructuring.TreeRestructuring;
 import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.*;
@@ -141,14 +142,12 @@ public class TreeViewSetup {
                         paste.setOnAction(e -> paste(this.getTreeItem(), this.getTreeView().getRoot()));
                         paste.disableProperty().bind(treeViewEditor1.canPaste().not());
                         delete.setOnAction(e -> delete(this.getTreeItem()));
-//                        restore.setOnAction(e -> restore());
                         rename.setOnAction(e -> getTreeView().edit(this.getTreeItem()));
                         create.setOnAction(e -> this.create());
                         extract.setOnAction(e -> extract(this.getTreeItem()));
                         fileIDInfo.setOnAction(e -> {
                             try {
                                 showFileIDInfo(this.getTreeItem());
-//                                runOnANodeFileIDsModified();
                             }
                             catch (IOException ioe) {
                                 System.out.println("Failed to load FileIDInfo");
@@ -186,8 +185,6 @@ public class TreeViewSetup {
                             id, id, new HashSet<>(), new HashSet<>()
                     );
                     TreeItem<ANode> newTreeItem = this.treeViewEditor1.create(this.getTreeItem(), newnode, treeView.getId());
-//                    runOnANodeFileIDsModified();
-//                    this.getTreeItem().getValue().children().add(newnode);  //also create new anode relationship
                     getTreeView().edit(newTreeItem);
                 }
 
@@ -216,30 +213,32 @@ public class TreeViewSetup {
                     // If so, replace every ANode whose ID already occurs in this tree with a new ANode with different ID that is otherwise identical.
                     //      Change the ANode relationships accordingly before pasting.
                     // Then follows the regular paste operation.
+
                     LinkedList<TreeItem<ANode>> itemsToPaste = new LinkedList<>();
                     TreeAnalysisUtils.accumulateForEveryNodeBelow(treeViewEditor1.clipBoardContent(), itemsToPaste, t -> t);
                     HashMap<TreeItem<ANode>, Collection<TreeItem<ANode>>> duplicateItemsMap = TreeAnalysisUtils.lookForDuplicateIDsInTree(itemsToPaste, root, false);
 
-                    if (!duplicateItemsMap.isEmpty()) {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        for (TreeItem<ANode> dupTreeItem : duplicateItemsMap.keySet()) {
-                            for (TreeItem<ANode> aNode : duplicateItemsMap.get(dupTreeItem)) stringBuilder.append("ID: " + dupTreeItem.getValue().conceptId() + " Name: " + dupTreeItem.getValue().name() + " | ID: " + aNode.getValue().conceptId() + " Name: " + aNode.getValue().name() + "\n");
-                        }
-
+//                    if (!duplicateItemsMap.isEmpty()) {
+                    if (TreeRestructuring.searchForDupIDs(root, "Cannot paste in this tree. The following node IDs would be duplicated:", null, itemsToPaste)) {
+//                        StringBuilder stringBuilder = new StringBuilder();
+//                        for (TreeItem<ANode> dupTreeItem : duplicateItemsMap.keySet()) {
+//                            for (TreeItem<ANode> aNode : duplicateItemsMap.get(dupTreeItem)) stringBuilder.append("ID: " + dupTreeItem.getValue().conceptId() + " Name: " + dupTreeItem.getValue().name() + " | ID: " + aNode.getValue().conceptId() + " Name: " + aNode.getValue().name() + "\n");
+//                        }
+//
+////                        String popupText = """
+////                            Pasting will result in the following nodes being duplicated.
+////                            Assign new IDs to duplicated nodes and continue?
+////
+////                            Item to paste | already present item with same ID
+////
+////                            """ + stringBuilder.toString();
 //                        String popupText = """
-//                            Pasting will result in the following nodes being duplicated.
-//                            Assign new IDs to duplicated nodes and continue?
+//                                Cannot paste in this tree. The following node IDs would be duplicated:
 //
-//                            Item to paste | already present item with same ID
+//                                Item to paste | already present item with same ID
 //
-//                            """ + stringBuilder.toString();
-                        String popupText = """
-                                Cannot paste in this tree. The following node IDs would be duplicated:
-                                
-                                Item to paste | already present item with same ID
-                                
-                                """ + stringBuilder.toString();
-                        LittlePopUp.showScrollableTextPopup("Error", popupText, false);    // i dont want to implement this as undoable..
+//                                """ + stringBuilder.toString();
+//                        LittlePopUp.showScrollableTextPopup("Error", popupText, false);    // i dont want to implement this as undoable..
                         return;
 //                        if (!LittlePopUp.showScrollableTextPopup("Warning", popupText)) return;
 //                        for (TreeItem<ANode> itemWDuplicateANode : duplicateItemsMap.keySet()) replaceANodeByCopy(itemWDuplicateANode, root);
@@ -248,27 +247,12 @@ public class TreeViewSetup {
                     //now the regular pasting.
                     this.treeViewEditor1.paste(treeItem, treeView.getId()); //this node IS the targetParent
 
-                    //getLast() weil treeItem hier das parent ist und wir uns für die fileIDs des gerade hier gepasteten childs interessieren, was das letzte in der liste children ist.
-//        Collection<String> fileIDsToAdd = collectFileIDsBelow(treeItem.getChildren().getLast().getValue()).keySet();  it is no longer desired for parents to hold all fileids of their subtree
-//        for (String fileID : fileIDsToAdd) System.out.println(fileID);
-//        addFileIDsToParentsRec(treeItem, fileIDsToAdd);   //add the fileIDs to all parents
-
-//        for (TreeItem<ANode> childTreeItem : treeItem.getChildren()) {
-//            ANode childNode = childTreeItem.getValue(); //make sure the anode relationships are also created!
-//            if (!treeItem.getValue().children().contains(childNode)) treeItem.getValue().children().add(childNode);
-//        }
-//                    runOnANodeFileIDsModified();
-
                 }
 
                 private void delete(TreeItem<ANode> treeItem) {
                     if (treeItem.getParent() == null) return;
-//        removeFileIDsFromParentsRec(treeItem.getParent(), treeItem.getValue().getFileIds(), treeItem);
-//        removeFileIDsFromParentsRec(treeItem.getParent(), collectFileIDsBelow(treeItem.getValue()).keySet());
 
-//        treeItem.getParent().getValue().children().remove(treeItem.getValue()); //also delete anode relationship
                     this.treeViewEditor1.delete(treeItem, treeView.getId());
-//                    runOnANodeFileIDsModified();
                 }
 
                 /**
@@ -403,7 +387,6 @@ public class TreeViewSetup {
 //                    this.getItem().setName(temporaryANode.getName());
                     super.commitEdit(this.getItem());
 //                    setText(this.getItem().toString());
-//                    runOnANodeFileIDsModified();
                 }
             };
         });

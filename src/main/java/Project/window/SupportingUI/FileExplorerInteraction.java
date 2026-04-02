@@ -23,14 +23,10 @@ public class FileExplorerInteraction {
         return fileChooser.showSaveDialog(new Stage());
     }
 
-    public static boolean writeToFile(String content, File file) {
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file))){
-            bufferedWriter.write(content);
-            return true;
-        } catch ( IOException e ) {
-            System.out.println(e.getMessage());
-            return false;
-        }
+    public static void writeToFile(String content, File file) throws IOException {
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
+        bufferedWriter.write(content);
+        bufferedWriter.close();
     }
 
 

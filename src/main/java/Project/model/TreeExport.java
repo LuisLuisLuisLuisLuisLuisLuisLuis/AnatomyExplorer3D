@@ -1,11 +1,14 @@
 package Project.model;
 
+import Project.window.PopUp.LittlePopUp;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.FileChooser;
 import Project.window.SupportingUI.FileExplorerInteraction;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TreeExport {
@@ -23,25 +26,101 @@ public class TreeExport {
         File relationsFile = FileExplorerInteraction.chooseSaveDestination("Save relations file", new FileChooser.ExtensionFilter("Text", "*.*"));
         File fileListFile = FileExplorerInteraction.chooseSaveDestination("Save files list file", new FileChooser.ExtensionFilter("Text", "*.*"));
         if (relationsFile == null || fileListFile == null) return false;
-        if (FileExplorerInteraction.writeToFile(generateRelationList(treeView),relationsFile) && FileExplorerInteraction.writeToFile(generateFileList(treeView), fileListFile)) return true;
-        else return false;
+        try {
+            FileExplorerInteraction.writeToFile(generateRelationList(treeView), relationsFile);
+            FileExplorerInteraction.writeToFile(generateFileList(treeView), fileListFile);
+            return true;
+        } catch (IOException ignored) {return false;}
     }
 
-    public static void saveTrees(List<TreeView<ANode>> treeViews, List<String> treeNames) {
-        if (treeViews.size() != treeNames.size()) return;
-        File directory = FileExplorerInteraction.findDir("Choose saving directory");
-        if (directory == null) return;
-        for (int i = 0; i < treeViews.size(); i++) {
-            TreeView<ANode> treeView = treeViews.get(i);
-            String name = treeNames.get(i);
-            File relationsFile = new File(directory, name + "_inclusion_relation_list.txt");
-            File fileListFile = new File(directory, name + "_element_parts.txt");
-            if (relationsFile.exists() || fileListFile.exists()) {
-                System.err.println("File already exists");
-                return;
+    /**
+     *
+     * @param treeViews
+     * @param treeNames
+     * @return List of boolean matching indices of TreeViews where true = TreeView was saved and false = TreeView was not saved.
+     * Returns null if the process was aborted.
+     */
+    public static List<Boolean> saveTrees(List<TreeView<ANode>> treeViews, List<String> treeNames) {
+        List<Boolean> result = new ArrayList<>();
+        for (TreeView<ANode> ignored : treeViews) result.add(Boolean.FALSE);
+        if (treeViews.size() != treeNames.size()) return null;
+        File directory;
+        File[] relationsFiles = new File[treeViews.size()];
+        File[] fileListFiles = new File[treeViews.size()];
+
+        while (true) {
+            directory = FileExplorerInteraction.findDir("Choose saving directory");
+            if (directory == null) break;
+            StringBuilder names = new StringBuilder();
+            for (int i = 0; i < treeViews.size(); i++) {
+                String name = treeNames.get(i);
+                relationsFiles[i] = new File(directory, name + "_edge_list.txt");
+                fileListFiles[i] = new File(directory, name + "_file_list.txt");
+                names.append(relationsFiles[i].getName()).append("\n").append(fileListFiles[i].getName()).append("\n");
             }
+            if (LittlePopUp.showScrollableTextPopup("Info", "The following files will be created:", names.toString(), true)) break;
+        }
+        if (directory == null) return null;
+
+        StringBuilder errMsgBuilder = new StringBuilder();
+        for (int i = 0; i < relationsFiles.length; i++) {
+            String name = treeNames.get(i);
+            if (relationsFiles[i].exists()) errMsgBuilder.append(name + "_edge_list.txt\n");
+            if (fileListFiles[i].exists()) errMsgBuilder.append(name + "_file_list.txt\n");
+        }
+        String errMsg = errMsgBuilder.toString();
+
+        if (!errMsg.isBlank()) {
+            if (!LittlePopUp.showScrollableTextPopup("Warning", "The following files already exist. Overwrite?", errMsg, true, "Overwrite")) return saveTrees(treeViews, treeNames);
+        }
+        errMsgBuilder = new StringBuilder();
+        for (int i = 0; i < treeViews.size(); i++) {
+            try {
+                FileExplorerInteraction.writeToFile(generateRelationList(treeViews.get(i)), relationsFiles[i]);
+                try {
+                    FileExplorerInteraction.writeToFile(generateFileList(treeViews.get(i)), fileListFiles[i]);
+                    result.set(i, true);
+                    continue;
+                } catch (IOException ioException) {
+                    errMsgBuilder.append(treeNames.get(i) + ": " + ioException.getMessage());
+                }
+            } catch (IOException ioException) {
+                errMsgBuilder.append(treeNames.get(i) + ": " + ioException.getMessage());
+            }
+            result.set(i, false);
+        }
+        errMsg = errMsgBuilder.toString();
+        if (!errMsg.isBlank()) LittlePopUp.showScrollableTextPopup("Error", "Encountered errors saving the following models:", errMsg, false);
+        return result;
+    }
+
+
+    public static boolean saveTree(TreeView<ANode> treeView, String name) {
+        File directory;
+        File relationsFile;
+        File fileListFile;
+        while (true) {
+            directory = FileExplorerInteraction.findDir("Choose saving directory");
+            if (directory == null) return false;
+            relationsFile = new File(directory, name + "_edge_list.txt");
+            fileListFile = new File(directory, name + "_file_list.txt");
+            if (!LittlePopUp.showScrollableTextPopup("Info", "The following files will be created:", relationsFile.getName() + "\n" + fileListFile.getName(), true)) {
+                return false;
+            }
+            String errmsg = "";
+            if (relationsFile.exists()) errmsg += name + "_edge_list.txt\n";
+            if (fileListFile.exists()) errmsg += name + "_file_list.txt\n";
+            if (!errmsg.isBlank()) {
+                if (LittlePopUp.showMsg("Error", "The following files already exist:\n" + errmsg + "\nOverwrite?", "Yes", "Cancel")) break;
+            } else break;
+        }
+        try {
             FileExplorerInteraction.writeToFile(generateRelationList(treeView), relationsFile);
             FileExplorerInteraction.writeToFile(generateFileList(treeView),fileListFile);
+            return true;
+        } catch (IOException ioException) {
+            LittlePopUp.showMsg("Error", "Encountered an error while saving:\n" + ioException.getMessage(), "OK");
+            return false;
         }
     }
 

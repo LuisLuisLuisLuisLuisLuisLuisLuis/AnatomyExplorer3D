@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class ANode implements HasChildren<ANode>, Comparable<ANode> {
+public class ANode implements Comparable<ANode> {
 
     private String conceptId;
     private String name;

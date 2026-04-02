@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.net.URL;
 
 public class FileIDView {
-    private final TreeAnalysisController controller;
+    private final FileIDInfoController controller;
     private final Parent root;
 
     public FileIDView() throws IOException {
@@ -17,6 +17,6 @@ public class FileIDView {
         controller = loader.getController();
     }
 
-    public TreeAnalysisController getController() {return controller; }
+    public FileIDInfoController getController() {return controller; }
     public Parent getRoot() { return root; }
 }

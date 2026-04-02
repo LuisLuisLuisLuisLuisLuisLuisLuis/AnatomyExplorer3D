@@ -1,12 +1,11 @@
 package Project.window.TreeView.TreeAnalysis.MVPPattern;
 
-import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
 import Project.window.TreeView.TreeViewEditing.TreeViewSetup;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 
-public class TreeAnalysisController {
+public class FileIDInfoController {
 
     @FXML
     private TextField nameTextfield;

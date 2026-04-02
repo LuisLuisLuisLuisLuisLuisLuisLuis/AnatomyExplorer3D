@@ -20,18 +20,15 @@ public class AnatomyExplorer extends Application {
 
         WindowView view = new WindowView();
 
-        InputStream partOf_parts_list_file = getClass().getResourceAsStream("/Project/anatomy/partof_parts_list_e.txt");    //parts_list is unused because its useless information for me.
-        InputStream isA_parts_list_file = getClass().getResourceAsStream("/Project/anatomy/isa_parts_list_e.txt");
-
 
         primaryStage.setTitle("Anatomy Viewer");
         Scene primaryScene = new javafx.scene.Scene(view.getRoot(), 900, 600);
 
         primaryStage.setScene(primaryScene);
-
         primaryStage.show();
 
         WindowPresenter windowPresenter = new WindowPresenter(view.getController());
+
         primaryStage.setOnCloseRequest(e -> {
             e.consume();
             windowPresenter.requestExit();
@@ -53,12 +50,9 @@ public class AnatomyExplorer extends Application {
             primaryStage.setFullScreen(newValue);
         }));
 
-
-
     }
 
-    public static String FONTS_CSS =
-            AnatomyExplorer.class.getResource("/Project/Styles/fonts.css")
-                    .toExternalForm();
+
+    public static String FONTS_CSS = AnatomyExplorer.class.getResource("/Project/Styles/fonts.css").toExternalForm();
 }
 

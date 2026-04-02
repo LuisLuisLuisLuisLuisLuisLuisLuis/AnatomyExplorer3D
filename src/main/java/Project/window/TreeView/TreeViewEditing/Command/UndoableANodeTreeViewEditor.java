@@ -6,6 +6,7 @@ import Project.model.ANode;
 import Project.window.PopUp.LittlePopUp;
 import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import Project.window.TreeView.TreeRestructuring.TreeRestructuring;
+import com.sun.source.tree.Tree;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
@@ -30,6 +31,11 @@ public class UndoableANodeTreeViewEditor {
     private void runOnEvent() {for (Runnable runnable : onEventRunnables) runnable.run();}
 
     /**
+     * @return The ID of the TreeView of the last command on the undostack.
+     */
+    public String treeViewIDOfLastExecuted() {return undoStack.getLast().getTreeViewID();}
+
+    /**
      *  @param runnable A runnable to be run on every execute.
      */
     public void addOnExecute(Runnable runnable) {onExecuteRunnables.add(runnable);}
@@ -41,7 +47,7 @@ public class UndoableANodeTreeViewEditor {
 
     /**
      * Before this class can work on a TreeView, the TreeView must be provided. This class relies on the .getId() of the
-     * TreeView.
+     * TreeView. This also means that this class cannot work on two TreeViews whose IDs are the same.
      */
     public void addTreeView(TreeView<ANode> treeView) {if (!treeViews.containsKey(treeView.getId())) this.treeViews.put(treeView.getId(), treeView);}
     public void removeTreeView(TreeView<ANode> treeView) {this.treeViews.remove(treeView.getId());}
@@ -65,8 +71,8 @@ public class UndoableANodeTreeViewEditor {
     }
     
 
-    private final ObservableList<Command> undoStack = FXCollections.observableList(new LinkedList<Command>());
-    private final ObservableList<Command> redoStack = FXCollections.observableList(new LinkedList<Command>());
+    private final ObservableList<TreeViewEditorCommand> undoStack = FXCollections.observableList(new LinkedList<TreeViewEditorCommand>());
+    private final ObservableList<TreeViewEditorCommand> redoStack = FXCollections.observableList(new LinkedList<TreeViewEditorCommand>());
 
     public BooleanBinding canUndo() {return Bindings.isEmpty(undoStack).not();}
     public BooleanBinding canRedo() {return Bindings.isEmpty(redoStack).not();}
@@ -89,7 +95,7 @@ public class UndoableANodeTreeViewEditor {
         runOnEvent();
     }
 
-    void execute(Command treeViewEditorCommand) {
+    void execute(TreeViewEditorCommand treeViewEditorCommand) {
         logger.log(Level.INFO, "Execute " + treeViewEditorCommand.name());
         treeViewEditorCommand.execute();
         undoStack.add(treeViewEditorCommand);
@@ -188,6 +194,7 @@ public class UndoableANodeTreeViewEditor {
         protected TreeView<ANode> getTreeView() {
             return treeViews.get(treeViewID);
         }
+        public String getTreeViewID() {return treeViewID;}
 
         public TreeViewEditorCommand(String treeViewID) {
             if (!treeViews.containsKey(treeViewID)) throw new IllegalArgumentException("This TreeViewEditor does not know about TreeView ID=" + treeViewID);
@@ -259,6 +266,7 @@ public class UndoableANodeTreeViewEditor {
         @Override
         public void undo() {
             TreeItem<ANode> parent = TreeAnalysisUtils.getTreeItemWANodeId(parentID, getTreeView().getRoot());
+            TreeItem<ANode> newNode = TreeAnalysisUtils.getTreeItemWANodeId(this.newNode.getValue().conceptId(), getTreeView().getRoot());  // if treeview's been recreated then so has newNode
             parent.getChildren().remove(newNode);
             updateValuesOnRemove(newNode, parent);
         }

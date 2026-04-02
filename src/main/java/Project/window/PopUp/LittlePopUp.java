@@ -17,9 +17,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.function.Function;
 
 public class LittlePopUp {
@@ -112,23 +110,33 @@ public class LittlePopUp {
         return dialog.showAndWait().orElse(null);
     }
 
+    public static boolean showScrollableTextPopup(String title, String headertext, String text, boolean choice) {
+        return showScrollableTextPopup(title, headertext, text, choice, "");
+    }
+
+    public static boolean showScrollableTextPopup(String title, String text, boolean choice) {
+        return showScrollableTextPopup(title, null, text, choice, "");
+    }
+
     public static boolean showScrollableTextPopup(String title, String text) {
-        return showScrollableTextPopup(title, text, true);
+        return showScrollableTextPopup(title, null, text, true, "");
     }
     /**
      * @param title Window title
+     * @param headertext Header text
      * @param text Text to show
      * @param choice If yes -> OK and Cancel button. Else only OK button.
      * @return Button clicked == OK Button
      */
-    public static boolean showScrollableTextPopup(String title, String text, boolean choice) {
+    public static boolean showScrollableTextPopup(String title, String headertext, String text, boolean choice, String okButtonText) {
 
         Dialog<Boolean> dialog = new Dialog<>();
         dialog.setResizable(true);
         dialog.setTitle(title);
+        dialog.setHeaderText(headertext);
 
         ButtonType okType =
-                new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+                new ButtonType(okButtonText.isBlank() ? "OK" : okButtonText, ButtonBar.ButtonData.OK_DONE);
 
         if (choice) dialog.getDialogPane().getButtonTypes().addAll(okType, ButtonType.CANCEL);
         else dialog.getDialogPane().getButtonTypes().add(okType);
@@ -230,6 +238,28 @@ public class LittlePopUp {
         return dialog.showAndWait().orElse(false);
     }
 
+    /**
+     * Show a Popup with 3 buttons.
+     * @return  OKButton ->  1, NOButton -> 0, Cancel   ->  -1
+     */
+    public static Integer showMsg(String title, String message, String okButtonText, String noButtonText, String cancelButtonText) {
+        Dialog<Integer> dialog = new Dialog<>();
+        dialog.setTitle(title);
+        dialog.setContentText(message);
+        dialog.setResizable(true);
+        ButtonType okBType = new ButtonType(okButtonText, ButtonBar.ButtonData.OK_DONE);
+        ButtonType noBType = new ButtonType(noButtonText, ButtonBar.ButtonData.NO);
+        dialog.setResultConverter(
+                button -> {
+                    if (button == okBType) return 1;
+                    if (button == noBType) return 0;
+                    else return -1;
+                }
+        );
+        dialog.getDialogPane().getButtonTypes().addAll(okBType, noBType, new ButtonType(cancelButtonText, ButtonBar.ButtonData.CANCEL_CLOSE));
+        return dialog.showAndWait().orElse(-1);
+    }
+
     public static boolean showMsg(String title, String message, String okButtonText, String noButtonText) {
         Dialog<Boolean> dialog = new Dialog<>();
         dialog.setTitle(title);
@@ -277,10 +307,40 @@ public class LittlePopUp {
         return dialog.getResult();
     }
 
-//    public static boolean cancellableLoadingPopup(String title, String message) {
-//
-//    }
+    /**
+     * Show some checkboxes and return the texts of the ones selected upon close or null if user cancels.
+     * @param options Each option will be the text of a CheckBox.
+     * @param title Title of window
+     * @param message Header message
+     * @return List of Texts of selected checkboxes or null if cancelled.
+     */
+    public static List<String> scrollableListPopup(List<String> options, String title, String message) {
+        Dialog<List<String>> dialog = new Dialog<>();
+        dialog.setTitle(title);
+        dialog.setHeaderText(message);
 
+        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButton, ButtonType.CANCEL);
+
+        List<CheckBox> checkBoxes = new ArrayList<>(options.size());
+        for (String option : options) checkBoxes.add(new CheckBox(option));
+
+        VBox content = new VBox(10);
+        content.getChildren().addAll(checkBoxes);
+
+        dialog.setResultConverter(button -> {
+            if (button == okButton) {
+                List<String> selected = new ArrayList<>();
+                for (CheckBox checkBox : checkBoxes) if (checkBox.isSelected()) selected.add(checkBox.getText());
+                return selected;
+            }
+            return null; // cancel
+        });
+        dialog.getDialogPane().setContent(content);
+
+        Optional<List<String>> result = dialog.showAndWait();
+        return result.orElse(null);
+    }
 
 }
 

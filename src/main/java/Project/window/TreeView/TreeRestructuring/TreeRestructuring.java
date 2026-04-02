@@ -115,9 +115,9 @@ public class TreeRestructuring {
         controller.getUndoButton().disableProperty().bind(Bindings.isEmpty(undoList));
         controller.getRedoButton().disableProperty().bind(Bindings.isEmpty(redoList));
 
-        treeViewEditor.addOnExecute(() -> executeCommand(new TreeEditorMockCommand<>(treeViewEditor)));
+        treeViewEditor.addOnExecute(() -> executeCommand(new TreeEditorMockCommand(treeViewEditor)));
 
-        this.showPopup = new LittlePopUp.ShowPopup(treeRestructuringView.getRoot(), "Modify tree via AI", 1000, 500);
+        this.showPopup = new LittlePopUp.ShowPopup(treeRestructuringView.getRoot(), "Modify subtree", 1000, 500);
 
         showPopup.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.isControlDown() && event.getCode() == KeyCode.F) controller.getTreeSearchField().requestFocus();
@@ -146,7 +146,7 @@ public class TreeRestructuring {
         controller.getTreeSearchPrevButton().setOnAction(e -> searchTree.previous());
         controller.getTreeSearchPrevButton().disableProperty().bind(searchTree.getHasPreviousObservable());
 
-        controller.getSearchForDupIDsButton().setOnAction(e -> searchForDupIDs(restrucTreeView.getRoot(), "There are duplicate IDs in the tree.", "No duplicate IDs in the tree."));    // wanna check if any IDs within aiTree are duplicate
+        controller.getSearchForDupIDsButton().setOnAction(e -> searchForDupIDs(restrucTreeView.getRoot(), "There are duplicate IDs in the tree.", "No duplicate IDs in the tree.", TreeAnalysisUtils.accumulateAllTreeItemsBelow(restrucTreeView.getRoot())));    // wanna check if any IDs within aiTree are duplicate
 
         controller.getAddMissingToTreeButton().setOnAction(e -> {
             TreeItem<ANode> restructRoot = restrucTreeView.getRoot();
@@ -174,47 +174,62 @@ public class TreeRestructuring {
 
     }
 
-    private boolean searchForDupIDs(TreeItem<ANode> root, String errmsg, String goodmsg) {
-        LinkedList<TreeItem<ANode>> allAITreeItems = new LinkedList<>();
-        TreeAnalysisUtils.accumulateForEveryNodeBelow(restrucTreeView.getRoot(), allAITreeItems, t -> t);
-        HashMap<TreeItem<ANode>, Collection<TreeItem<ANode>>> duplicateItemsMap = TreeAnalysisUtils.lookForDuplicateIDsInTree(allAITreeItems, root, false, realTreeRoot);
 
+    /**
+     * Search if any of the given TreeItems IDs already occur in the given tree, ignoring the subTreeToAvoid.
+     * Shows a PopupWindow displaying the results of the search.
+     * @param treeToSearch The tree to search.
+     * @param errmsg A general message to show if duplicate items are found (next to a list of duplicate items)
+     * @param goodmsg A general message to show if no duplicates were found. Set to null to show no Popup window if no duplicates were found.
+     * @param itemsToCheck List of items to check. The method checks if treeToSearch contains any IDs of itemsToCheck.
+     * @return if any duplicates were found.
+     */
+    public static boolean searchForDupIDs(TreeItem<ANode> treeToSearch, String errmsg, String goodmsg, Collection<TreeItem<ANode>> itemsToCheck) {
+        return searchForDupIDs(treeToSearch, new TreeItem<ANode>() , errmsg, goodmsg, itemsToCheck);
+    }
+
+    /**
+     * Search if any of the given TreeItems IDs already occur in the given tree, ignoring the subTreeToAvoid.
+     * Shows a PopupWindow displaying the results of the search.
+     * @param treeToSearch The tree to search.
+     * @param subtreeToAvoid this subtree of treeToSearch will be ignored / skipped in the search.
+     * @param errmsg A general message to show if duplicate items are found (next to a list of duplicate items)
+     * @param goodmsg A general message to show if no duplicates were found. Set to null to show no Popup window if no duplicates were found.
+     * @param itemsToCheck List of items to check. The method checks if treeToSearch contains any IDs of itemsToCheck.
+     * @return if any duplicates were found.
+     */
+    public static boolean searchForDupIDs(TreeItem<ANode> treeToSearch, TreeItem<ANode> subtreeToAvoid, String errmsg, String goodmsg, Collection<TreeItem<ANode>> itemsToCheck) {
+        HashMap<TreeItem<ANode>, Collection<TreeItem<ANode>>> duplicateItemsMap = TreeAnalysisUtils.lookForDuplicateIDsInTree(itemsToCheck, treeToSearch, false, subtreeToAvoid);
 
         if (!duplicateItemsMap.isEmpty()) {
 
             StringBuilder stringBuilder = new StringBuilder();
             for (TreeItem<ANode> dupTreeItem : duplicateItemsMap.keySet()) {
-                for (TreeItem<ANode> aNode : duplicateItemsMap.get(dupTreeItem))
-                    stringBuilder.append("ID: " + dupTreeItem.getValue().conceptId() + " Name: " + dupTreeItem.getValue().name() + "  |  ID: " + aNode.getValue().conceptId() + " Name: " + aNode.getValue().name() + "\n");
+                for (TreeItem<ANode> otherItem : duplicateItemsMap.get(dupTreeItem)) {
+//                    stringBuilder.append("ID: " + dupTreeItem.getValue().conceptId() + " Name: " + dupTreeItem.getValue().name() + "  |  ID: " + otherItem.getValue().conceptId() + " Name: " + otherItem.getValue().name() + "\n");
+                    stringBuilder.append(dupTreeItem.getValue().name() + "(id=" + dupTreeItem.getValue().conceptId() + ")   |   " + otherItem.getValue() + "(id=" + otherItem.getValue().conceptId() + ")\n");
+                }
             }
 
-//            String popupText = """
-//                The followings nodes share the same IDs with at least one other node.
-//                Assign new IDs to duplicated nodes and continue?
-//
-//                Node  |  Other node with same ID
-//
-//                """ + stringBuilder.toString();
             String popupText = errmsg + """
                 
                 
                 Item to paste | already present item with same ID
-                
-                """ + stringBuilder.toString();
-            LittlePopUp.showScrollableTextPopup("Error", popupText, false);    // i dont want to implement this as undoable..
-            return false;
+                """;
+            LittlePopUp.showScrollableTextPopup("Error", popupText, stringBuilder.toString(), false);    // i dont want to implement this as undoable..
+            return true;
 //            if (LittlePopUp.showScrollableTextPopup("Warning", popupText)) {
-//                for (TreeItem<ANode> itemWDuplicateANode : duplicateItemsMap.keySet()) replaceANodeByCopy(itemWDuplicateANode, root);
+//                for (TreeItem<ANode> itemWDuplicateANode : duplicateItemsMap.keySet()) replaceANodeByCopy(itemWDuplicateANode, treeToSearch);
 //                return true;
 //            } else return false;
         } else {
-            LittlePopUp.showScrollableTextPopup("Info", goodmsg, false);
-            return true;
+            if (goodmsg != null) LittlePopUp.showScrollableTextPopup("Info", goodmsg ,"", false);
+            return false;
         }
     }
 
     private void acceptTree() {
-        if (!searchForDupIDs(restrucTreeView.getRoot(), "Cannot accept. There are duplicate IDs in the tree.", "No duplicate IDs in the tree.") || !searchForDupIDs(realTreeMasterRoot, "Cannot accept. Some IDs already exist in the real tree.", "No overlapping IDs with the real tree.")) return;   //want to check if any of the IDs of aiTree already occur anywhere in the full real tree
+        if (searchForDupIDs(restrucTreeView.getRoot(), "Cannot accept. There are duplicate IDs in the tree.", null, TreeAnalysisUtils.accumulateAllTreeItemsBelow(restrucTreeView.getRoot())) || searchForDupIDs(realTreeMasterRoot, realTreeRoot, "Cannot accept. Some IDs already exist in the real tree.", null, TreeAnalysisUtils.accumulateAllTreeItemsBelow(restrucTreeView.getRoot()))) return;   //want to check if any of the IDs of aiTree already occur anywhere in the full real tree
         setResult(restrucTreeView.getRoot());
         restrucTreeView.setRoot(null);
         runOnAccepted();
