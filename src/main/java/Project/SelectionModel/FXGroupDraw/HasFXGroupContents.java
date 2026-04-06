@@ -1,6 +1,8 @@
 package Project.SelectionModel.FXGroupDraw;
 
 import Project.SelectionModel.HasSelection;
+import Project.command.Remember.RememberHasFXGroupContents;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.*;
 import javafx.scene.Group;
 import javafx.scene.shape.CullFace;
@@ -10,8 +12,13 @@ import javafx.scene.shape.TriangleMesh;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class HasFXGroupContents implements HasSelection<MeshView> {
+
+    private static final Logger logger = Logger.getLogger(HasFXGroupContents.class.getName());
 
     private final String id;
     @Override
@@ -41,15 +48,25 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
                 availableMeshViews.add(change.getKey());
             }
         });
+        if (logger.getLevel() == Level.FINER) {
+            this.availableMeshViews.addListener((ListChangeListener<MeshView>) c -> {
+                while (c.next()) {
+                    if (c.wasAdded()) logger.log(Level.INFO, c.getAddedSubList().toString() + " added to availableMeshViews");
+                    else if (c.wasRemoved()) logger.log(Level.INFO, c.getRemoved().toString() + " removed from availableMeshViews");
+                }
+
+            });
+
+        }
     }
 
     private final ObservableMap<MeshView, TriangleMesh> meshViewToOGMesh = FXCollections.observableHashMap();
     private final ObservableList<MeshView> availableMeshViews = FXCollections.observableArrayList();
 
-    protected void addMeshViews(List<MeshView> meshViews) {
+    public void addMeshViews(List<MeshView> meshViews) {
         LinkedList<MeshView> newOnes = new LinkedList<>();
         for (MeshView meshView : meshViews) {
-            if (meshViewToOGMesh.containsKey(meshView) || meshView == null) continue;
+            if (meshViewToOGMesh.containsKey(meshView) || meshView == null || getMeshViewWithID(meshView.getId()) != null) {continue;}
             newOnes.add(meshView);
             meshViewToOGMesh.put(meshView, (TriangleMesh) meshView.getMesh());
             meshView.setMesh(null);
@@ -57,7 +74,7 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
         this.group.getChildren().addAll(newOnes);
     }
 
-    protected void addOBJ(String fileName) {
+    public void addOBJ(String fileName) {
         if (getMeshViewWithID(fileName) != null) return;
         MeshView meshView = (MeshView) hasFXGroupContentsContainer.createMeshView(fileName);
         TriangleMesh triangleMesh = (TriangleMesh) meshView.getMesh();
@@ -65,8 +82,9 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
         meshView.setMesh(null);
         this.group.getChildren().add(meshView);
     }
-    protected void removeOBJ(String fileName) {
-        MeshView meshView = getMeshViewWithID(fileName);
+
+    public void removeOBJ(String id) {
+        MeshView meshView = getMeshViewWithID(id);
         meshViewToOGMesh.remove(meshView);
         this.group.getChildren().remove(meshView);
         this.selection.remove(meshView);
@@ -86,30 +104,34 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
     }
 
     /**
+     * Draws a MeshView with the same ID as mockItem. Does NOT set CullFace.BACK. Adds the MeshView to the Selection of this.
+     * @param mockItem
+     * @param triangleMesh
+     */
+    public void select(MeshView mockItem, TriangleMesh triangleMesh) {
+        logger.log(Level.FINE, "trying to select "+ mockItem.getId());
+        MeshView target = getMeshViewWithID(mockItem.getId());
+        logger.log(Level.FINER, mockItem.getId() + " is " + (target==null ? "" : "not ") + "null");
+        if (target == null || !(target.getMesh() == null)) return;  //dont draw things that are not drawable by this OR that are already drawn
+        target.setMesh(triangleMesh);
+        this.selection.add(target);
+    }
+
+    /**
      * Draws a MeshView with the same ID as mockItem. Sets CullFace.BACK. Adds the MeshView to the Selection of this.
      * @param mockItem This MeshView will not be drawn. Instead, a MeshView which this class already has that has the same
      *                 ID as mockItem will be drawn.
      */
     @Override
     public void select(MeshView mockItem) {
+        logger.log(Level.FINE, "trying to select "+ mockItem.getId());
         MeshView target = getMeshViewWithID(mockItem.getId());
+        logger.log(Level.FINER, mockItem.getId() + " is " + (target==null ? "" : "not ") + "null");
         if (target == null || !(target.getMesh() == null)) return;  //dont draw things that are not drawable by this OR that are already drawn
         target.setCullFace(CullFace.BACK);  //
         target.setMesh(meshViewToOGMesh.get(target));
         this.selection.add(target);
         target.setUserData(null);   //
-    }
-
-    /**
-     * Draws a MeshView with the same ID as mockItem. Does NOT set CullFace.BACK. Adds the MeshView to the Selection of this.
-     * @param mockItem
-     * @param triangleMesh
-     */
-    public void select(MeshView mockItem, TriangleMesh triangleMesh) {
-        MeshView target = getMeshViewWithID(mockItem.getId());
-        if (target == null || !(target.getMesh() == null)) return;  //dont draw things that are not drawable by this OR that are already drawn
-        target.setMesh(triangleMesh);
-        this.selection.add(target);
     }
 
     @Override

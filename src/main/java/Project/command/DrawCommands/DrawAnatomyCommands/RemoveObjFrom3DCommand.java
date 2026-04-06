@@ -52,7 +52,7 @@ public class RemoveObjFrom3DCommand implements Command {
             hasFXGroupContents.select(meshView, idToMesh.get(id));
         }
 //        rememberFXMeshViewColors.restoreSelection();  not necessary anymore since MeshViews keep existing and only their Mesh changes  // re-color
-//        threeDSelectionGroup.changeSelection(removedNodes, false, false); removed because it seems unintuitive  //also reselect all removed nodes
+//        threeDSelectionGroup.changeSelection(removedNodes, false, false); removed because it seems unintuitive //also reselect all removed nodes
     }
 
     @Override

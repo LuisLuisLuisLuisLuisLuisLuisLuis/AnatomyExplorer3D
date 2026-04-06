@@ -9,14 +9,14 @@ import javafx.stage.Stage;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Locale;
-
+import java.util.logging.Level;
 
 
 public class AnatomyExplorer extends Application {
 
     public void start(Stage primaryStage) throws Exception {
         Locale.setDefault(Locale.ENGLISH);  // all default texts are in ENG
-        LoggingConfig.init();
+        LoggingConfig.init(Level.FINE);
 
         WindowView view = new WindowView();
 

@@ -34,16 +34,16 @@ public class RememberFXMeshViewColors {
     public void restoreSelection() {
         // two-step restoration: first restore the colors, then saturate them if the nodes are selected.
         for (String nodeID : nodeIDs) {
-            Node node = hasFXGroupContents.getMeshViewWithID(nodeID);
-            if (node instanceof MeshView && ((MeshView) node).getMaterial() instanceof  PhongMaterial) {
-                ((PhongMaterial) ((MeshView) node).getMaterial()).setDiffuseColor(oldColors.get(nodeID));
+            MeshView node = hasFXGroupContents.getMeshViewWithID(nodeID);
+            if (node != null && node.getMaterial() instanceof  PhongMaterial) {
+                ((PhongMaterial) node.getMaterial()).setDiffuseColor(oldColors.get(nodeID));
             }
         }
 
         for (String selectedNodeID : selectionGroup.getSelection()) {
-            Node node = hasFXGroupContents.getMeshViewWithID(selectedNodeID);
-            if (node instanceof MeshView && ((MeshView) node).getMaterial() instanceof PhongMaterial) {
-                ((PhongMaterial) ((MeshView) node).getMaterial()).setDiffuseColor(((PhongMaterial) ((MeshView) node).getMaterial()).getDiffuseColor().saturate().saturate());
+            MeshView node = hasFXGroupContents.getMeshViewWithID(selectedNodeID);
+            if (node != null && node.getMaterial() instanceof PhongMaterial) {
+                ((PhongMaterial) node.getMaterial()).setDiffuseColor(((PhongMaterial) node.getMaterial()).getDiffuseColor().saturate().saturate());
             }
         }
 
@@ -51,10 +51,10 @@ public class RememberFXMeshViewColors {
 
     private void remember() {
         for (String nodeID : nodeIDs) { // go thru the IDs and get the corresponding node
-            Node node = hasFXGroupContents.getMeshViewWithID(nodeID);
-            if (node instanceof MeshView && ((MeshView) node).getMaterial() instanceof PhongMaterial) { // cast to meshView
+            MeshView node = hasFXGroupContents.getMeshViewWithID(nodeID);
+            if (node != null && node.getMaterial() instanceof PhongMaterial) { // cast to meshView
                 // if the nodeID is contained in the user selection, desaturate the color before saving
-                Color oldColor = selectionGroup.getSelection().contains(nodeID) ? ((PhongMaterial) ((MeshView) node).getMaterial()).getDiffuseColor().desaturate().desaturate() : ((PhongMaterial) ((MeshView) node).getMaterial()).getDiffuseColor();
+                Color oldColor = selectionGroup.getSelection().contains(nodeID) ? ((PhongMaterial) node.getMaterial()).getDiffuseColor().desaturate().desaturate() : ((PhongMaterial) node.getMaterial()).getDiffuseColor();
                 oldColors.put(nodeID, oldColor); // save
             }
         }

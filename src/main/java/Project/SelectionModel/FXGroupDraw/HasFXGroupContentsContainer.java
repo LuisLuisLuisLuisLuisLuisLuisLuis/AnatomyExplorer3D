@@ -6,17 +6,14 @@ import Project.window.ThreeDPaneHandling.Coloring.FileGroupingScheme;
 import Project.window.ThreeDPaneHandling.OpenOBJ;
 import Project.window.WindowPresenter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.concurrent.Worker;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 
-import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
@@ -24,9 +21,12 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, String> {
+
+    private static final Logger logger = Logger.getLogger(HasFXGroupContentsContainer.class.getName());
 
     /**
      * Has a mapping of FileIDs (that come in as groupItems here) to anatomical group (String[]).
@@ -96,11 +96,11 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
             MeshView result = OpenOBJ.objInputStreamToMeshViews(inputStream, groupItem, getColorForGroup(anatomicalGroup));
             long endTime = System.nanoTime();
             long durationMillis = (endTime - startTime) / 1000000;
-            System.out.println("transformGroupItemToSelecitonItem took " + durationMillis);
+            logger.log(Level.FINEST, "creating meshview took " + durationMillis);
             return result;
         }
         else {
-            System.out.println("HasFXGroupContentsContainer: inputstream is null");
+            logger.log(Level.WARNING, "inputstream is null");
             return null;
         }
     }
@@ -176,12 +176,21 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
         return null;
     }
 
+
+    private SimpleBooleanProperty isLoadingOBJs = new SimpleBooleanProperty(false);
+
+    /**
+     * @return Are there OBJs being loaded on a different thread right now?
+     */
+    public SimpleBooleanProperty getIsLoadingOBJs() {return isLoadingOBJs;}
+
     private void loadOBJsMulti(File file, Set<String> whiteList) {
         File[] files = file.listFiles();
         if (files == null) return;
         Task<List<MeshView>> task = new Task() {
             @Override
             protected Object call() throws Exception {
+                isLoadingOBJs.set(true);
                 ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
                 List<Future<MeshView>> meshViewF = new ArrayList<>(files.length);
                 for (File file1 : files) {
@@ -206,7 +215,12 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
             }
         };
 
-        task.setOnSucceeded(e -> hasFXGroupContents.addMeshViews(task.getValue()));
+        task.setOnSucceeded(e -> {
+            logger.log(Level.FINE, "loading OBJs task done");
+            hasFXGroupContents.addMeshViews(task.getValue());
+            isLoadingOBJs.set(false);
+        });
+
         WindowPresenter.getWindowPresenter().runBlockingTask(task, true);
     }
 
@@ -222,19 +236,20 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
         loadOBJs(new File(url.getFile()), whiteList);
     }
 
-    private void removeOBJs(File file) {
-        File[] files = file.listFiles();
-        if (files == null) return;
-        for (File objfile : files) {
-            if (!objfile.getName().endsWith(".obj")) continue;
-            hasFXGroupContents.removeOBJ(objfile.getName().substring(0, objfile.getName().lastIndexOf(".")));
-        }
-    }
-    private void removeOBJs(URL url) {
-        removeOBJs(new File(url.getFile()));
-    }
+//    private void removeOBJs(File file) {
+//        File[] files = file.listFiles();
+//        if (files == null) return;
+//        for (File objfile : files) {
+//            if (!objfile.getName().endsWith(".obj")) continue;
+//            hasFXGroupContents.removeOBJ(objfile.getName().substring(0, objfile.getName().lastIndexOf(".")));
+//        }
+//    }
+//
+//    private void removeOBJs(URL url) {
+//        removeOBJs(new File(url.getFile()));
+//    }
 
-    private final ArrayList<File> fileDirs;
+
     public ArrayList<File> getFileDirs() {
         return fileDirs;
     }
@@ -243,20 +258,27 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
         loadOBJs(dir, whiteList);
     }
     public void removeFileDir(File dir) {
-        fileDirs.remove(dir); removeOBJs(dir);}
-
+        fileDirs.remove(dir);
+//        removeOBJs(dir);
+    }
+    // THEORETICALLY the location lists could also be sets. BUT if 2 models share the same resource location, then removing one of them
+    // would remove the location for both, possibly breaking resource loading (not actually since OBJs are now created only once at
+    // startup but still, it would be wrong). leaving it as a list has the advantage that locations will occur as often as the number of models
+    // that use them, circumventing this error.
+    // Problem now:
+    private final ArrayList<File> fileDirs;
     private final ArrayList<URL> resourceLocations;
 
     public ArrayList<URL> getResourceLocationsLocations() {return resourceLocations;}
 
     public void addResourceLocation(URL url, Set<String> whiteList) {
-        for (URL url1: resourceLocations) if (url.getFile().equals(url1.getFile())) return;
+//        for (URL url1: resourceLocations) if (url.getFile().equals(url1.getFile())) return;
         resourceLocations.add(url);
         loadOBJs(url, whiteList);
     }
 
-
-    public void removeResourceLocation(URL url) {resourceLocations.remove(url); removeOBJs(url);}
+    public void removeResourceLocation(URL url) {resourceLocations.remove(url); //removeOBJs(url);
+    }
 
 
     public static void printNrFaces(List<MeshView> meshViews, String msg) {

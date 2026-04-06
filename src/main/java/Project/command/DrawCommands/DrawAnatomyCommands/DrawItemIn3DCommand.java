@@ -30,7 +30,6 @@ public class DrawItemIn3DCommand implements Command {
         //was buggy when these two commands change order
         threeDSelectionGroup.changeSelection(itemsToDraw, false, true); //unselect them
         threeDContentGroup.changeSelection(itemsToDraw, false, true);   //remove the items again
-
     }
 
     @Override

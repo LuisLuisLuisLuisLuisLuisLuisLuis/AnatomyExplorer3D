@@ -38,12 +38,12 @@ import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import Project.command.TreeCommands.TreeEditorMockCommand;
 import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
 import Project.window.TreeView.TreeViewEditing.TreeViewSetup;
-import com.sun.source.tree.Tree;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -1333,11 +1333,23 @@ public class WindowPresenter {
         TreeView<ANode> modelTreeView = this.treeViews.stream().filter(treeView -> treeView.getId().equals(model.getName())).toList().getFirst();
         treeViewSelectionGroup.removeSelectionContainer(modelTreeViewSelectionContainer);
 
-        threeDContentGroup.changeSelection(
-                selectionMediatorTree_3D_Content.transformAselectionToBSelection(
-                        modelTreeViewSelectionContainer.getSelectionFormatted(
-                                FXCollections.observableList(
-                                        TreeAnalysisUtils.accumulateForEveryNodeBelow(modelTreeView.getRoot(), treeItem -> treeItem)))), false, true);
+        Set<String> meshViewIDsToRemove = selectionMediatorTree_3D_Content.transformAselectionToBSelection(
+                modelTreeViewSelectionContainer.getSelectionFormatted(
+                        FXCollections.observableList(
+                                TreeAnalysisUtils.accumulateForEveryNodeBelow(modelTreeView.getRoot(), treeItem -> treeItem))));
+        for (TreeView<ANode> treeView : treeViews) {
+            if (model.getName().equals(treeView.getId())) continue;
+            TreeAnalysisUtils.applyRec(treeView.getRoot(), new Function<TreeItem<ANode>, Object>() {
+                @Override
+                public Object apply(TreeItem<ANode> treeItem) {
+                    meshViewIDsToRemove.removeAll(treeItem.getValue().fileIds());
+                    return null;
+                }
+            });
+        }
+        meshViewIDsToRemove.removeAll(threeDContentGroup.getSelection());
+
+        for (String id : meshViewIDsToRemove) hasInnerGroupContents.removeOBJ(id);
 
         this.treeViewSelectionContainers.removeIf(treeViewSelectionContainer -> treeViewSelectionContainer.getId().equals(model.getName()));
         this.selectionMediatorTree3D_Selection.removeRoot(model.getRoot());
@@ -1409,13 +1421,13 @@ public class WindowPresenter {
         public List<String> getModelIDs() {return models.stream().map(Model::getName).toList();}
         private final boolean[] isUnsaved;  //remember if any model has unsaved changed.
 
-        public RemoveModelCommand(List<Model> models) {
-            this.models = models;
-            this.contextMenus = new ArrayList<>(models.size());
+        public RemoveModelCommand(List<Model> modelsToRm) {
+            this.models = modelsToRm;
+            this.contextMenus = new ArrayList<>(modelsToRm.size());
             this.meshViewIDsToRemove = new HashSet<>();
-            this.isUnsaved = new boolean[models.size()];
+            this.isUnsaved = new boolean[modelsToRm.size()];
             int i = 0;
-            for (Model model : models) {
+            for (Model model : modelsToRm) {
                 TreeView<ANode> modelTreeView = treeViews.stream().filter(treeView -> treeView.getId().equals(model.getName())).toList().getFirst();
                 TreeViewSelectionContainer modelTreeViewSelectionContainer = treeViewSelectionContainers.stream().filter(treeViewSelectionContainer -> treeViewSelectionContainer.getId().equals(model.getName())).toList().get(0);
                 meshViewIDsToRemove.addAll(selectionMediatorTree_3D_Content.transformAselectionToBSelection(
@@ -1430,6 +1442,18 @@ public class WindowPresenter {
 
                 isUnsaved[i] = isModelUnsaved.get(model.getName()).get();
             }
+            Collection<String> modelsToRMNames = modelsToRm.stream().map(Model::getName).toList();
+            for (TreeView<ANode> treeView : treeViews) {
+                if (modelsToRMNames.contains(treeView.getId())) continue;
+                TreeAnalysisUtils.applyRec(treeView.getRoot(), new Function<TreeItem<ANode>, Object>() {
+                    @Override
+                    public Object apply(TreeItem<ANode> treeItem) {
+                        meshViewIDsToRemove.removeAll(treeItem.getValue().fileIds());
+                        return null;
+                    }
+                });
+            }
+
         }
         public RemoveModelCommand(Model model) {this(List.of(model));}
 
@@ -1437,17 +1461,38 @@ public class WindowPresenter {
         public void execute() {
             this.rememberFXGroupContents = new RememberHasFXGroupContents(hasInnerGroupContents);
             this.rememberFXMeshViewColors = new RememberFXMeshViewColors(meshViewIDsToRemove, hasInnerGroupContents, threeDSelectionGroup);
+            threeDContentGroup.changeSelection(meshViewIDsToRemove, false, true);
             for (Model model : models) {forgetModel(model);}
         }
         @Override
         public void undo() {
+            SimpleIntegerProperty count = new SimpleIntegerProperty(0);
             for (int m = 0; m < models.size(); m++) {
                 Model model = models.get(m);
                 loadModel(model, contextMenus.get(m));
                 isModelUnsaved.get(model.getName()).set(this.isUnsaved[m]);
+                count.set(count.getValue()+1);
             }
-            this.rememberFXGroupContents.restoreSelection();
-            this.rememberFXMeshViewColors.restoreSelection();
+            // this is necessary because loadModel() causes HasFXGroupContentsContainer to create MeshViews in a diff Thread
+            // before making them drawable by HasFXGroupContents. But bcuz that happens on a diff thread, the FXThread moves on and
+            // would like to immediately call restoreSelection(), even tho the MeshViews needed haven't been created yet.
+            // -> need to wait.
+            // note that when many models are being loaded in a loop, the listener will trigger as soon as the first model
+            // has completed loading OBJs, which will lead to the same scenario. To avoid this, it is necessary to make sure
+            // that the listener only actions if loading OBJs of the last model is completed and that's done by making sure all
+            // loops have gone thru using the count variable.
+            if (hasTheeDContentsContainer.getIsLoadingOBJs().get()) {
+                hasTheeDContentsContainer.getIsLoadingOBJs().addListener(new ChangeListener<Boolean>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                        if (!newValue && count.get() == models.size()) {
+                            rememberFXGroupContents.restoreSelection();
+                            rememberFXMeshViewColors.restoreSelection();
+                        }
+                    }
+                });
+            }
+
         }
         @Override
         public void redo() {execute();}
@@ -1649,7 +1694,7 @@ public class WindowPresenter {
      * Binds the blocking, progress showing UI to a Task.
      * Does NOT schedule or run or cancel the task.
      * @param task The task
-     * @param knowsProgress Can the task report progress or is progress indetermined.
+     * @param knowsProgress Can the task report progress or is progress indetermined?
      */
     private <T> void bindBlockingProgress(Task<T> task, boolean knowsProgress) {
         Function<Boolean, Boolean> blockingEffect = new Function<Boolean, Boolean>() {

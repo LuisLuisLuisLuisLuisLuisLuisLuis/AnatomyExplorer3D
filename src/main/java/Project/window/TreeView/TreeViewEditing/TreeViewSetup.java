@@ -216,7 +216,7 @@ public class TreeViewSetup {
 
                     LinkedList<TreeItem<ANode>> itemsToPaste = new LinkedList<>();
                     TreeAnalysisUtils.accumulateForEveryNodeBelow(treeViewEditor1.clipBoardContent(), itemsToPaste, t -> t);
-                    HashMap<TreeItem<ANode>, Collection<TreeItem<ANode>>> duplicateItemsMap = TreeAnalysisUtils.lookForDuplicateIDsInTree(itemsToPaste, root, false);
+//                    HashMap<TreeItem<ANode>, Collection<TreeItem<ANode>>> duplicateItemsMap = TreeAnalysisUtils.lookForDuplicateIDsInTree(itemsToPaste, root, false);
 
 //                    if (!duplicateItemsMap.isEmpty()) {
                     if (TreeRestructuring.searchForDupIDs(root, "Cannot paste in this tree. The following node IDs would be duplicated:", null, itemsToPaste)) {
@@ -352,6 +352,7 @@ public class TreeViewSetup {
                         rows.removeIf(row -> row.col1.equals(fileID));
                         rows.add(new FileIDRow(fileID, thisanode.name(), "lightblue"));
                     });
+                    fileIDView.getController().getAddFileIDButton().setDisable(!allowEditing);
 
                     fileIDView.getController().getRemoveFileIDButton().setOnAction(e -> {
                         String fileID = fileIDView.getController().getAddFileIDTextField().getCharacters().toString();
@@ -361,6 +362,7 @@ public class TreeViewSetup {
                         rows.removeIf(row -> row.col1.equals(fileID));
                         rows.add(new FileIDRow(fileID, thisanode.name(), "gray"));
                     });
+                    fileIDView.getController().getRemoveFileIDButton().setDisable(!allowEditing);
 
 
                     fileIDView.getController().getSearchButton().setOnAction(e -> {
