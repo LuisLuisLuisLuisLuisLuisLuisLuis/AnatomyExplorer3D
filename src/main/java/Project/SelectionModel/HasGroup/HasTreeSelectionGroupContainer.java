@@ -26,7 +26,7 @@ public class HasTreeSelectionGroupContainer extends HasGroupContainer<ANode, Str
 
 
     @Override
-    protected Collection<ANode> transformGroupItemToSelectionItem(String groupItem) {
+    public Collection<ANode> transformGroupItemToSelectionItem(String groupItem) {
         //System.out.println("tranform group item to selection item:" + selectionMediator.fileIDtoName(groupItem));
         return selectionMediator.fileIDtoANode(groupItem);
     }

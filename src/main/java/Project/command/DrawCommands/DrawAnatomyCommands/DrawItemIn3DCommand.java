@@ -1,7 +1,12 @@
 package Project.command.DrawCommands.DrawAnatomyCommands;
 
+import Project.SelectionModel.FXGroupDraw.HasFXGroupContents;
+import Project.SelectionModel.FXGroupDraw.HasFXGroupContentsContainer;
+import Project.SelectionModel.FXGroupSelection.FXGroupSelectionContainer;
+import Project.SelectionModel.FXGroupSelection.HasFXGroupSelection;
 import Project.SelectionModel.SelectionGroup;
 import Project.command.Command;
+import javafx.scene.shape.MeshView;
 
 import java.util.Set;
 
@@ -14,6 +19,10 @@ public class DrawItemIn3DCommand implements Command {
     private SelectionGroup<String> threeDSelectionGroup;
     private Set<String> itemsToDraw;
 
+    private Set<MeshView> meshViewsToDraw;
+    private HasFXGroupContents hasFXGroupContents;
+    private HasFXGroupSelection hasFXGroupSelection;
+
     /**
      * @param itemsToDraw: List of fileIDs
      * @param threeDContentGroup: SelectionGroup controlling which items are drawn.
@@ -23,19 +32,33 @@ public class DrawItemIn3DCommand implements Command {
         this.threeDContentGroup = threeDContentGroup;
         this.threeDSelectionGroup = threeDSelectionGroup;
         this.itemsToDraw = itemsToDraw;
+    }   // i dont use the old constructor anymore because i think the command should also work without selection group.
+
+
+    public DrawItemIn3DCommand(Set<MeshView> itemsToDraw, HasFXGroupContents hasFXGroupContents, HasFXGroupSelection hasFXGroupSelection) {
+        this.hasFXGroupContents = hasFXGroupContents;
+        this.hasFXGroupSelection = hasFXGroupSelection;
+        this.meshViewsToDraw = itemsToDraw;
     }
 
     @Override
     public void undo() {
         //was buggy when these two commands change order
-        threeDSelectionGroup.changeSelection(itemsToDraw, false, true); //unselect them
-        threeDContentGroup.changeSelection(itemsToDraw, false, true);   //remove the items again
+//        threeDSelectionGroup.changeSelection(itemsToDraw, false, true); //unselect them
+//        threeDContentGroup.changeSelection(itemsToDraw, false, true);   //remove the items again
+        for (MeshView meshView: meshViewsToDraw) {
+            hasFXGroupContents.unselect(meshView);
+            hasFXGroupSelection.unselect(meshView);
+        }
     }
 
     @Override
     public void execute() {
-        remember();
-        threeDContentGroup.changeSelection(itemsToDraw, false, false);  //add the items
+//        hasFXGroupContentsContainer.changeSelection(itemsToDraw, false, false);
+//        threeDContentGroup.changeSelection(itemsToDraw, false, false);  //add the items
+        for (MeshView meshView: meshViewsToDraw) {
+            hasFXGroupContents.select(meshView);
+        }
     }
 
     @Override
@@ -43,8 +66,6 @@ public class DrawItemIn3DCommand implements Command {
         execute();
     }
 
-    private void remember() {
-    }
 
     @Override
     public String name() {

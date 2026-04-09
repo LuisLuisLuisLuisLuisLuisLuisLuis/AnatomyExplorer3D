@@ -11,6 +11,14 @@ import javafx.scene.layout.VBox;
 public class MainWindowController {
 
     @FXML
+    private Button quizButton;
+    @FXML
+    private MenuButton selectionStyleButton;
+    @FXML
+    private CheckMenuItem saturationStyleMenuitem;
+    @FXML
+    private CheckMenuItem fillStyleMenuitem;
+    @FXML
     private CheckMenuItem enableTreeEditingCheckMenu;
     @FXML
     private BorderPane mainBorderpain;
@@ -126,12 +134,6 @@ public class MainWindowController {
 
     @FXML
     private MenuItem menuAddAxes;
-
-    @FXML
-    private MenuItem menuClearView;
-
-    @FXML
-    private MenuItem menuResetView;
 
     @FXML
     private MenuItem menuClose;
@@ -300,12 +302,6 @@ public class MainWindowController {
         return menuAddAxes;
     }
 
-    public MenuItem getMenuClearView() {
-        return menuClearView;
-    }
-
-    public MenuItem getMenuResetView() {return menuResetView;}
-
     public MenuItem getMenuClose() {
         return menuClose;
     }
@@ -473,4 +469,12 @@ public class MainWindowController {
     public BorderPane getMainBorderpain() {return mainBorderpain;}
 
     public CheckMenuItem getEnableTreeEditingCheckMenu() {return enableTreeEditingCheckMenu;}
+
+    public MenuButton getSelectionStyleButton() {return selectionStyleButton;}
+
+    public CheckMenuItem getFillStyleCheckMenu() {return fillStyleMenuitem;}
+
+    public CheckMenuItem getSaturationStyleCheckMenu() {return saturationStyleMenuitem;}
+
+    public Button getQuizButton() {return quizButton;}
 }

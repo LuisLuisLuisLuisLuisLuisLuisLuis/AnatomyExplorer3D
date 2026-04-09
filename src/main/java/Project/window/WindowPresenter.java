@@ -34,6 +34,12 @@ import Project.window.SupportingUI.TextSearch.SearchTree;
 import Project.window.ThreeDPaneHandling.*;
 import Project.SelectionModel.*;
 
+import Project.window.ThreeDPaneHandling.Effects.Explode;
+import Project.window.ThreeDPaneHandling.Effects.SelectionEffect;
+import Project.window.ThreeDPaneHandling.Movement.CamMover;
+import Project.window.ThreeDPaneHandling.Movement.Group3DRotation;
+import Project.window.ThreeDPaneHandling.Movement.MouseScrolling3D;
+import Project.window.ThreeDPaneHandling.Movement.SetupMouseRotate3D;
 import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import Project.command.TreeCommands.TreeEditorMockCommand;
 import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
@@ -63,10 +69,7 @@ import javafx.scene.effect.GaussianBlur;
 import javafx.scene.input.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Box;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.MeshView;
+import javafx.scene.shape.*;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
@@ -129,17 +132,25 @@ public class WindowPresenter {
     private final SetupMouseRotate3D setupMouseRotate3D;    // uses groupRotater to rotate a group using mouse drag
     private boolean isRotating = false; //is the user rotating the 3D view via mouse drag right now? if so, disable click-selecting meshViews
 
+    // the currently chosen selection effect
+    private SelectionEffect.Effect selectionEffect = SelectionEffect.Effect.VIA_SATURATION;
+
 
     private final ArrayList<TreeView<ANode>> treeViews;
     private final ArrayList<SearchTree> searchTrees;
     private final SelectionGroup<ANode> treeViewSelectionGroup;
     private final ArrayList<TreeViewSelectionContainer> treeViewSelectionContainers;
+    /**
+     * Maps model id to a boolean property. True if the model has unsaved changes.
+     */
     private final HashMap<String, BooleanProperty> isModelUnsaved = new HashMap<>();
-    private final LinkedList<Circle> unsavedCircle = new LinkedList<>();
+
 
     private final HasFXGroupContents hasInnerGroupContents;
-    private final SelectionGroup<String> threeDContentGroup;
     private final HasFXGroupContentsContainer hasTheeDContentsContainer;
+    private final SelectionGroup<String> threeDContentGroup;
+    private final HasFXGroupSelection hasInnerGroupSelectedItems;
+    private final FXGroupSelectionContainer threeDSelectionContainer;
     private final SelectionGroup<String> threeDSelectionGroup;
 
     private final ArrayList<SelectionMediator_Tree_3D> selectionMediatorTree3DS;
@@ -212,8 +223,8 @@ public class WindowPresenter {
         this.models = new ArrayList<>();
 
         mainModel = new Model(
-                getClass().getResourceAsStream("/Project/anatomy/anatomy_inclusion_relation_list.txt"),
-                getClass().getResourceAsStream("/Project/anatomy/anatomy_element_parts.txt"),
+                getClass().getResourceAsStream("/Project/anatomy/anatomy_edge_list.txt"),
+                getClass().getResourceAsStream("/Project/anatomy/anatomy_file_list.txt"),
                 "anatomy",
                 WindowPresenter.class.getResource("/Project/anatomy/BP3D_4.0_obj_99/"));
 
@@ -259,7 +270,13 @@ public class WindowPresenter {
 
         controller.getMenuSaveTree().setOnAction(e -> {
             //purposefully save all and not skip unchanged ones.
-            TreeExport.saveTrees(treeViews.stream().toList(), treeViews.stream().map(TreeView::getId).toList());
+            List<Boolean> result = TreeExport.saveTrees(treeViews.stream().toList(), treeViews.stream().map(TreeView::getId).toList());
+            if (result == null) return;
+            for (int i = 0; i < result.size(); i++) {
+                boolean r = result.get(i);
+                String id = treeViews.get(i).getId();
+                if (isModelUnsaved.get(id).get()) if (r) isModelUnsaved.get(id).set(false);
+            }
         });
         controller.getEnableTreeEditingCheckMenu().selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
@@ -359,8 +376,8 @@ public class WindowPresenter {
 
         //---------------initialize 3D selection model-----------
         threeDSelectionGroup = new SelectionGroup<>("3dSelectionGroup");
-        HasFXGroupSelection hasInnerGroupSelectedItems = new HasFXGroupSelection(hasInnerGroupContents, "hasInnerGroupSelectedItems");
-        FXGroupSelectionContainer threeDSelectionContainer = new FXGroupSelectionContainer(
+        hasInnerGroupSelectedItems = new HasFXGroupSelection(hasInnerGroupContents, "hasInnerGroupSelectedItems");
+        threeDSelectionContainer = new FXGroupSelectionContainer(
                 hasInnerGroupSelectedItems, threeDSelectionGroup);
         threeDSelectionGroup.addSelectionContainer(threeDSelectionContainer);
         //-----------------------------------------------
@@ -374,7 +391,10 @@ public class WindowPresenter {
         this.selectionMediatorTree3D_Selection = new SelectionMediator_Tree_3D(treeViewSelectionGroup, threeDSelectionGroup);
 
         //------------load main model------------
-        loadModel(mainModel); //not as command because it should not be undoable / removable
+        MenuItem mmSave = new MenuItem("Save");
+        loadModel(mainModel, new ContextMenu(mmSave)); //not as command because it should not be undoable / removable
+        mmSave.setOnAction(actionEvent -> tryToSaveTree(treeViews.stream().filter(t -> t.getId().equals(mainModel.getName())).toList().getFirst()));
+        mmSave.disableProperty().bind(isModelUnsaved.get(mainModel.getName()).not());
         //---------------------------------------
 
         hasInnerGroupContents.getSelection().addListener((InvalidationListener) e -> centerGroupToItself(innerGroup));  //should be called after the command below, otherwise it'll fire every loop
@@ -428,19 +448,19 @@ public class WindowPresenter {
             threeDSelectionGroup.changeSelection(selectionMediatorTree3D_Selection.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()), true, false);
         });
         controller.getShowInTreeButton().setOnAction(e -> {
-//            selectionMediatorTree3D_Selection.pushBtoA(); unfortunately not correct if there are ANodes with same id but different files in multiple trees.
+//            selectionMediatorTree3D_Selection.pushBtoA(); unfortunately not correct if there are ANodes with same id but different files in multiple trees!
             TreeViewSelectionContainer treeViewSelectionContainer = null;
             for (TreeViewSelectionContainer treeViewSelectionContainer1 : this.treeViewSelectionContainers) if (treeViewSelectionContainer1.getId().equals(getSelectedTreeView().getId())) treeViewSelectionContainer = treeViewSelectionContainer1;
             if (treeViewSelectionContainer == null) {return;}
             SelectionMediator_Tree_3D selectionMediatorTree3D = getSelectionMediatorTree3D(treeViewSelectionContainer.getId());
             selectionMediatorTree3D = selectionMediatorTree3D != null ? selectionMediatorTree3D : selectionMediatorTree3D_Selection;
-            treeViewSelectionContainer.changeSelection(selectionMediatorTree3D.transformBSelectionToASelection(threeDSelectionGroup.getSelection()), true, false);
-            treeViewSelectionContainer.updateGroup();
+//            treeViewSelectionContainer.changeSelection(selectionMediatorTree3D.transformBSelectionToASelection(threeDSelectionGroup.getSelection()), true, false);
+//            treeViewSelectionContainer.updateGroup(); //TODO:
+            Set<ANode> anodesToSelect = selectionMediatorTree3D.transformBSelectionToASelection(threeDSelectionGroup.getSelection());
+            for (ANode aNode : anodesToSelect) getSelectedTreeView().getSelectionModel().select(TreeAnalysisUtils.getTreeItemWANodeId(aNode.getConceptId(), getSelectedTreeView().getRoot()));
             if (!getSelectedTreeView().getSelectionModel().getSelectedIndices().isEmpty()) getSelectedTreeView().scrollTo(getSelectedTreeView().getSelectionModel().getSelectedIndices().getFirst());   //scroll to selection
         });
 
-        controller.getSelectIn3DButton().disableProperty().bind(controller.getSelectionSynchCheck().selectedProperty());
-        controller.getShowInTreeButton().disableProperty().bind(controller.getSelectionSynchCheck().selectedProperty());
         //--------------------------------
 
 
@@ -465,23 +485,20 @@ public class WindowPresenter {
 
 
         //------------Call change of appearance of MeshViews upon un-/selecting them------------
-        hasInnerGroupSelectedItems.getSelection().addListener(new ListChangeListener<Node>() {
-            @Override
-            public void onChanged(Change<? extends Node> c) {
-                while (c.next()) {
-                    if (c.wasAdded()) {
-                        for (Node node : c.getAddedSubList()) {
-                            if (node instanceof MeshView) {
-                                meshViewSelectionEffect((MeshView) node, true);
+        hasInnerGroupSelectedItems.getSelection().addListener((ListChangeListener<MeshView>) c -> {
+            while (c.next()) {
+                if (c.wasAdded()) {
+                    for (MeshView node : c.getAddedSubList()) {
+                        if (node != null) {
+                            meshViewSelectionEffect(node, true);
 
-                            }
                         }
                     }
-                    if (c.wasRemoved()) {
-                        for (Node node : c.getRemoved()) {
-                            if (node instanceof MeshView) {
-                                meshViewSelectionEffect((MeshView) node, false);
-                            }
+                }
+                if (c.wasRemoved()) {
+                    for (MeshView node : c.getRemoved()) {
+                        if (node != null) {
+                            meshViewSelectionEffect(node, false);
                         }
                     }
                 }
@@ -498,7 +515,7 @@ public class WindowPresenter {
 
         controller.getResetViewButton().setOnAction(e -> executeCommand(new ResetViewDrawCommand(new Group[]{contentGroup,slicePlaneGroup}, camera, initialTransform, initialCameraPosition, setupMouseRotate3D)));
         controller.getClearViewButton().setOnAction(e -> {
-            executeCommand(new ClearCommand(contentGroup, hasInnerGroupContents));
+            executeCommand(new ClearCommand<>(contentGroup, hasInnerGroupContents));
             threeDSelectionGroup.changeSelection(new HashSet<>(), true, false);
         });
 
@@ -530,7 +547,8 @@ public class WindowPresenter {
 
         //-----------------buttons to draw / undraw------------------------------
         controller.getRemoveObjButton().setOnAction(e -> {
-            executeCommand(new RemoveObjFrom3DCommand(new HashSet<>(threeDSelectionGroup.getSelection()), threeDContentGroup, hasInnerGroupContents, threeDSelectionGroup));
+            executeCommand(new RemoveObjFrom3DCommand(new HashSet<>(hasInnerGroupSelectedItems.getSelection()), hasInnerGroupContents, hasInnerGroupSelectedItems));
+//            executeCommand(new RemoveObjFrom3DCommand(new HashSet<>(threeDSelectionGroup.getSelection()), threeDContentGroup, hasInnerGroupContents, threeDSelectionGroup));
         });
         controller.getRemoveObjButton().disableProperty().bind(Bindings.isEmpty(hasInnerGroupContents.getSelection()));
 
@@ -543,20 +561,21 @@ public class WindowPresenter {
 //            for (String item : new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionGroup.getSelection()))) {  //need to create this again to not concurrently modify doDraw
             HashSet<String> toDraw = new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()));
             for (String item : new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()))) {  //need to create this again to not concurrently modify doDraw
-
                 if (threeDContentGroup.getSelection().contains(item)) {
                     toDraw.remove(item);    //remove already present items
                 }
             }
             if (!toDraw.isEmpty()) {
-                executeCommand(new DrawItemIn3DCommand(toDraw, threeDContentGroup, threeDSelectionGroup));
+//                executeCommand(new DrawItemIn3DCommand(toDraw, threeDContentGroup, threeDSelectionGroup));
+                Set<MeshView> meshViewsToDraw = new HashSet<>(toDraw.size());
+                for (String id : toDraw) meshViewsToDraw.addAll(hasTheeDContentsContainer.transformGroupItemToSelectionItem(id));
+                executeCommand(new DrawItemIn3DCommand(meshViewsToDraw, hasInnerGroupContents, hasInnerGroupSelectedItems));
                 if (controller.getSelectionSynchCheck().isSelected()) {
                     treeViewSelectionGroup.setNoUpdating(true);
                     threeDSelectionGroup.changeSelection(toDraw, false, false);
                     treeViewSelectionGroup.setNoUpdating(false);
                 }
             }
-            printMem();
         });
 
         controller.getRemoveFrom3DButton().setOnAction(e -> {
@@ -564,13 +583,16 @@ public class WindowPresenter {
             for (TreeViewSelectionContainer treeViewSelectionContainer1 : this.treeViewSelectionContainers) if (treeViewSelectionContainer1.getId().equals(getSelectedTreeView().getId())) treeViewSelectionContainer = treeViewSelectionContainer1;
             if (treeViewSelectionContainer == null) {System.out.println("drawin3dButton: treeViewSelectionContainer is null!"); return;}
             HashSet<String> toRemove = new HashSet<>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()));
-            for (String item : new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()))) {  //need to create this again to not concurrently modify doDraw
+            for (String item : new HashSet<>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()))) {  //need to create this again to not concurrently modify doDraw
                 if (!threeDContentGroup.getSelection().contains(item)) {
                     toRemove.remove(item);    //remove items that aren't even drawn
                 }
             }
             if (!toRemove.isEmpty()) {
-                executeCommand(new RemoveObjFrom3DCommand(toRemove, threeDContentGroup, hasInnerGroupContents, threeDSelectionGroup));
+                Set<MeshView> meshViews = new HashSet<>();
+                for (String id : toRemove) meshViews.addAll(hasTheeDContentsContainer.transformGroupItemToSelectionItem(id));
+                executeCommand(new RemoveObjFrom3DCommand(meshViews, hasInnerGroupContents, hasInnerGroupSelectedItems));
+//                executeCommand(new RemoveObjFrom3DCommand(toRemove, threeDContentGroup, hasInnerGroupContents, threeDSelectionGroup));
                 if (controller.getSelectionSynchCheck().isSelected()) {
                     treeViewSelectionGroup.setNoUpdating(true);
                     threeDSelectionGroup.changeSelection(toRemove, false, false);
@@ -579,10 +601,13 @@ public class WindowPresenter {
             }
 //            executeCommand(new RemoveObjFrom3DCommand(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionGroup.getSelection()), threeDContentGroup, hasInnerGroupContents, threeDSelectionGroup));
         });
-        controller.getRemoveFrom3DButton().disableProperty().bind(Bindings.isEmpty(hasInnerGroupContents.getSelection()));
-
-        controller.getShowInTreeButton().disableProperty().bind(Bindings.isEmpty(hasInnerGroupSelectedItems.getSelection()));
         //-----------------------------------------------------------
+
+        //--------------------some (not all) disable button bindings---------------------
+        controller.getRemoveFrom3DButton().disableProperty().bind(Bindings.isEmpty(hasInnerGroupContents.getSelection()));
+        controller.getSelectIn3DButton().disableProperty().bind(controller.getSelectionSynchCheck().selectedProperty());
+        controller.getShowInTreeButton().disableProperty().bind(controller.getSelectionSynchCheck().selectedProperty().or(Bindings.isEmpty(hasInnerGroupSelectedItems.getSelection())));
+        //------------------------------------------------------------
 
 
         //-----------------enable loading of custom models---------------------
@@ -764,9 +789,36 @@ public class WindowPresenter {
         });
         controller.getApplyColorButton().disableProperty().bind(Bindings.isEmpty(hasInnerGroupSelectedItems.getSelection()));
 
-        controller.getColorPicker().getCustomColors().add(0, Color.CRIMSON); // default color
+        controller.getColorPicker().getCustomColors().add(0, HasFXGroupContentsContainer.DEFAULT_COLOR); // default color
         //---------------------------------------------
 
+        //-------------chooose selection mode-------------------------------------
+
+        controller.getSaturationStyleCheckMenu().selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                if (selectionEffect != SelectionEffect.Effect.VIA_SATURATION) return;
+                controller.getSaturationStyleCheckMenu().setSelected(true);
+            }
+            else {
+                if (selectionEffect == SelectionEffect.Effect.VIA_SATURATION) return;
+                changeSelectionEffect(SelectionEffect.Effect.VIA_SATURATION);
+                controller.getFillStyleCheckMenu().setSelected(false);
+            }
+        });
+        controller.getFillStyleCheckMenu().selectedProperty().addListener((obs, oldValue, newVaule) -> {
+            if (!newVaule) {
+                if (selectionEffect != SelectionEffect.Effect.VIA_DRAWMODE) return;
+                controller.getFillStyleCheckMenu().setSelected(true);
+            }
+            else {
+                if (selectionEffect == SelectionEffect.Effect.VIA_DRAWMODE) return;
+                changeSelectionEffect(SelectionEffect.Effect.VIA_DRAWMODE);
+                controller.getSaturationStyleCheckMenu().setSelected(false);
+
+            }
+        });
+
+        //------------------------------------------------------------------------
 
         //debug printer
         //info: i think this printer always prints everything in the Set (also everything that was added in previous changes)
@@ -870,7 +922,8 @@ public class WindowPresenter {
         });
 
         //--------setup correct UI behaviour (visibility, width)
-        if (apiKey == null) controller.getShowAICheck().disableProperty().set(true);
+//        if (apiKey == null) controller.getShowAICheck().disableProperty().set(true);
+        controller.getShowAICheck().disableProperty().set(true);    //disabled for now
         controller.getAiButtonBox().visibleProperty().bind(controller.getShowAICheck().selectedProperty());
         controller.getAiButtonBox().managedProperty().bind(controller.getShowAICheck().selectedProperty());
         controller.getAiPromptTextArea().visibleProperty().bind(controller.getShowAICheck().selectedProperty());
@@ -1003,8 +1056,16 @@ public class WindowPresenter {
 
         //---------------------------end cutting-------------------------
 
+        //-------------------------------quiz------------------------------
+        controller.getQuizButton().setOnAction(e -> {
+            TreeItem<ANode> picked = LittlePopUp.selectTreeItemDialog(getSelectedTreeView().getRoot());
+            if (picked == null) return;
+            getSelectedTreeView().getSelectionModel().select(picked);
+        });
+        //-------------------------------------------------------------------
 
         hasInnerGroupContents.getSelection().addListener((ListChangeListener<? super Node>) i -> controller.getBotLabelDrawCount().setText(hasInnerGroupContents.getSelection().size() + " items drawn."));
+
 
 
 //-----------------end of constructor----------------
@@ -1041,24 +1102,35 @@ public class WindowPresenter {
 
 
     /**
-     * Implements the 3D selection effect.
+     * Apply the 3D selection effect.
      * @param meshView to select.
-     * @param select: to select or to unselect (decides which effect is applied).
+     * @param selected: to select or to unselect (decides which effect is applied).
      */
-    private void meshViewSelectionEffect(MeshView meshView, boolean select) {
-        if (!(meshView.getMaterial() instanceof PhongMaterial)) meshView.setMaterial(new PhongMaterial(Color.WHITE));
-        PhongMaterial currentMaterial = (PhongMaterial) meshView.getMaterial();
-        //things ive tried:
-        //currentMaterial.setSpecularColor(Color.WHITE); //or other colors
-        //currentMaterial.setSpecularPower(1200);
-        //currentMaterial.getDiffuseColor().desaturate().desaturate().desaturate();
-
-        if (select) {
-            currentMaterial.setDiffuseColor(currentMaterial.getDiffuseColor().saturate().saturate());
-        } else {
-            currentMaterial.setDiffuseColor(currentMaterial.getDiffuseColor().desaturate().desaturate());
-        }  //works!
+    private void meshViewSelectionEffect(MeshView meshView, boolean selected) {
+        SelectionEffect.applySelectionEffect(meshView, selected, selectionEffect);
     }
+
+    /**
+     * Applies the currently chosen selection effect to the given MeshView.
+     * @param selected whether to select or unselect.
+     * */
+    public void applySelectionEffect(MeshView meshView, boolean selected) {
+        meshViewSelectionEffect(meshView, selected);
+    }
+
+    /**
+     * Change the selectionEffect of this to the newEffect. Then apply the new effect on all MeshViews of threeDContentGroup.
+     * @param newEffect the new effect
+     */
+    private void changeSelectionEffect(SelectionEffect.Effect newEffect) {
+        for (MeshView meshView : hasInnerGroupContents.getAllItems()) {
+            boolean isSelected = threeDSelectionGroup.getSelection().contains(meshView.getId());
+            SelectionEffect.transformSelectionMode(meshView, isSelected, this.selectionEffect, newEffect);
+        }
+        this.selectionEffect = newEffect;
+    }
+
+
 
     //only for debug purposes
     private void printTreeSelection(TreeView<ANode> treeView) {
@@ -1612,12 +1684,12 @@ public class WindowPresenter {
 
     /**
      * Tries to save the given tree.
-     * @return True if the tree has been saved or does not need saving. Set isModelSaved accordingly.
+     * Set isModelUnSaved to saved if the tree had unsaved changes and saving was successful.
+     * @return True if the tree has been saved successfully, false if cancelled.
      */
     private boolean tryToSaveTree(TreeView<ANode> treeView) {
-        if (!isModelUnsaved.get(treeView.getId()).get()) return true;
-        boolean result =TreeExport.saveTree(treeView, treeView.getId());
-        isModelUnsaved.get(treeView.getId()).set(!result);
+        boolean result = TreeExport.saveTree(treeView, treeView.getId());
+        if (isModelUnsaved.get(treeView.getId()).getValue()) isModelUnsaved.get(treeView.getId()).set(!result);
         return result;
     }
 

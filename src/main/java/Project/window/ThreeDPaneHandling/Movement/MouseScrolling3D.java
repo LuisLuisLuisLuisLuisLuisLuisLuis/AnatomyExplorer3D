@@ -1,12 +1,7 @@
-package Project.window.ThreeDPaneHandling;
+package Project.window.ThreeDPaneHandling.Movement;
 
-import javafx.beans.InvalidationListener;
 import javafx.geometry.Point3D;
-import javafx.scene.Group;
 import javafx.scene.layout.Pane;
-import javafx.scene.transform.Transform;
-
-import java.util.HashMap;
 
 /**
  * Sets up camera movement via mouse scrolling for a Pane and a PerspectiveCamera encapsulated by a CamMover.

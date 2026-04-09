@@ -1,13 +1,11 @@
-package Project.window.ThreeDPaneHandling;
+package Project.window.ThreeDPaneHandling.OBJFile;
 
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.shape.VertexFormat;
-import org.jetbrains.annotations.Contract;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * OBJ parser

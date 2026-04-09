@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ProgressIndicator?>
@@ -38,13 +39,14 @@
                            <children>
                               <BorderPane prefHeight="372.8" prefWidth="296.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <top>
-                                    <ToolBar fx:id="treeToolBar" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                    <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                                       <items>
                                         <Button fx:id="treeExpandButton" mnemonicParsing="false" text="Expand" />
                                           <Button fx:id="treeCollapseButton" mnemonicParsing="false" text="Collapse" />
                                           <Button fx:id="treeSelectAllButton" mnemonicParsing="false" text="Select All of" />
                                           <Button fx:id="treeSelectNoneButton" mnemonicParsing="false" text="Select None" />
                                           <Separator orientation="VERTICAL" />
+                                          <Button fx:id="quizButton" mnemonicParsing="false" text="Quiz" />
                                           <Button fx:id="infoButton" mnemonicParsing="false" text="Leaf Info" />
                                       </items>
                                     </ToolBar>
@@ -74,7 +76,7 @@
                                                     <Button fx:id="treeSearchPrevButton" mnemonicParsing="false" text="&lt;" />
                                                       <Button fx:id="treeSearchNextButton" mnemonicParsing="false" text="&gt;" />
                                                       <Button fx:id="treeSearchAllButton" mnemonicParsing="false" text="All" />
-                                                      <CheckBox fx:id="regexCheck" mnemonicParsing="false" selected="false" text="Regex" />
+                                                      <CheckBox fx:id="regexCheck" mnemonicParsing="false" text="Regex" />
                                                       <Separator orientation="VERTICAL" />
                                                       <CheckBox fx:id="showAICheck" mnemonicParsing="false" text="Show AI" />
                                                   </items>
@@ -141,6 +143,13 @@
                                                   </items>
                                                 </SplitMenuButton>
                                                 <Separator orientation="VERTICAL" />
+                                                <MenuButton fx:id="selectionStyleButton" mnemonicParsing="false" text="Selection style">
+                                                  <items>
+                                                    <CheckMenuItem fx:id="saturationStyleMenuitem" mnemonicParsing="false" selected="true" text="Saturation" />
+                                                    <CheckMenuItem fx:id="fillStyleMenuitem" mnemonicParsing="false" text="Fill mode" />
+                                                  </items>
+                                                </MenuButton>
+                                                <Separator orientation="VERTICAL" />
                                                 <ColorPicker fx:id="colorPicker" prefHeight="26.0" prefWidth="81.0" />
                                                 <Button fx:id="applyColorButton" mnemonicParsing="false" text="Apply to Selected" />
                                                 <Button fx:id="explodeButton" mnemonicParsing="false" text="Explode" />
@@ -197,7 +206,7 @@
                               <items>
                                     <MenuItem fx:id="loadHierarchyMenu" mnemonicParsing="false" text="Load hierarchy" />
                                     <CheckMenuItem fx:id="enableBP3DV3checkMenu" mnemonicParsing="false" text="Enable BP3D 3.0" />
-                                  <CheckMenuItem fx:id="enableTreeEditingCheckMenu" mnemonicParsing="false" text="Enable Tree Editing"/>
+                                  <CheckMenuItem fx:id="enableTreeEditingCheckMenu" mnemonicParsing="false" text="Enable Tree Editing" />
                                     <MenuItem fx:id="menuSaveTree" mnemonicParsing="false" text="Save Trees" />
                                   <MenuItem fx:id="menuClose" mnemonicParsing="false" text="Quit" />
                               </items>
@@ -206,10 +215,8 @@
                                 <items>
                                     <CheckMenuItem fx:id="darkModeMenuItem" mnemonicParsing="false" text="Dark Mode" />
                                     <CheckMenuItem fx:id="fullScreenCheck" mnemonicParsing="false" text="Fullscreen" />
-                                    <MenuItem fx:id="menuAddAxes" mnemonicParsing="false" text="Add Axes" visible="false"/>
-                                    <MenuItem fx:id="menuRmAxes" mnemonicParsing="false" text="Add Axes" visible="false"/>
-                                    <MenuItem fx:id="menuClearView" mnemonicParsing="false" text="Clear View" visible="false"/>
-                                    <MenuItem fx:id="menuResetView" mnemonicParsing="false" text="Reset View" visible="false"/>
+                                    <MenuItem fx:id="menuAddAxes" mnemonicParsing="false" text="Add Axes" visible="false" /> <!-- axes don't fit very well right now, might improve later-->
+                                    <MenuItem fx:id="menuRmAxes" mnemonicParsing="false" text="Add Axes" visible="false" /> <!-- by using CheckMenu and proper adjusting size.-->
                                 </items>
                               </Menu>
                             <Menu mnemonicParsing="false" text="Help">

@@ -96,7 +96,7 @@ public class TreeViewSetup {
      * @param _treeViewEditor TreeViewEditor that will work on this tree.
      */
     public void setCellFactory(TreeView<ANode> treeView, UndoableANodeTreeViewEditor _treeViewEditor, ANode modelRoot, boolean allowEditing) {
-        treeView.setEditable(true);
+        treeView.setEditable(allowEditing);
         _treeViewEditor.addTreeView(treeView);
         treeView.setCellFactory(tv -> {
             return new TextFieldTreeCell<ANode>(

@@ -18,8 +18,8 @@ public class ClearCommand<T> extends GroupCommand {
 
     /**
      * Clears view and resets perspective.
-     * @param hasSelection Group to be cleared of contents.
-     * @param contentGroup Group whose perspective is to be reset.
+     * @param hasSelection to be cleared
+     * @param contentGroup Group whose perspective is to be reset
      */
     public ClearCommand(Group contentGroup, HasFXGroupContents hasSelection) {
         super(contentGroup);

@@ -30,7 +30,7 @@ public class FXGroupSelectionContainer extends SelectionContainer<MeshView, Stri
 
 
     @Override
-    protected Collection<MeshView> transformGroupItemToSelectionItem(String groupItem) {
+    public Collection<MeshView> transformGroupItemToSelectionItem(String groupItem) {
         LinkedList<MeshView> result = new LinkedList<>();
         result.add(quickAccessMap.getOrDefault(groupItem, null));
         return result;

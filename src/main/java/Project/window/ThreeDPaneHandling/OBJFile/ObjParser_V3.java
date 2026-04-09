@@ -1,4 +1,4 @@
-package Project.window.ThreeDPaneHandling;
+package Project.window.ThreeDPaneHandling.OBJFile;
 
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.shape.VertexFormat;

@@ -1,11 +1,10 @@
 package Project.SelectionModel;
 
 
-import Project.model.ANode;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TreeItem;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Set;
@@ -83,11 +82,12 @@ public abstract class SelectionContainer<selectionType, groupSelectionType> {
 
     /**
      * Set the selection of this, using the format used by the selectionGroup.
-     * To be called by the selectionGroup.
+     * ONLY to be called by the selectionGroup.
+     * Does NOT update the selection group (because it is only called by the selection group).
      * @param groupSelection: the selection.
      * @return those items that were failed to be selected.
      */
-    public ObservableList<groupSelectionType> changeSelection(Set<groupSelectionType> groupSelection, boolean clear, boolean remove) {
+    protected ObservableList<groupSelectionType> changeSelection(@NotNull Set<groupSelectionType> groupSelection, boolean clear, boolean remove) {
         long startTime = System.nanoTime();
         if (!isUpdatingGroup()) {
             isBeingUpdated(true);
@@ -118,7 +118,7 @@ public abstract class SelectionContainer<selectionType, groupSelectionType> {
     }
 
 
-    protected abstract Collection<selectionType> transformGroupItemToSelectionItem(groupSelectionType groupItem);
+    public abstract Collection<selectionType> transformGroupItemToSelectionItem(groupSelectionType groupItem);
 
     private final ObservableList<groupSelectionType> failedToSelect = FXCollections.observableArrayList();
     public ObservableList<groupSelectionType> getFailedToSelect() {

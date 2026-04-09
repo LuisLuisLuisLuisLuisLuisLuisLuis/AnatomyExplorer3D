@@ -1,12 +1,10 @@
-package Project.window.ThreeDPaneHandling;
+package Project.window.ThreeDPaneHandling.Effects;
 
+import Project.window.ThreeDPaneHandling.Movement.Group3DRotation;
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
-import javafx.scene.transform.Rotate;
-
-import java.util.function.Function;
 
 
 public class ContinuousRotator {

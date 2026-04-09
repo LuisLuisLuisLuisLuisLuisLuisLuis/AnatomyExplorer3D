@@ -1,7 +1,7 @@
 package Project.command.DrawCommands;
 
 import Project.command.Command;
-import Project.window.ThreeDPaneHandling.Group3DRotation;
+import Project.window.ThreeDPaneHandling.Movement.Group3DRotation;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
 

@@ -5,10 +5,6 @@ import Project.SelectionModel.HasSelection;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
-import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.shape.Mesh;
 import javafx.scene.shape.MeshView;
 
 import java.util.LinkedList;
@@ -73,13 +69,6 @@ public class HasFXGroupSelection implements HasSelection<MeshView> {
 
     public void unselect(MeshView item) {
         this.selection.remove(item);
-    }
-
-    public void selectAll() {
-        clearSelection();
-        for (MeshView item : this.getAllItems()) {
-            select(item);
-        }
     }
 
 

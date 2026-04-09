@@ -1,10 +1,10 @@
-package Project.window.ThreeDPaneHandling;
+package Project.window.ThreeDPaneHandling.OBJFile;
 
-import javafx.scene.Group;
+import Project.SelectionModel.FXGroupDraw.HasFXGroupContentsContainer;
+import Project.window.WindowPresenter;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Mesh;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 import javafx.stage.FileChooser;
@@ -13,8 +13,6 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,10 +36,11 @@ public class OpenOBJ {
             //meshView.setCullFace(CullFace.FRONT); strangely caused the cube to deform when rotating.
             material.setDiffuseMap(new Image(image.toURI().toString()));
         } else {
-            if (color != null) material.setDiffuseColor(color.desaturate().desaturate());
-            else material.setDiffuseColor(Color.CRIMSON.desaturate().desaturate()); //indicating that no img is loaded
+            if (color == null) color = HasFXGroupContentsContainer.DEFAULT_COLOR;
+            material.setDiffuseColor(color);
         }
         meshView.setMaterial(material);
+        WindowPresenter.getWindowPresenter().applySelectionEffect(meshView, false);
         return meshView;
     }
     //default case of no color

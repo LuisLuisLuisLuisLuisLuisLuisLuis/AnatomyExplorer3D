@@ -2,7 +2,10 @@ package Project.window.PopUp;
 
 
 import Project.AnatomyExplorer;
-import javafx.beans.value.ChangeListener;
+import Project.model.ANode;
+import Project.window.SupportingUI.TextSearch.SearchTree;
+import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
+import Project.window.TreeView.TreeViewEditing.TreeViewSetup;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -10,6 +13,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -18,7 +24,6 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
 import java.util.*;
-import java.util.function.Function;
 
 public class LittlePopUp {
 
@@ -341,7 +346,72 @@ public class LittlePopUp {
         Optional<List<String>> result = dialog.showAndWait();
         return result.orElse(null);
     }
+    
+    
+    public static TreeItem<ANode> selectTreeItemDialog(TreeItem<ANode> root) {
 
+        // Dialog
+        Dialog<TreeItem<ANode>> dialog = new Dialog<>();
+        dialog.setResizable(true);
+        dialog.setTitle("Tree Selection");
+        BorderPane content = new BorderPane();
+
+        // seutp TreeView
+        TreeView<ANode> treeView = new TreeView<>(root);
+        treeView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        TreeViewSetup treeViewSetup = new TreeViewSetup(new UndoableANodeTreeViewEditor());
+        treeViewSetup.setCellFactory(treeView, new UndoableANodeTreeViewEditor(), root.getValue(), false);
+        treeView.setShowRoot(true);
+        treeView.getSelectionModel().select(treeView.getRoot()); // so something is always selected when the user presses OK
+                                                                 // -> null is returned iff the user pressed cancel
+
+        // text search
+        SearchTree searchTree = new SearchTree(treeView);
+        TextField treeSearchField = new TextField();
+        CheckBox regexCheck = new CheckBox();
+        treeSearchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER && !treeSearchField.getText().isEmpty()) {
+                searchTree.find(treeSearchField.getText(), false, regexCheck.isSelected());
+            }
+        });
+        dialog.getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {if (event.isControlDown() && event.getCode() == KeyCode.F) treeSearchField.requestFocus();});
+
+        Button treeSearchNextButton = new Button(">");
+        Button treeSearchPrevButton = new Button("<");
+
+        treeSearchNextButton.setOnAction(e -> searchTree.next());
+        treeSearchNextButton.disableProperty().bind(searchTree.getCanNextObservable().not());
+        treeSearchPrevButton.setOnAction(e -> searchTree.previous());
+        treeSearchPrevButton.disableProperty().bind(searchTree.getHasPreviousObservable());
+
+        ToolBar topBar = new ToolBar(treeSearchField, regexCheck, treeSearchPrevButton, treeSearchNextButton);
+
+        // dont create Button buttons because they dont work with dialog result converter
+        ButtonType acceptType = new ButtonType("Accept", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().setAll(acceptType, cancelType);
+
+        Button acceptBtn = (Button) dialog.getDialogPane().lookupButton(acceptType);
+
+        acceptBtn.setDefaultButton(false);  // IMPORTANT else accept button will fire on any and all Enter pressed events (such as when pressing enter in the search field)
+
+        content.setTop(topBar);
+        content.setCenter(treeView);
+
+        dialog.getDialogPane().setContent(content);
+
+        // Result conversion
+        dialog.setResultConverter(button -> {
+            if (button == acceptType) {
+                return treeView.getSelectionModel().getSelectedItem();
+            }
+            return null;
+        });
+
+        // Show dialog
+        Optional<TreeItem<ANode>> result = dialog.showAndWait();
+        return result.orElse(null);
+    }
 }
-
+    
 

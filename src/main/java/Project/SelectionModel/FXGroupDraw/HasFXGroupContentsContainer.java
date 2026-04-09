@@ -3,7 +3,7 @@ package Project.SelectionModel.FXGroupDraw;
 import Project.SelectionModel.SelectionContainer;
 import Project.SelectionModel.SelectionGroup;
 import Project.window.ThreeDPaneHandling.Coloring.FileGroupingScheme;
-import Project.window.ThreeDPaneHandling.OpenOBJ;
+import Project.window.ThreeDPaneHandling.OBJFile.OpenOBJ;
 import Project.window.WindowPresenter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -32,19 +32,37 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
      * Has a mapping of FileIDs (that come in as groupItems here) to anatomical group (String[]).
      * -> one fileID may be mapped to multiple anatomical groups.
      * Is set on Construction by loading resource .json.
-     *
-     * You will still need this when you implement diff selection visualization modes, specifically color visualization
-     * (e.g. intense Red for selected) because you will need to be able to go back to default.
-     * Also, this schema may be needed for loading/saving sessions IF you still allow user to change colors.
      */
     private FileGroupingScheme fileGroupingScheme;
+// You will still need this when you implement diff selection visualization modes, specifically color visualization
+// (e.g. intense Red for selected) because you will need to be able to go back to default.
+// Also, this schema may be needed for loading/saving sessions IF you still allow user to change colors.
+
     /**
      * The index to use when accessing anatomical group array returned by fileGroupingScheme.
      */
     private int anatomicalGroupLevel;
+    public int getAnatomicalGroupLevel() {return anatomicalGroupLevel;}
+
+    public static final String DEFAULT_COLOR_VAL = "#789B73";
+    public static final Color DEFAULT_COLOR = Color.web(DEFAULT_COLOR_VAL);
 
     public Color getColorForGroup(String group) {
-        return Color.web(this.fileGroupingScheme.groupToColor.getOrDefault(group, "#789B73"));
+        return Color.web(this.fileGroupingScheme.groupToColor.getOrDefault(group, DEFAULT_COLOR_VAL));
+    }
+
+    public String[] findAnatomyGroupsForID(String id) {
+        return this.fileGroupingScheme.fileIDstoGroups.getOrDefault(id, null);
+    }
+
+    public String findAnatomyGroupForID(String id) {
+        String[] anatomicalGroups = findAnatomyGroupsForID(id);
+        if (anatomicalGroups != null ) {
+            return anatomicalGroups[anatomicalGroupLevel];
+        } else {
+            logger.log(Level.FINER, "could not find a color-group for " + id + ", returning null.");
+            return null;
+        }
     }
 
 
@@ -65,7 +83,7 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
      * @return MeshView with the FileID as id.
      */
     @Override
-    protected Collection<MeshView> transformGroupItemToSelectionItem(String groupItem) {
+    public Collection<MeshView> transformGroupItemToSelectionItem(String groupItem) {
 
         MeshView mock = new MeshView();
         mock.setId(groupItem);
@@ -84,14 +102,7 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
 
         if (inputStream != null) {
             long startTime = System.nanoTime();
-            String[] anatomicalGroups = this.fileGroupingScheme.fileIDstoGroups.getOrDefault(groupItem, null);
-            String anatomicalGroup;
-            if (anatomicalGroups != null ) {
-                anatomicalGroup = anatomicalGroups[anatomicalGroupLevel];
-            } else {
-                System.out.println("could not find a color-group for " + groupItem + ", returning null.");
-                anatomicalGroup = null;
-            }
+            String anatomicalGroup = findAnatomyGroupForID(groupItem);
             //fileGroupingScheme.groupToColor returns hex values of the color (String) which must be converted to Color using Color.web(string)
             MeshView result = OpenOBJ.objInputStreamToMeshViews(inputStream, groupItem, getColorForGroup(anatomicalGroup));
             long endTime = System.nanoTime();

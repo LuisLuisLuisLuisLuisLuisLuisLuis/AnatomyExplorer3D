@@ -2,9 +2,8 @@ package Project.command.DrawCommands;
 
 import Project.command.Command;
 import Project.command.Remember.RememberFXPerspective;
-import Project.window.ThreeDPaneHandling.SetupMouseRotate3D;
+import Project.window.ThreeDPaneHandling.Movement.SetupMouseRotate3D;
 import javafx.geometry.Point3D;
-import javafx.scene.Camera;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Group;
 import javafx.scene.transform.Affine;

@@ -41,7 +41,7 @@ public class TreeViewSelectionContainer extends SelectionContainer<TreeItem<ANod
 
 
     @Override
-    protected Collection<TreeItem<ANode>> transformGroupItemToSelectionItem(ANode groupItem) {
+    public Collection<TreeItem<ANode>> transformGroupItemToSelectionItem(ANode groupItem) {
         LinkedList<TreeItem<ANode>> result = new LinkedList<>();
         result.add(quickAccessMap.getOrDefault(groupItem.conceptId(), null));
         return result;

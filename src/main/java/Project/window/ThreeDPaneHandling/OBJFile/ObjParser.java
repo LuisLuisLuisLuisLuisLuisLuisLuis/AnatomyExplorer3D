@@ -1,11 +1,10 @@
-package Project.window.ThreeDPaneHandling;
+package Project.window.ThreeDPaneHandling.OBJFile;
 
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.shape.VertexFormat;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 

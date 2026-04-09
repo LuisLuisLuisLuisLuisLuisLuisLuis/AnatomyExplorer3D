@@ -1,4 +1,4 @@
-package Project.window.ThreeDPaneHandling;
+package Project.window.ThreeDPaneHandling.Movement;
 
 import javafx.geometry.Point3D;
 import javafx.scene.PerspectiveCamera;

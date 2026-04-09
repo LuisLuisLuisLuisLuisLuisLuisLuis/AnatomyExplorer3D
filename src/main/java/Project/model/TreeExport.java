@@ -34,7 +34,14 @@ public class TreeExport {
     }
 
     /**
-     *
+     * Tries to save the given treeviews under the given names.
+     * <ul>
+     *     <li>Asks for a directory</li>
+     *     <li>Notifies the user of the files that will be created</li>
+     *     <li>Asks if existing files should be overwritten</li>
+     * </ul>
+     * The user can abort at any of these steps. Then, the files be attempted to be created. The user will be notified after
+     * the process if any errors occurred.
      * @param treeViews
      * @param treeNames
      * @return List of boolean matching indices of TreeViews where true = TreeView was saved and false = TreeView was not saved.
@@ -94,7 +101,19 @@ public class TreeExport {
         return result;
     }
 
-
+    /**
+     * Tries to save the given treeview under the given name.
+     * <ul>
+     *     <li>Asks for a directory</li>
+     *     <li>Notifies the user of the files that will be created</li>
+     *     <li>Asks if existing files should be overwritten</li>
+     * </ul>
+     * The user can abort at any of these steps. Then, the files be attempted to be created. The user will be notified after
+     * the process if any errors occurred.
+     * @param treeView to be saved
+     * @param name name to preprend to the files
+     * @return true if saving was successful, false if cancelled or an error occurred.
+     */
     public static boolean saveTree(TreeView<ANode> treeView, String name) {
         File directory;
         File relationsFile;
@@ -111,7 +130,7 @@ public class TreeExport {
             if (relationsFile.exists()) errmsg += name + "_edge_list.txt\n";
             if (fileListFile.exists()) errmsg += name + "_file_list.txt\n";
             if (!errmsg.isBlank()) {
-                if (LittlePopUp.showMsg("Error", "The following files already exist:\n" + errmsg + "\nOverwrite?", "Yes", "Cancel")) break;
+                if (LittlePopUp.showScrollableTextPopup("Warning", "The following files already exist. Overwrite?", errmsg, true, "Overwrite")) break;
             } else break;
         }
         try {
