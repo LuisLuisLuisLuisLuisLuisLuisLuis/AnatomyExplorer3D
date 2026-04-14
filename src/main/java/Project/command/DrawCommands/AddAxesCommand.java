@@ -1,6 +1,5 @@
 package Project.command.DrawCommands;
 
-import Project.command.GroupCommand;
 import Project.window.ThreeDPaneHandling.Axes;
 import javafx.scene.Group;
 

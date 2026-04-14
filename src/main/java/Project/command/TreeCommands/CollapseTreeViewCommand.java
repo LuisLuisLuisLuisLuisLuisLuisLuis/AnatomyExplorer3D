@@ -2,7 +2,6 @@ package Project.command.TreeCommands;
 
 import Project.command.Remember.RememberTreeViewSelection;
 import Project.model.ANode;
-import Project.command.TreeCommand;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;

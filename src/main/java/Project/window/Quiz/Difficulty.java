@@ -9,6 +9,9 @@ public class Difficulty {
         this.name = name;
     }
 
+    @Override
+    public String toString() {return name;}
+
     public static final Difficulty VERY_EASY = new Difficulty(100, "VERY_EASY");
     public static final Difficulty EASY = new Difficulty(200, "EASY");
     public static final Difficulty MEDIUM = new Difficulty(300, "MEDIUM");

@@ -1,34 +1,45 @@
 package Project.window.Quiz;
 
-import org.jetbrains.annotations.NotNull;
 
 /**
+ * @param <Q> type of the question
  * @param <S> the type of score used to evaluate the answer
  * @param <T> the type of the answer
  */
-public interface Question<S, T> {
+public interface Question<Q, T, S> {
+
     /**
-     * Asks the question.
+     * @return the question
      */
-    void ask();
+    Q ask();
 
     /**
      * Submit the answer.
      * @param answer answer
+     */
+    void submit(T answer);
+
+    /**
+     * @return the answer submitted by the user.
+     */
+    T getSubmittedAnswer();
+
+    /**
+     * Evaluate the answer and return a score.
+     * @param answer answer to the question
      * @return the score for that answer.
      */
-    S submit(@NotNull T answer);
+    S evaluate(T answer);
 
     /**
-     * Skips this question.
-     * @return the score for giving no answer.
+     * @return the best possible score you can get
      */
-    S skip();
+    S maxScore();
 
     /**
-     * @return true if this question has been skipped.
+     * @return the worst possible score you can get
      */
-    boolean isSkipped();
+    S minScore();
 
     /**
      * @return false as long as the question has not been answered and true as soon as an answer has been submitted.
@@ -36,17 +47,23 @@ public interface Question<S, T> {
     boolean isAnswered();
 
     /**
-     * @return the score for the given answer. Returns null as long as no answer is given.
+     * @return the score for the given answer.
      */
     S getScore();
 
     /**
-     * @return the answer submitted by the user. Returns null as long as no answer is given.
+     * @return the difficulty of this question
      */
-    T getSubmittedAnswer();
+    Difficulty getDifficulty();
 
     /**
-     * @return the correct answer.
+     * @return the name of this question
      */
-    T getCorrectAnswer();
+    String getName();
+
+    /**
+     * @return instructions for this question
+     */
+    String getInstructions();
+
 }

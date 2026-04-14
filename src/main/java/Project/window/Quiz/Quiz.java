@@ -1,7 +1,5 @@
 package Project.window.Quiz;
 
-import org.jetbrains.annotations.Contract;
-
 import java.util.List;
 
 /**
@@ -20,9 +18,29 @@ public interface Quiz<S> {
     void stop();
 
     /**
+     * @return if the quiz can go to the next question
+     */
+    boolean canNext();
+
+    /**
+     * @return if the quiz can go to the previous question
+     */
+    boolean canPrevious();
+
+    /**
+     * @return the next question
+     */
+    Question<?,?,S> next();
+
+    /**
+     * @return the next question
+     */
+    Question<?,?,S> previous();
+
+    /**
      * @return the questions of this quiz
      */
-    List<Question> getQuestions();  //not specifying the types of question because the quiz may have questions of different types.
+    List<? extends Question<?,?,S>> getQuestions();  //not specifying the types of question because the quiz may have questions of different types.
 
     /**
      * @return the current progress (between 0 and 1)

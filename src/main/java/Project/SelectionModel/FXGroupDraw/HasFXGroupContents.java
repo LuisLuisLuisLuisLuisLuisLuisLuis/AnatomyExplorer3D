@@ -33,9 +33,9 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
     public void setHasFXGroupContentsContainer(HasFXGroupContentsContainer hasFXGroupContentsContainer) {this.hasFXGroupContentsContainer = hasFXGroupContentsContainer;}
 
     /**
-     * This class resets all MeshViews UserData upon select()!!
-     * @param group
-     * @param id
+     * This class resets MeshView.UserData upon selecting it!
+     * @param group Group to which MeshViews will be added.
+     * @param id ID of this
      */
     public HasFXGroupContents(Group group, String id) {
         this.group = group;

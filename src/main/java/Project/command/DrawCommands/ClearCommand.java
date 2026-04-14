@@ -1,13 +1,10 @@
 package Project.command.DrawCommands;
 
 import Project.SelectionModel.FXGroupDraw.HasFXGroupContents;
-import Project.command.GroupCommand;
 import Project.command.Remember.RememberHasFXGroupContents;
-import Project.command.Remember.RememberHasSelection;
 import Project.command.Remember.RememberFXPerspective;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
-import javafx.scene.shape.MeshView;
 
 public class ClearCommand<T> extends GroupCommand {
 

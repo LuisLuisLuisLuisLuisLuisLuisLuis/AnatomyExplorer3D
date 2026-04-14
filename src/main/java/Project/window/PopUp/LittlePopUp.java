@@ -412,6 +412,40 @@ public class LittlePopUp {
         Optional<TreeItem<ANode>> result = dialog.showAndWait();
         return result.orElse(null);
     }
+
+    public static List<String> test(List<String> options, String title, String message) {
+        Dialog<List<String>> dialog = new Dialog<>();
+        dialog.setTitle(title);
+        dialog.setHeaderText(message);
+
+        ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(okButton, ButtonType.CANCEL);
+
+        List<CheckBox> checkBoxes = new ArrayList<>(options.size());
+        for (String option : options) checkBoxes.add(new CheckBox(option));
+
+        VBox content = new VBox(10);
+        content.getChildren().addAll(checkBoxes);
+        Button test = new Button("click me");
+        for (CheckBox checkBox : checkBoxes) checkBox.setVisible(false);
+        test.setOnAction(e -> {for (CheckBox checkBox : checkBoxes) checkBox.setVisible(true);});
+        content.getChildren().add(test);
+
+        dialog.setResultConverter(button -> {
+            if (button == okButton) {
+                List<String> selected = new ArrayList<>();
+                for (CheckBox checkBox : checkBoxes) if (checkBox.isSelected()) selected.add(checkBox.getText());
+                return selected;
+            }
+            return null; // cancel
+        });
+        dialog.getDialogPane().setContent(content);
+
+        Optional<List<String>> result = dialog.showAndWait();
+        return result.orElse(null);
+    }
+
+
 }
     
 

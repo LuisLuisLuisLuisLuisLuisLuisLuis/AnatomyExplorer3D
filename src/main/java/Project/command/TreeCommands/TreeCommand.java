@@ -1,5 +1,6 @@
-package Project.command;
+package Project.command.TreeCommands;
 
+import Project.command.Command;
 import Project.model.ANode;
 import javafx.scene.control.TreeView;
 

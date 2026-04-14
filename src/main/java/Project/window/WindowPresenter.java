@@ -28,6 +28,7 @@ import Project.window.PopUp.About;
 import Project.window.PopUp.Help;
 import Project.window.PopUp.InfoChart;
 import Project.window.PopUp.LittlePopUp;
+import Project.window.Quiz.*;
 import Project.window.Slicing.Plane;
 import Project.window.SupportingUI.FileExplorerInteraction;
 import Project.window.SupportingUI.TextSearch.SearchTree;
@@ -1058,9 +1059,33 @@ public class WindowPresenter {
 
         //-------------------------------quiz------------------------------
         controller.getQuizButton().setOnAction(e -> {
-            TreeItem<ANode> picked = LittlePopUp.selectTreeItemDialog(getSelectedTreeView().getRoot());
-            if (picked == null) return;
-            getSelectedTreeView().getSelectionModel().select(picked);
+            SimpleMultipleChoice3DQuestion<String, Integer> question1 = new SimpleMultipleChoice3DQuestion<>(Difficulty.EASY, 0, 1, "mandible", List.of("mandible", "left maxilla"), List.of(hasInnerGroupContents.getMeshViewWithID("FJ3375"), hasInnerGroupContents.getMeshViewWithID("FJ3269"), hasInnerGroupContents.getMeshViewWithID("FJ3289")), List.of(hasInnerGroupContents.getMeshViewWithID("FJ3289")), hasInnerGroupContents, hasInnerGroupSelectedItems);
+
+            SimpleMultipleChoiceUIQuestion<String, Integer> question2 = new SimpleMultipleChoiceUIQuestion<>(
+                    Difficulty.EASY, 0,1,"yess", List.of("yess", "noo"), false
+            );
+            List<UIQuestion<?, Integer>> list = new LinkedList<>();
+            list.add(question1);
+            list.add(question2);
+            UIQuiz<Integer> quiz3 = new UIQuiz<>(list, true, true);
+            UIQuiz<Integer> quiz = new UIQuiz<>(List.of(question1, question2), true, true);
+            MOCKQuizSimple<Integer> quiz2 = new MOCKQuizSimple<>(List.of(new MOCKQSimple2<Integer,Integer,Integer>()));
+
+
+
+//            question.setName("Question 1");
+//            question.setInstructions("What's the name of the selected item?");
+//            LittlePopUp.showChartPopup(question.ask(), "Quiz", 500,500);
+//            question.getAnsweredProperty().addListener(new ChangeListener<Boolean>() {
+//                @Override
+//                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+//                    if (newValue) LittlePopUp.showMsg("your result", Integer.toString(question.getScore()), "OK");
+//                }
+//            });
+
+//            TreeItem<ANode> picked = LittlePopUp.selectTreeItemDialog(getSelectedTreeView().getRoot());
+//            if (picked == null) return;
+//            getSelectedTreeView().getSelectionModel().select(picked);
         });
         //-------------------------------------------------------------------
 
