@@ -7,7 +7,7 @@ import javafx.scene.shape.MeshView;
 
 import java.util.List;
 
-public abstract class SimpleSelectIn3DQuestion<S> extends SimpleQuestion<Node, List<MeshView>, S> implements UIQuestion<List<MeshView>,S>{
+public abstract class SimpleSelectIn3DQuestion<S extends Comparable<S>> extends SimpleQuestion<Node, List<MeshView>, S> implements UIQuestion<List<MeshView>,S>{
 
     private final HasFXGroupContents hasFXGroupContents;
     private final HasFXGroupSelection hasFXGroupSelection;

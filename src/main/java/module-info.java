@@ -16,12 +16,14 @@ module com.anatomyExplorer {
     requires java.management;
     requires jdk.compiler;
     requires java.logging;
+    requires jdk.xml.dom;
 
     exports Project.AI.Format to com.fasterxml.jackson.databind;
     exports Project.window.ThreeDPaneHandling.Coloring to com.fasterxml.jackson.databind;
 
     opens Project.window to javafx.fxml;
     opens Project.window.TreeView.TreeAnalysis.MVPPattern to javafx.fxml;
+    opens Project.window.Quiz to javafx.fxml;
 
     exports Project;
     opens Project.window.TreeView.TreeAnalysis to javafx.fxml;

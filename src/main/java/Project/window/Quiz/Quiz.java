@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @param <S> the type of the score
  */
-public interface Quiz<S> {
+public interface Quiz<S extends Comparable<S>> {
 
     /**
      * Start the quiz
@@ -66,4 +66,9 @@ public interface Quiz<S> {
      * @return the best score achieved on this quiz
      */
     S getPB();
+
+    /**
+     * @return the score of the quiz given by the list of scores
+     */
+    S computeScore(List<S> scores);
 }

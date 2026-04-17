@@ -81,6 +81,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -970,7 +971,7 @@ public class WindowPresenter {
 
         //------------Menu: Help----------
         controller.getMenuGuide().setOnAction(e -> LittlePopUp.showPopup(Help.getHelp(), "Help", 1000, 500));
-        controller.getMenuAbout().setOnAction(e -> LittlePopUp.showChartPopup(About.getAbout(), "About", 400, 100));
+        controller.getMenuAbout().setOnAction(e -> LittlePopUp.showPaddedPopup(About.getAbout(), "About", 400, 100));
 
         //------------------optional sync tree + 3D selection
         HasGroup<ANode> hasTreeSelectionGroup = new HasGroup<>(treeViewSelectionGroup);
@@ -1061,15 +1062,23 @@ public class WindowPresenter {
         controller.getQuizButton().setOnAction(e -> {
             SimpleMultipleChoice3DQuestion<String, Integer> question1 = new SimpleMultipleChoice3DQuestion<>(Difficulty.EASY, 0, 1, "mandible", List.of("mandible", "left maxilla"), List.of(hasInnerGroupContents.getMeshViewWithID("FJ3375"), hasInnerGroupContents.getMeshViewWithID("FJ3269"), hasInnerGroupContents.getMeshViewWithID("FJ3289")), List.of(hasInnerGroupContents.getMeshViewWithID("FJ3289")), hasInnerGroupContents, hasInnerGroupSelectedItems);
 
-            SimpleMultipleChoiceUIQuestion<String, Integer> question2 = new SimpleMultipleChoiceUIQuestion<>(
-                    Difficulty.EASY, 0,1,"yess", List.of("yess", "noo"), false
+            SimpleMultipleChoiceUIQuestion<String, Integer> question2 = new SimpleMultipleChoiceUIQuestion<String, Integer>(
+                    Difficulty.EASY, 0,1,List.of("yess", "maybe"), List.of("yess", "noo", "maybe"), false
             );
+            question1.setName("Question 1");
+            question1.setInstructions("Choose the right item");
+            question2.setName("Question 2");
+            question2.setInstructions("Choose the right item");
+
             List<UIQuestion<?, Integer>> list = new LinkedList<>();
             list.add(question1);
             list.add(question2);
-            UIQuiz<Integer> quiz3 = new UIQuiz<>(list, true, true);
-            UIQuiz<Integer> quiz = new UIQuiz<>(List.of(question1, question2), true, true);
-            MOCKQuizSimple<Integer> quiz2 = new MOCKQuizSimple<>(List.of(new MOCKQSimple2<Integer,Integer,Integer>()));
+
+            UIQuiz<Integer> quiz3 = new UIQuizInt(list, true, true);//, 5, TimeUnit.MINUTES);
+//            UIQuiz<Integer> quiz = new UIQuizInt(List.of(question1, question2), true, true);
+//            UIQuiz<Integer> quiz2 = new UIQuizInt(List.of(question1, question2), false, false);
+//            UIQuiz<Integer> quiz4 = new UIQuizInt(List.of(question1, question2), true, false);
+            quiz3.start();
 
 
 

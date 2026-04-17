@@ -1,12 +1,14 @@
 package Project.window.Quiz;
 
 
+import Project.command.Command;
+
 /**
  * @param <Q> type of the question
- * @param <S> the type of score used to evaluate the answer
+ * @param <S> the type of the score used to score the answer. A smaller score is interpreted as worse than a higher score.
  * @param <T> the type of the answer
  */
-public interface Question<Q, T, S> {
+public interface Question<Q, T , S extends Comparable<S>> {
 
     /**
      * @return the question
@@ -40,6 +42,11 @@ public interface Question<Q, T, S> {
      * @return the worst possible score you can get
      */
     S minScore();
+
+    /**
+     * @return the default score for now answer
+     */
+    S defaultScore();
 
     /**
      * @return false as long as the question has not been answered and true as soon as an answer has been submitted.

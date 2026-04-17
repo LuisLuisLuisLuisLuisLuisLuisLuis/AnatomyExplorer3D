@@ -7,7 +7,7 @@ import javafx.scene.shape.MeshView;
 
 import java.util.List;
 
-public class SimpleMultipleChoice3DQuestion<T,S> extends SimpleMultipleChoiceUIQuestion<T,S>{
+public class SimpleMultipleChoice3DQuestion<T,S extends Comparable<S>> extends SimpleMultipleChoiceUIQuestion<T,S>{
 
     private final HasFXGroupContents hasFXGroupContents;
     private final HasFXGroupSelection hasFXGroupSelection;

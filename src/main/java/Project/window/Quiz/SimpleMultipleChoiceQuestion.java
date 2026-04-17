@@ -3,7 +3,7 @@ package Project.window.Quiz;
 import java.util.HashSet;
 import java.util.List;
 
-public abstract class SimpleMultipleChoiceQuestion<Q,T,S> extends SimpleQuestion<Q,List<T>,S> implements MultipleChoiceQuestion<Q,T,S> { // implements MultipleChoiceQuestion<Q,T,S>
+public abstract class SimpleMultipleChoiceQuestion<Q,T,S extends Comparable<S>> extends SimpleQuestion<Q,List<T>,S> implements MultipleChoiceQuestion<Q,T,S> { // implements MultipleChoiceQuestion<Q,T,S>
 
     private final boolean exposesNumberOfCorrectChoices;
 

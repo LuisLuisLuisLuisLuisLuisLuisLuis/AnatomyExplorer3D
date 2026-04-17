@@ -7,7 +7,7 @@ import java.util.logging.*;
 
 public class LoggingConfig {
 
-    public static void init() {init(Level.FINE, Level.CONFIG);}
+    public static void init() {init(Level.CONFIG, Level.CONFIG);}
     public static void init(Level level) {init(level, level);}
     /**
      * Setup root Logger.

@@ -28,17 +28,22 @@ import java.util.*;
 public class LittlePopUp {
 
     /**
-     * Makes a little popup window
+     * Makes a little popup window with padding around the contents.
      * @param node: content of the window
      * @param title: Title of window
      * @param x: width
      * @param y: height
      */
-    public static void showChartPopup(Node node, String title, int x, int y) {
+    public static void showPaddedPopup(Node node, String title, int x, int y) {
         if (node == null) return;
         VBox root = new VBox(node);
         root.setPadding(new Insets(10));
         showPopup(root, title, x, y);
+    }
+
+    public static void showPopup(Node node, String title, int x, int y) {
+        if (node == null) return;
+        showPopup(new VBox(node), title, x, y);
     }
 
     /**

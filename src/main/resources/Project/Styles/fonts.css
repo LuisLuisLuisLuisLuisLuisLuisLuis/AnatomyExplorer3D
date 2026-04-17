@@ -28,3 +28,12 @@
     -fx-text-fill: -fx-text-inner-color;
 }
 
+.text-correct {
+    -fx-text-fill: green;
+    -fx-font-weight: bold;
+}
+
+.text-wrong {
+    -fx-text-fill: crimson;
+    -fx-font-weight: bold;
+}

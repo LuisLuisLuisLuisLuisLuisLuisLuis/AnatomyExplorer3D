@@ -3,24 +3,24 @@ package Project.window.Quiz;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Region;
 
 public class UIQuizController {
 
     @FXML
-    private ToolBar titleToolbar;
+    private Region topSpacer1;
     @FXML
-    private ToolBar scoreToolBar;
+    private Region topSpacer2;
+    @FXML
+    private ToolBar questInfoToolbar;
     @FXML
     private Button prevButton;
     @FXML
     private Button nextButton;
     @FXML
     private Button endButton;
-    @FXML
-    private Label pbLabel;
     @FXML
     private Label scoreLabel;
     @FXML
@@ -30,15 +30,7 @@ public class UIQuizController {
     @FXML
     private AnchorPane questUIAnchorPane;
     @FXML
-    private Label questNameLabel;
-    @FXML
-    private Label questLabel;
-    @FXML
-    private TextArea descriptionArea;
-
-    public Label getPbLabel() {
-        return pbLabel;
-    }
+    private Label questProgressLabel;
 
     public Button getPrevButton() {
         return prevButton;
@@ -68,19 +60,13 @@ public class UIQuizController {
         return questUIAnchorPane;
     }
 
-    public Label getQuestNameLabel() {
-        return questNameLabel;
+    public Label getQuestProgressLabel() {
+        return questProgressLabel;
     }
 
-    public Label getQuestLabel() {
-        return questLabel;
-    }
+    public ToolBar getTitleToolbar() {return questInfoToolbar;}
 
-    public TextArea getDescriptionArea() {
-        return descriptionArea;
-    }
+    public Region getTopSpacer2() {return topSpacer2;}
 
-    public ToolBar getScoreToolBar() {return scoreToolBar;}
-
-    public ToolBar getTitleToolbar() {return titleToolbar;}
+    public Region getTopSpacer1() {return topSpacer1;}
 }

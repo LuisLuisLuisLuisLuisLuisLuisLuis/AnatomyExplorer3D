@@ -16,7 +16,7 @@ public class AnatomyExplorer extends Application {
 
     public void start(Stage primaryStage) throws Exception {
         Locale.setDefault(Locale.ENGLISH);  // all default texts are in ENG
-        LoggingConfig.init(Level.FINE);
+        LoggingConfig.init(Level.CONFIG);
 
         WindowView view = new WindowView();
 

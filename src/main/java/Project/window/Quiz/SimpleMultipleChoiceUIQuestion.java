@@ -1,20 +1,20 @@
 package Project.window.Quiz;
 
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SimpleMultipleChoiceUIQuestion<T,S> extends SimpleMultipleChoiceQuestion<Node,T,S> implements UIQuestion<List<T>,S>{
+public class SimpleMultipleChoiceUIQuestion<T,S extends Comparable<S>> extends SimpleMultipleChoiceQuestion<Node,T,S> implements UIQuestion<List<T>,S>{
 
     private static final Logger logger = Logger.getLogger(SimpleMultipleChoiceUIQuestion.class.getName());
 
@@ -23,12 +23,68 @@ public class SimpleMultipleChoiceUIQuestion<T,S> extends SimpleMultipleChoiceQue
     /**
      * the root of the UI
      */
-    private VBox root;
+    private BorderPane uiRoot;
+
+    private final VBox feedbackBox = new VBox();
+
+    private final HBox correctAnswerBox = new HBox();
+
+    private boolean showCorrectAnswerOnWrongSubmit = false;
 
     private final SimpleBooleanProperty answeredProperty = new SimpleBooleanProperty(isAnswered);
 
+    private final SimpleObjectProperty<List<T>> submittedAnswerProperty = new SimpleObjectProperty<>();
+
+    private final SimpleObjectProperty<S> scoreProperty = new SimpleObjectProperty<>(minScore());
+
     @Override
     public SimpleBooleanProperty getAnsweredProperty() {return answeredProperty;}
+
+    @Override
+    public SimpleObjectProperty<S> getScoreProperty() {return scoreProperty;}
+
+    @Override
+    public SimpleObjectProperty<List<T>> submittedAnswerProperty() {return submittedAnswerProperty;}
+
+    @Override
+    public void showCorrectAnswerOnWrongSubmit(boolean flag) {this.showCorrectAnswerOnWrongSubmit = flag;}
+
+
+    protected void correctFeedback() {
+        Label l = new Label("Correct");
+        l.getStyleClass().add("text-correct");
+        feedbackBox.getChildren().clear();
+        feedbackBox.getChildren().add(l);
+        feedbackBox.setVisible(true);
+    }
+    protected void wrongFeedback() {
+        Label l = new Label("Wrong");
+        l.getStyleClass().add("text-wrong");
+        feedbackBox.getChildren().clear();
+        feedbackBox.getChildren().add(l);
+        if (showCorrectAnswerOnWrongSubmit) feedbackBox.getChildren().add(correctAnswerBox);
+        feedbackBox.setVisible(true);
+    }
+
+    protected void setupCorrectAnswerBox() {
+        Label l = new Label("Correct answer: ");
+        l.setStyle("-fx-font-weight: bold");
+        correctAnswerBox.getChildren().add(l);
+        for (T answer : correctAnswer) correctAnswerBox.getChildren().add(new Label(answer.toString() + ", "));
+    }
+    /**
+     * Shows the correct answer in the GUI
+     */
+    protected void showCorrectAnswer() {
+        feedbackBox.setVisible(true);
+    }
+    /**
+     * Un-shows (hides) the correct answer in the GUI
+     */
+    protected void hideCorrectAnswer() {
+        feedbackBox.setVisible(false);
+    }
+
 
     /**
      * A simple multiple choice question model with only one correct answer. Shows the user a multiple choice UI.
@@ -42,6 +98,12 @@ public class SimpleMultipleChoiceUIQuestion<T,S> extends SimpleMultipleChoiceQue
     public SimpleMultipleChoiceUIQuestion(Difficulty difficulty, S minScore, S maxScore, List<T> correctAnswers, List<T> possibleAnswers, boolean exposesNumberOfCorrectChoices) {
         super(difficulty, minScore, maxScore, correctAnswers, possibleAnswers, exposesNumberOfCorrectChoices);
         this.forceOnlyOneAnswer = false;
+        setupCorrectAnswerBox();
+        this.submittedAnswerProperty.addListener((obs, old, neww) -> {
+            logger.log(Level.CONFIG, "" + getScore().compareTo(maxScore()));
+            if (getScore().compareTo(maxScore()) < 0) wrongFeedback();
+            else correctFeedback();
+        });
     }
 
     /**
@@ -85,7 +147,7 @@ public class SimpleMultipleChoiceUIQuestion<T,S> extends SimpleMultipleChoiceQue
         HBox botBox = new HBox(submitButton);
         ui.getChildren().add(botBox);
 
-        this.root = QuestionFormat.stacked(getName(), getInstructions(), getDifficulty(), maxScore(), minScore(), ui);
+        this.uiRoot = QuestionFormat.stacked(getName(), getInstructions(), getDifficulty(), maxScore(), minScore(), ui);
     }
 
     private void makeCheckBoxUI() {
@@ -109,8 +171,9 @@ public class SimpleMultipleChoiceUIQuestion<T,S> extends SimpleMultipleChoiceQue
         });
         HBox botBox = new HBox(submitButton);
         ui.getChildren().add(botBox);
+        ui.getChildren().add(feedbackBox);
 
-        this.root = QuestionFormat.stacked(getName(), getInstructions(), getDifficulty(), maxScore(), minScore(), ui);
+        this.uiRoot = QuestionFormat.stacked(getName(), getInstructions(), getDifficulty(), maxScore(), minScore(), ui);
     }
 
     private void generateUI() {
@@ -124,13 +187,18 @@ public class SimpleMultipleChoiceUIQuestion<T,S> extends SimpleMultipleChoiceQue
     @Override
     public Node ask() {
         generateUI();
-        return root;
+        return uiRoot;
     }
 
+    /**
+     * Checks for equality of answer and correct answer, ignoring ordering.
+     * @param answer answer to the question
+     * @return maxScore if they are equal, else minScore.
+     */
     @Override
     public S evaluate(List<T> answer) {
         logger.log(Level.CONFIG, "evaluating answer: " + answer);
-        if (answer.equals(correctAnswer)) return maxScore();
+        if (new HashSet<T>(answer).equals(new HashSet<T>(correctAnswer))) return maxScore();    //using sets to ignore list ordering
         else return minScore();
     }
 
@@ -138,6 +206,8 @@ public class SimpleMultipleChoiceUIQuestion<T,S> extends SimpleMultipleChoiceQue
     public void submit(List<T> answer) {
         super.submit(answer);
         this.answeredProperty.set(super.isAnswered);
+        this.submittedAnswerProperty.set(getSubmittedAnswer());
+        this.scoreProperty.set(getScore());
     }
 
 }
