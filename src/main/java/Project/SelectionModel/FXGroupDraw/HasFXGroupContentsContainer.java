@@ -125,7 +125,7 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
      * @param hasSelection   : an object that has a selection
      * @param selectionGroup : a SelectionGroup for this container to be part of
      */
-    public HasFXGroupContentsContainer(HasFXGroupContents hasSelection, SelectionGroup<String> selectionGroup) {
+    public HasFXGroupContentsContainer(HasFXGroupContents hasSelection, @NotNull SelectionGroup<String> selectionGroup) {
         super(hasSelection, selectionGroup);
         this.hasFXGroupContents = hasSelection;
         this.fileDirs = new ArrayList<>(2);
@@ -237,10 +237,6 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
 
     private void loadOBJs(File file, Set<String> whiteList) {
         loadOBJsMulti(file, whiteList);
-//        if (true) return;
-//        File[] files = file.listFiles();
-//        if (files == null) return; //TODO: UI notification?
-//        for (File objfile : files) hasFXGroupContents.addOBJ(objfile.getName().substring(0, objfile.getName().lastIndexOf(".")));
     }
 
     private void loadOBJs(URL url, Set<String> whiteList) {

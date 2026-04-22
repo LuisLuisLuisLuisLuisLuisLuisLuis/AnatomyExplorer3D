@@ -135,9 +135,10 @@ public abstract class SelectionContainer<selectionType, groupSelectionType> {
      * @param hasSelection: an object that has a selection
      * @param selectionGroup: a SelectionGroup for this container to be part of
      */
-    public SelectionContainer(HasSelection<selectionType> hasSelection, SelectionGroup<groupSelectionType> selectionGroup) {
+    public SelectionContainer(HasSelection<selectionType> hasSelection, @NotNull SelectionGroup<groupSelectionType> selectionGroup) {
         this.hasSelection = hasSelection;
         this.selectionGroup = selectionGroup;
+        selectionGroup.addSelectionContainer(this);
         this.hasSelection.getSelection().addListener((ListChangeListener<? super selectionType>) e -> {
             updateGroup(); //if the selection changes, update the group
         });

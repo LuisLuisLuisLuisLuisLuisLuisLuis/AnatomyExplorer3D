@@ -148,6 +148,7 @@ public class SelectionGroup<groupSelection> {
      * @param selectionContainer
      */
     public void addSelectionContainer(SelectionContainer selectionContainer) {
+        if (selectionContainers.contains(selectionContainer)) return;
         selectionContainers.add(selectionContainer);
         selectionContainer.setGroup(this);
         //instantly set the selection of the newly added selectionContainer here

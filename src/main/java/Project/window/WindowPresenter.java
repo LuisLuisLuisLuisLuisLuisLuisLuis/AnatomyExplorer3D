@@ -370,7 +370,7 @@ public class WindowPresenter {
         //-------------initialize selection model for 3D contents (not 3D selection but what meshViews are drawn)
         this.hasInnerGroupContents = new HasFXGroupContents(innerGroup, "hasinnergroupMeshes");
         this.threeDContentGroup = new SelectionGroup<String>("3dContentGroup");
-        this.hasTheeDContentsContainer = new HasFXGroupContentsContainer(hasInnerGroupContents, threeDContentGroup); //, new String[]{isAFilesLocation.getValue().getAbsolutePath(), partOfFilesLocation.getValue().getAbsolutePath()}
+        this.hasTheeDContentsContainer = new HasFXGroupContentsContainer(hasInnerGroupContents); //, new String[]{isAFilesLocation.getValue().getAbsolutePath(), partOfFilesLocation.getValue().getAbsolutePath()}
         this.hasInnerGroupContents.setHasFXGroupContentsContainer(hasTheeDContentsContainer);
         threeDContentGroup.addSelectionContainer(hasTheeDContentsContainer);
         //---------------------------
@@ -379,9 +379,8 @@ public class WindowPresenter {
         //---------------initialize 3D selection model-----------
         threeDSelectionGroup = new SelectionGroup<>("3dSelectionGroup");
         hasInnerGroupSelectedItems = new HasFXGroupSelection(hasInnerGroupContents, "hasInnerGroupSelectedItems");
-        threeDSelectionContainer = new FXGroupSelectionContainer(
-                hasInnerGroupSelectedItems, threeDSelectionGroup);
-        threeDSelectionGroup.addSelectionContainer(threeDSelectionContainer);
+        threeDSelectionContainer = new FXGroupSelectionContainer(hasInnerGroupSelectedItems, threeDSelectionGroup);
+//        threeDSelectionGroup.addSelectionContainer(threeDSelectionContainer);
         //-----------------------------------------------
 
 
