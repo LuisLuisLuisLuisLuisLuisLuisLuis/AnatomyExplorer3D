@@ -3,12 +3,16 @@ package Project.window.Quiz;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 
 public class UIQuizController {
 
+    @FXML
+    private SplitPane questSplitPane;
     @FXML
     private Region topSpacer1;
     @FXML
@@ -69,4 +73,6 @@ public class UIQuizController {
     public Region getTopSpacer2() {return topSpacer2;}
 
     public Region getTopSpacer1() {return topSpacer1;}
+
+    public SplitPane getQuestSplitPane() {return questSplitPane;}
 }

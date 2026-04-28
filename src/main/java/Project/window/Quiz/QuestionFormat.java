@@ -57,7 +57,7 @@ public class QuestionFormat {
         scrollPane.setFitToWidth(true);
         Region centerSpacer = new Region();
         VBox.setVgrow(centerSpacer, Priority.ALWAYS);
-        centerBox.getChildren().addAll(uiContainer, centerSpacer, scrollPane);
+        centerBox.getChildren().addAll(uiContainer, scrollPane);
 
         result.setCenter(centerBox);
 

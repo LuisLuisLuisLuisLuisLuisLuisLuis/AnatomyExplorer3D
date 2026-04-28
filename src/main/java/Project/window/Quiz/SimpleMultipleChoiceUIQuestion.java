@@ -4,9 +4,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -21,9 +19,9 @@ public class SimpleMultipleChoiceUIQuestion<T,S extends Comparable<S>> extends S
     private boolean forceOnlyOneAnswer;
 
     /**
-     * the root of the UI
+     * the root of the UI which will be returned by ask()
      */
-    private BorderPane uiRoot;
+    protected BorderPane uiRoot;
 
     private final VBox feedbackBox = new VBox();
 
@@ -70,19 +68,10 @@ public class SimpleMultipleChoiceUIQuestion<T,S extends Comparable<S>> extends S
         Label l = new Label("Correct answer: ");
         l.setStyle("-fx-font-weight: bold");
         correctAnswerBox.getChildren().add(l);
-        for (T answer : correctAnswer) correctAnswerBox.getChildren().add(new Label(answer.toString() + ", "));
-    }
-    /**
-     * Shows the correct answer in the GUI
-     */
-    protected void showCorrectAnswer() {
-        feedbackBox.setVisible(true);
-    }
-    /**
-     * Un-shows (hides) the correct answer in the GUI
-     */
-    protected void hideCorrectAnswer() {
-        feedbackBox.setVisible(false);
+        for (int i = 0; i < correctAnswer.size(); i++) {
+            T answer = correctAnswer.get(i);
+            correctAnswerBox.getChildren().add(new Label(i < correctAnswer.size()-1 ? answer.toString() + ", " : answer.toString()));
+        }
     }
 
 
@@ -124,7 +113,7 @@ public class SimpleMultipleChoiceUIQuestion<T,S extends Comparable<S>> extends S
     /**
      * Generates the multiple choice UI for this question.
      */
-    private void makeRadioButtonUI() {
+    private VBox makeRadioButtonUI() {
         ToggleGroup toggleGroup = new ToggleGroup();
         VBox ui = new VBox();
         ui.setSpacing(QuestionFormat.DEFAULT_CHECK_SPACING);
@@ -146,23 +135,22 @@ public class SimpleMultipleChoiceUIQuestion<T,S extends Comparable<S>> extends S
         });
         HBox botBox = new HBox(submitButton);
         ui.getChildren().add(botBox);
-
-        this.uiRoot = QuestionFormat.stacked(getName(), getInstructions(), getDifficulty(), maxScore(), minScore(), ui);
+        return ui;
     }
 
-    private void makeCheckBoxUI() {
-        VBox ui = new VBox();
-        ui.setSpacing(QuestionFormat.DEFAULT_CHECK_SPACING);
+    private VBox makeCheckBoxUI() {
+        VBox uiVbox = new VBox();
+        uiVbox.setSpacing(QuestionFormat.DEFAULT_CHECK_SPACING);
         for (T possibleAnswer : possibleAnswers) {
             CheckBox checkBox = new CheckBox(possibleAnswer.toString());
             checkBox.setUserData(possibleAnswer);
-            ui.getChildren().add(checkBox);
+            uiVbox.getChildren().add(checkBox);
         }
 
         Button submitButton = new Button("Submit");
         submitButton.setOnAction(e -> {
             List<T> answer = new LinkedList<>();
-            for (Node node : ui.getChildren()) {
+            for (Node node : uiVbox.getChildren()) {
                 if (node instanceof CheckBox checkBox) {
                     if (checkBox.isSelected()) answer.add((T) checkBox.getUserData());
                 }
@@ -170,19 +158,24 @@ public class SimpleMultipleChoiceUIQuestion<T,S extends Comparable<S>> extends S
             submit(answer);
         });
         HBox botBox = new HBox(submitButton);
-        ui.getChildren().add(botBox);
-        ui.getChildren().add(feedbackBox);
+        uiVbox.getChildren().add(botBox);
 
-        this.uiRoot = QuestionFormat.stacked(getName(), getInstructions(), getDifficulty(), maxScore(), minScore(), ui);
+        return uiVbox;
     }
 
     private void generateUI() {
-        if (forceOnlyOneAnswer) makeRadioButtonUI();
-        else makeCheckBoxUI();
+        VBox answerVBox = forceOnlyOneAnswer ? makeRadioButtonUI() : makeCheckBoxUI();
+        Region spacer1 = new Region();
+        Region spacer2 = new Region();
+        HBox.setHgrow(spacer1, Priority.ALWAYS);
+        HBox.setHgrow(spacer2, Priority.ALWAYS);
+        HBox answerVBoxWrapper = new HBox(spacer1, answerVBox, spacer2);
+        VBox ui = new VBox(answerVBoxWrapper, feedbackBox);
+        this.uiRoot = QuestionFormat.stacked(getName(), getInstructions(), getDifficulty(), maxScore(), minScore(), ui);
     }
 
     /**
-     * @return the multiple choice UI of this question. Allows the user to submit answer from the list of possible answers.
+     * @return The multiple choice UI of this question. Allows the user to select and submit an answer from the list of possible answers.
      */
     @Override
     public Node ask() {
@@ -211,3 +204,4 @@ public class SimpleMultipleChoiceUIQuestion<T,S extends Comparable<S>> extends S
     }
 
 }
+

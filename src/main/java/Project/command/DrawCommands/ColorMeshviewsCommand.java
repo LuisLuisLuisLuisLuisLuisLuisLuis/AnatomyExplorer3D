@@ -1,6 +1,7 @@
 package Project.command.DrawCommands;
 
 import Project.SelectionModel.FXGroupDraw.HasFXGroupContents;
+import Project.SelectionModel.FXGroupSelection.HasFXGroupSelection;
 import Project.SelectionModel.SelectionGroup;
 import Project.command.Command;
 import Project.command.Remember.RememberFXMeshViewColors;
@@ -17,19 +18,20 @@ public class ColorMeshviewsCommand implements Command {
     private HasFXGroupContents hasFXGroupContents;
     private Set<String> nodeIDs;
     private Color newColor;
-    private SelectionGroup selectionGroup;
+//    private SelectionGroup selectionGroup;
+    private HasFXGroupSelection hasFXGroupSelection;
 
     /**
      * @param color: Color all nodes with this color.
      * @param nodeIDs: Nodes to color.
      * @param hasFXGroupContents: contains the nodes
-     * @param selectionGroup: holds
+     * @param hasFXGroupSelection: holds
      */
-    public ColorMeshviewsCommand(Color color, Set<String> nodeIDs, HasFXGroupContents hasFXGroupContents, SelectionGroup selectionGroup) {
+    public ColorMeshviewsCommand(Color color, Set<String> nodeIDs, HasFXGroupContents hasFXGroupContents, HasFXGroupSelection hasFXGroupSelection) {
         this.nodeIDs = nodeIDs;
         this.newColor = color;
         this.hasFXGroupContents = hasFXGroupContents;
-        this.selectionGroup = selectionGroup;
+        this.hasFXGroupSelection = hasFXGroupSelection;
     }
 
     @Override
@@ -41,13 +43,13 @@ public class ColorMeshviewsCommand implements Command {
     public void execute() {
         remember();
 
-        for (String nodeID : nodeIDs) { // go thru nodeIDs and get the corresponding nodes
-            Node node = hasFXGroupContents.getMeshViewWithID(nodeID);
-            if (node instanceof MeshView) {
-                if (((MeshView) node).getMaterial() instanceof PhongMaterial) {
+        for (String nodeID : nodeIDs) { // go through nodeIDs and get the corresponding nodes
+            MeshView meshView = hasFXGroupContents.getMeshViewWithID(nodeID);
+            if (meshView != null) {
+                if (meshView.getMaterial() instanceof PhongMaterial) {
                     // saturate or not, depending on selection
-                    if (selectionGroup.getSelection().contains(nodeID)) ((PhongMaterial) ((MeshView) node).getMaterial()).setDiffuseColor(newColor);
-                    else ((PhongMaterial) ((MeshView) node).getMaterial()).setDiffuseColor(newColor.desaturate().desaturate());
+                    if (hasFXGroupSelection.getSelection().stream().map(MeshView::getId).toList().contains(nodeID)) ((PhongMaterial) meshView.getMaterial()).setDiffuseColor(newColor);
+                    else ((PhongMaterial) meshView.getMaterial()).setDiffuseColor(newColor.desaturate().desaturate());
                 }
             }
         }
@@ -60,7 +62,7 @@ public class ColorMeshviewsCommand implements Command {
 
     private void remember() {
         // remember and undo via RememberFxMeshViewColors
-        this.rememberFxMeshViewColors = new RememberFXMeshViewColors(nodeIDs, hasFXGroupContents, selectionGroup);
+        this.rememberFxMeshViewColors = new RememberFXMeshViewColors(nodeIDs, hasFXGroupContents, hasFXGroupSelection);
     }
 
     @Override

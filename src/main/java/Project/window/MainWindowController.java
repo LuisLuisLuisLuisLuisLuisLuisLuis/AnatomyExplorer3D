@@ -11,6 +11,8 @@ import javafx.scene.layout.VBox;
 public class MainWindowController {
 
     @FXML
+    private Button testPlane;
+    @FXML
     private Button quizButton;
     @FXML
     private MenuButton selectionStyleButton;
@@ -85,14 +87,6 @@ public class MainWindowController {
     @FXML
     private Button explodeButton;
 
-    public Button getApplyColorButton() {
-        return applyColorButton;
-    }
-
-    @FXML
-    private Button applyColorButton;
-    @FXML
-    private ColorPicker colorPicker;
     @FXML
     private Button redoButton;
     @FXML
@@ -370,10 +364,6 @@ public class MainWindowController {
         return removeObjButton;
     }
 
-    public ColorPicker getColorPicker() {
-        return colorPicker;
-    }
-
     public Button getExplodeButton() {
         return explodeButton;
     }
@@ -477,4 +467,8 @@ public class MainWindowController {
     public CheckMenuItem getSaturationStyleCheckMenu() {return saturationStyleMenuitem;}
 
     public Button getQuizButton() {return quizButton;}
+
+    public Button getTestPlane() {
+        return testPlane;
+    }
 }

@@ -3,11 +3,14 @@ package Project.window.Slicing;
 import java.util.List;
 import java.util.ArrayList;
 import Project.window.ThreeDPaneHandling.Axes;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
+import javafx.scene.shape.MeshView;
 import javafx.scene.transform.NonInvertibleTransformException;
 
 
@@ -26,7 +29,7 @@ public class Plane {
     }
 
     /**
-     * Makes a box with the given specifications rotated by 90deg around Z.
+     * Makes a box with the given specifications
      * @return The Box.
      */
     public static Box makeBox(double height, double width, double depth, PhongMaterial phongMaterial) {
@@ -39,7 +42,19 @@ public class Plane {
     }
 
     /**
-     * Assume the Box represents a Plane whose Normal was originally (0,0,1).
+     * @param node a node
+     * @return the center of the node in local space
+     */
+    public static Point3D computeCenter(Node node) {
+        Bounds bounds = node.getBoundsInLocal();
+        double X = (bounds.getMinX() + bounds.getMaxX()) / 2;
+        double Y = (bounds.getMinY() + bounds.getMaxY()) / 2;
+        double Z = (bounds.getMinZ() + bounds.getMaxZ()) / 2;
+        return new Point3D(X,Y,Z);
+    }
+
+    /**
+     * Assume the Box represents a Plane whose normal was originally (0,0,1).
      * Obtain the direction of the normal in the coordinate system of meshGroup.
      * @return The plane as normal (x,y,z,d)
      */
@@ -49,24 +64,20 @@ public class Plane {
         Point3D localNormal = new Point3D(0,0,1);
 
         // 2. normal to world
-        Point3D worldNormal =
-                box.getLocalToSceneTransform()
-                        .deltaTransform(localNormal)
-                        .normalize();
+        Point3D worldNormal = box.getLocalToSceneTransform()
+                .deltaTransform(localNormal)
+                .normalize();
 
         // 3. point on plane (box center)
-        Point3D worldPoint =
-                box.localToScene(Point3D.ZERO);
+        Point3D worldPoint = box.localToScene(Point3D.ZERO);
 
         // 4. convert to mesh local space
-        Point3D meshPoint =
-                meshGroup.sceneToLocal(worldPoint);
+        Point3D meshPoint = meshGroup.sceneToLocal(worldPoint);
 
-        Point3D meshNormal =
-                meshGroup.getLocalToSceneTransform()
-                        .createInverse()
-                        .deltaTransform(worldNormal)
-                        .normalize();
+        Point3D meshNormal = meshGroup.getLocalToSceneTransform()
+                .createInverse()
+                .deltaTransform(worldNormal)
+                .normalize();
 
         // 5. compute d
         double nx = meshNormal.getX();

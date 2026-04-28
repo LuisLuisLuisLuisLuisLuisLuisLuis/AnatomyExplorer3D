@@ -89,6 +89,7 @@ public class SliceCommand implements Command {
         Task<Boolean> task = new Task<>() {
             @Override
             protected Boolean call() throws Exception {
+                updateMessage("Slicing MeshViews...");
                 ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
                 int total = meshViewGroup.getChildren().size();
                 final int[] done = {0};

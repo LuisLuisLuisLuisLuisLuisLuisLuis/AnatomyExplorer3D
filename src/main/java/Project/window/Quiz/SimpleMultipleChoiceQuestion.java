@@ -60,7 +60,7 @@ public abstract class SimpleMultipleChoiceQuestion<Q,T,S extends Comparable<S>> 
      */
     @Override
     public void submit(List<T> answer) throws IllegalArgumentException{
-        if (!new HashSet<>(possibleAnswers).containsAll(answer)) throw new IllegalArgumentException("Answer must be one of " + possibleAnswers.toString());
+        if (!new HashSet<>(possibleAnswers).containsAll(answer)) throw new IllegalArgumentException("Answer must be one of " + possibleAnswers + " but was " + answer);
         super.submit(answer);
     }
 

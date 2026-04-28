@@ -2,10 +2,16 @@ package Project.window.PopUp;
 
 
 import Project.AnatomyExplorer;
+import Project.SelectionModel.SelectionGroup;
+import Project.SelectionModel.Tree.HasTreeView;
+import Project.SelectionModel.Tree.TreeViewSelectionContainer;
 import Project.model.ANode;
 import Project.window.SupportingUI.TextSearch.SearchTree;
 import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
 import Project.window.TreeView.TreeViewEditing.TreeViewSetup;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -22,6 +28,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -415,6 +422,182 @@ public class LittlePopUp {
 
         // Show dialog
         Optional<TreeItem<ANode>> result = dialog.showAndWait();
+        return result.orElse(null);
+    }
+
+
+    public record SelectTreeItemResult(TreeItem<ANode> result, String treeName) {
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+            SelectTreeItemResult that = (SelectTreeItemResult) o;
+            return Objects.equals(treeName, that.treeName) && Objects.equals(result, that.result);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(result, treeName);
+        }
+
+        @Override
+        public @NotNull String toString() {
+            return result.getValue().toString() + " (" + treeName + ")";
+        }
+    }
+
+    /**
+     * Creates a Tab with a TreeView for each root item and allows the user to choose one TreeItem.
+     * @param roots a list of TreeItems. Each one of them will be used as a root of a separate TreeView.
+     * @param treeNames names of the trees. will be used to label to which TreeView (and thus to which root) the picked TreeItem belongs.
+     * @param title title to be given to the window. set as null or empty to display default title.
+     * @param message a message to be displayed on top of the window. leave null or empty to omit.
+     * @return the picked TreeItem and the name of the TreeView it was picked from.
+     */
+    public static SelectTreeItemResult selectTreeItemDialog(List<TreeItem<ANode>> roots, List<String> treeNames, String title, String message) {
+
+        if (roots.size() != treeNames.size() || roots.isEmpty()) return null;
+
+        Dialog<SelectTreeItemResult> dialog = new Dialog<>();
+        dialog.setResizable(true);
+        dialog.setTitle((title == null || title.isBlank() ? "Tree Selection" : title));
+        if (message != null && !message.isBlank()) dialog.setHeaderText(message);
+
+        SelectionGroup<ANode> selectionGroup = new SelectionGroup<>("treeSelectionGroup");
+
+        BorderPane content = new BorderPane();
+
+        // --- TabPane with multiple TreeViews ---
+        TabPane tabPane = new TabPane();
+
+        // global selection holder
+//        ObjectProperty<TreeItem<ANode>> selectedItem = new SimpleObjectProperty<>();
+        ObjectProperty<SelectTreeItemResult> selectedItem = new SimpleObjectProperty<>();
+
+        // search-related (will point to currently active tree)
+        ObjectProperty<SearchTree> activeSearchTree = new SimpleObjectProperty<>();
+
+        for (int i = 0; i < roots.size(); i++) {
+
+            TreeItem<ANode> root = roots.get(i);
+
+            TreeView<ANode> treeView = new TreeView<>(root);
+            treeView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+            treeView.setId(treeNames.get(i));
+
+            HasTreeView<ANode> hasTreeView = new HasTreeView<>(treeView);
+            TreeViewSelectionContainer treeViewSelectionContainer = new TreeViewSelectionContainer(hasTreeView);
+            selectionGroup.addSelectionContainer(treeViewSelectionContainer);
+
+            TreeViewSetup treeViewSetup = new TreeViewSetup(new UndoableANodeTreeViewEditor());
+            treeViewSetup.setCellFactory(treeView, new UndoableANodeTreeViewEditor(), root.getValue(), false);
+
+            treeView.setShowRoot(true);
+            treeView.getSelectionModel().select(treeView.getRoot());
+
+            // update global selection when this tree changes
+            treeView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal != null) {
+                    selectedItem.set(new SelectTreeItemResult(newVal, treeView.getId()));
+                }
+            });
+
+            // create SearchTree for this TreeView
+            SearchTree searchTree = new SearchTree(treeView);
+
+            Tab tab = new Tab(treeNames.get(i), treeView);
+            tab.setClosable(false);
+            tab.setUserData(searchTree); // store for later
+            tabPane.getTabs().add(tab);
+
+            // initialize selection & search with first tab
+            if (i == 0) {
+                selectedItem.set(new SelectTreeItemResult(treeView.getRoot(), treeView.getId()));
+                activeSearchTree.set(searchTree);
+            }
+        }
+
+        // --- Switch active search when tab changes ---
+        tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            if (newTab != null) {
+                activeSearchTree.set((SearchTree) newTab.getUserData());
+            }
+        });
+
+        // --- Search UI ---
+        TextField treeSearchField = new TextField();
+        CheckBox regexCheck = new CheckBox();
+
+        treeSearchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER && !treeSearchField.getText().isEmpty()) {
+                SearchTree st = activeSearchTree.get();
+                if (st != null) {
+                    st.find(treeSearchField.getText(), false, regexCheck.isSelected());
+                }
+            }
+        });
+
+        dialog.getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.isControlDown() && event.getCode() == KeyCode.F) {
+                treeSearchField.requestFocus();
+            }
+        });
+
+        Button nextBtn = new Button(">");
+        Button prevBtn = new Button("<");
+
+        nextBtn.setOnAction(e -> {
+            if (activeSearchTree.get() != null) activeSearchTree.get().next();
+        });
+
+        prevBtn.setOnAction(e -> {
+            if (activeSearchTree.get() != null) activeSearchTree.get().previous();
+        });
+
+        // NOTE: bindings per active tree are tricky → simplest is rebind on tab change
+        tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            if (newTab != null) {
+                SearchTree st = (SearchTree) newTab.getUserData();
+
+                nextBtn.disableProperty().unbind();
+                prevBtn.disableProperty().unbind();
+
+                nextBtn.disableProperty().bind(st.getCanNextObservable().not());
+                prevBtn.disableProperty().bind(st.getHasPreviousObservable());
+            }
+        });
+
+        // initialize bindings for first tab
+        if (!tabPane.getTabs().isEmpty()) {
+            SearchTree st = (SearchTree) tabPane.getTabs().get(0).getUserData();
+            nextBtn.disableProperty().bind(st.getCanNextObservable().not());
+            prevBtn.disableProperty().bind(st.getHasPreviousObservable());
+        }
+
+        ToolBar topBar = new ToolBar(treeSearchField, regexCheck, prevBtn, nextBtn);
+
+        // --- Buttons ---
+        ButtonType acceptType = new ButtonType("Accept", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().setAll(acceptType, cancelType);
+
+        Button acceptBtn = (Button) dialog.getDialogPane().lookupButton(acceptType);
+        acceptBtn.setDefaultButton(false);
+
+        content.setTop(topBar);
+        content.setCenter(tabPane);
+
+        dialog.getDialogPane().setContent(content);
+
+        // --- Result ---
+        dialog.setResultConverter(button -> {
+            if (button == acceptType) {
+                return selectedItem.get();
+            }
+            return null;
+        });
+
+        Optional<SelectTreeItemResult> result = dialog.showAndWait();
         return result.orElse(null);
     }
 

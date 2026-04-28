@@ -9,13 +9,16 @@ import javafx.scene.shape.MeshView;
 
 public class SelectionEffect {
 
+    /**
+     * The effects this class can apply.
+     */
     public enum Effect {
         VIA_SATURATION,
         VIA_DRAWMODE
     }
 
     /**
-     * Applies any of this classes selection effect functions specified by the effect enum.
+     * Applies the specified effect.
      */
     public static void applySelectionEffect(MeshView meshView, boolean selected, Effect effect) {
         if (effect == null) throw new NullPointerException("Effect cannot be null");

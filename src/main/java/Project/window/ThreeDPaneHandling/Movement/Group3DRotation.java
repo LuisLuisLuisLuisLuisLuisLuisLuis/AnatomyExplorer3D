@@ -2,6 +2,7 @@ package Project.window.ThreeDPaneHandling.Movement;
 
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
@@ -53,6 +54,14 @@ public class Group3DRotation {
     }
 
     public void applyTranslate(Point3D step) {
+        var currentTransform = contentGroup.getTransforms().isEmpty() ? new Translate() : contentGroup.getTransforms().getFirst();
+        var translate = new Translate(step.getX(), step.getY(), step.getZ());
+        Transform concatenation = translate.createConcatenation(currentTransform);
+        if (isTransformForbidden.apply(concatenation)) return;
+        contentGroup.getTransforms().setAll(concatenation);
+    }
+
+    public static void applyTranslate(Node contentGroup, Point3D step, Function<Transform, Boolean> isTransformForbidden) {
         var currentTransform = contentGroup.getTransforms().isEmpty() ? new Translate() : contentGroup.getTransforms().getFirst();
         var translate = new Translate(step.getX(), step.getY(), step.getZ());
         Transform concatenation = translate.createConcatenation(currentTransform);

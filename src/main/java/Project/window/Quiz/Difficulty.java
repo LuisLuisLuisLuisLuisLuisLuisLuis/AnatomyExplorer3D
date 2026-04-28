@@ -9,12 +9,14 @@ public class Difficulty {
         this.name = name;
     }
 
+    public int getDifficultyLevel() {return difficulty;}
+
     @Override
     public String toString() {return name;}
 
-    public static final Difficulty VERY_EASY = new Difficulty(100, "VERY_EASY");
+    public static final Difficulty VERY_EASY = new Difficulty(100, "VERY EASY");
     public static final Difficulty EASY = new Difficulty(200, "EASY");
     public static final Difficulty MEDIUM = new Difficulty(300, "MEDIUM");
     public static final Difficulty HARD = new Difficulty(400, "HARD");
-    public static final Difficulty VERY_HARD = new Difficulty(500, "VERY_HARD");
+    public static final Difficulty VERY_HARD = new Difficulty(500, "VERY HARD");
 }

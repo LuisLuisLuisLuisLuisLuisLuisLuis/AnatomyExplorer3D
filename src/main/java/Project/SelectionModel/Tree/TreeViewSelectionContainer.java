@@ -50,8 +50,8 @@ public class TreeViewSelectionContainer extends SelectionContainer<TreeItem<ANod
 
     private final HashMap<String, TreeItem<ANode>> quickAccessMap = new HashMap<>();
 
-    public TreeViewSelectionContainer(HasTreeView<ANode> hasTreeView, SelectionGroup<ANode> selectionGroup) {
-        super(hasTreeView, selectionGroup);
+    public TreeViewSelectionContainer(HasTreeView<ANode> hasTreeView) {
+        super(hasTreeView); //
         setupQuickAccessMap();
     }
 

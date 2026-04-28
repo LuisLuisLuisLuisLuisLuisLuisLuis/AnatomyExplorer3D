@@ -41,6 +41,28 @@ public class FXGroupSelectionContainer extends SelectionContainer<MeshView, Stri
      */
     private final HashMap<String, MeshView> quickAccessMap = new HashMap<>();
 
+    public FXGroupSelectionContainer(HasFXGroupSelection hasFXGroupSelection) {
+        super(hasFXGroupSelection);
+
+        //making the quickaccessmap synchronized -> it always knows what nodes are available in the Group and thus available for selection.
+        hasFXGroupSelection.getAllItemsObservable().addListener(new ListChangeListener<MeshView>() {
+            @Override
+            public void onChanged(Change<? extends MeshView> c) {
+                while (c.next()) {
+                    if (c.wasAdded()) {
+                        for (MeshView node : c.getAddedSubList()) {
+                            quickAccessMap.put(node.getId(), node);
+                        }
+                    } else if (c.wasRemoved()) {
+                        for (MeshView node : c.getRemoved()) {
+                            quickAccessMap.remove(node.getId());
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     public FXGroupSelectionContainer(HasFXGroupSelection hasFXGroup, SelectionGroup<String> selectionGroup) {
         super(hasFXGroup, selectionGroup);
 

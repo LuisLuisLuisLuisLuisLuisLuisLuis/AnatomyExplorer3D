@@ -1,18 +1,24 @@
 package Project.window.Quiz;
 
+import Project.window.MainWindowController;
 import Project.window.PopUp.LittlePopUp;
+import Project.window.ThreeDPaneHandling.Effects.SelectionEffect;
+import Project.window.ThreeDPaneHandling.ThreeDGroupHandler;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.shape.MeshView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -68,6 +74,22 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
         questUIAnchorPane.getChildren().add(child);
     }
 
+    protected UIQuizController controller;
+
+    protected Button resetViewButton = new Button("Reset view and colors");
+    protected ToolBar topToolbar = new ToolBar(resetViewButton);
+    protected Pane threeDPane = new Pane();
+    protected Label threeDSelectedLabel = new Label();
+    protected VBox threeDUI = new VBox(topToolbar, threeDPane, threeDSelectedLabel);
+
+    /**
+     * @return if there are any SimpleMultipleChoice3DQuestion in this quiz
+     */
+    public boolean has3DQuestions() {
+        for (UIQuestion<?, S> question : this.questions) if (question instanceof SimpleMultipleChoice3DQuestion) return true;
+        return false;
+    }
+
     //don't give to constructor but only set (via jackson) when creating from save file
     private S pb = null;
 
@@ -81,21 +103,25 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
 
     private double progress = 0;
 
-    private Timeline timeline;
-
     private final ArrayList<UIQuestion<?, S>> questions;
 
     protected final List<SimpleObjectProperty<S>> scores;
 
     private int currentQuestIndex = -1;
 
-    private SimpleObjectProperty<UIQuestion<?, S>> currentQuestion = new SimpleObjectProperty<>();
+    private SimpleObjectProperty<UIQuestion<?, S>> currentQuestionProperty = new SimpleObjectProperty<>();
 
     private final boolean showScore;
+
     private final boolean showCorrect;
+
     private final int allowedTime;
+
     private final TimeUnit timeUnit;
 
+    private Timeline timeline;
+
+    private ThreeDGroupHandler threeDGroupHandler = null;
     /**
      * 
      * @param questions the questions for this quiz
@@ -105,7 +131,8 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
      * @param timeUnit time unit of the given allowed time. Must be one of {HOURS, MINUTES, SECONDS}.
      */
     public UIQuiz(List<UIQuestion<?, S>> questions, boolean showScore, boolean showCorrect, int allowedTime, TimeUnit timeUnit) {
-        if (timeUnit == TimeUnit.DAYS || timeUnit == TimeUnit.MICROSECONDS || timeUnit == TimeUnit.MILLISECONDS) throw new IllegalArgumentException("Timeunit must be one of {DAYS, HOURS, MINUTES, SECONDS}.");
+        if (timeUnit == TimeUnit.DAYS || timeUnit == TimeUnit.MICROSECONDS || timeUnit == TimeUnit.MILLISECONDS) throw new IllegalArgumentException("Timeunit must be one of {HOURS, MINUTES, SECONDS}.");
+        questions.removeIf(Objects::isNull);
         this.questions = new ArrayList<>(questions);
         this.showScore = showScore;
         this.showCorrect = showCorrect;
@@ -119,10 +146,27 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
         this(questions, showScore, showCorrect, -1, TimeUnit.MINUTES);
     }
 
+
     protected Parent makeUI() throws IOException{
         UIQuizView uiQuizView = new UIQuizView();
-        UIQuizController controller = uiQuizView.getController();
+        this.controller = uiQuizView.getController();
         this.questUIAnchorPane = controller.getQuestUIAnchorPane();
+
+        if (has3DQuestions()) {
+            resetViewButton.setOnAction(e -> threeDGroupHandler.resetModifiables());
+            VBox.setVgrow(threeDPane, Priority.ALWAYS);
+            this.threeDGroupHandler = new ThreeDGroupHandler(this.threeDPane, new PerspectiveCamera(true), ThreeDGroupHandler.DEFAULT_INIAL_CAMERA_POSITION, "quiz3DHandler");
+            for (UIQuestion<?, S> question : this.questions) {
+                if (question instanceof Needs3DAccess needs3DAccessQuestion) {
+                    needs3DAccessQuestion.giveAccess(this.threeDGroupHandler);
+                }
+            }
+            this.threeDGroupHandler.getHasFXGroupSelection().getSelection().addListener((InvalidationListener) e -> {   // note how many items are selected
+                int size = this.threeDGroupHandler.getHasFXGroupSelection().getSelection().size();
+                this.threeDSelectedLabel.setText(size + (size == 1 ? " item selected." : " items selected."));
+            });
+
+        }
 
         //always keep the score up to date
         for (UIQuestion<?,S> question : questions) question.getScoreProperty().addListener((e, i, o) -> scoreProperty.set(computeScore(questions.stream().map(Question::getScore).toList())));
@@ -132,7 +176,7 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
         if (showScore) scoreProperty.addListener(e -> controller.getScoreLabel().setText("Score: " + scoreProperty.get().toString()));
 
 //        if (showCorrect) for (UIQuestion<?, S> question : questions) question.submittedAnswerProperty().addListener(e -> question.showCorrectAnswer());
-        if (showCorrect) for (UIQuestion<?, S> question : questions) question.showCorrectAnswerOnWrongSubmit(true);
+        for (UIQuestion<?, S> question : questions) question.showCorrectAnswerOnWrongSubmit(this.showCorrect);
 
         // set up the timer if needed
         if (allowedTime > -1) {
@@ -163,7 +207,7 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
         HBox.setHgrow(controller.getTopSpacer2(), Priority.ALWAYS);
 
 
-        currentQuestion.addListener(observable -> {
+        currentQuestionProperty.addListener(observable -> {
             controller.getQuestProgressLabel().setText("Question " + (currentQuestIndex+1) + "/" + this.questions.size());
             controller.getPrevButton().setDisable(!canPrevious());
             controller.getNextButton().setDisable(!canNext());
@@ -178,6 +222,18 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
 
         return uiQuizView.getRoot();
     }
+
+    /**
+     * does things that need to be done every time the current question changes
+     */
+    protected void onQuestionChange() {
+        UIQuestion<?, S> currentQuestion = currentQuestionProperty.get();
+        // only show the 3D Pane if needed
+        if (currentQuestion instanceof Needs3DAccess) {
+            if (!controller.getQuestSplitPane().getItems().contains(this.threeDUI)) controller.getQuestSplitPane().getItems().add(this.threeDUI);
+        }
+        else controller.getQuestSplitPane().getItems().remove(this.threeDUI);
+    }
     
 
     @Override
@@ -186,7 +242,7 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
         finishedProperty.set(false);
         runningProperty.set(true);
         try {
-            Scene scene = new Scene(makeUI());
+            Scene scene = new Scene(makeUI(),800,600);
             scene.getStylesheets().add(getClass().getResource("/Project/Styles/fonts.css").toExternalForm());
             Stage popupStage = new Stage();
             popupStage.setTitle(this.getName());
@@ -260,9 +316,10 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
     public UIQuestion<?, S> next() {
         if (canNext()){
             currentQuestIndex++;
-            currentQuestion.set(questions.get(currentQuestIndex));
-            setQuestUIAnchorPaneChild(currentQuestion.get().ask());
-            return currentQuestion.get();
+            currentQuestionProperty.set(questions.get(currentQuestIndex));
+            setQuestUIAnchorPaneChild(currentQuestionProperty.get().ask());
+            onQuestionChange();
+            return currentQuestionProperty.get();
         } else return null;
     }
 
@@ -270,9 +327,10 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
     public UIQuestion<?, S> previous() {
         if (canPrevious()) {
             currentQuestIndex--;
-            currentQuestion.set(questions.get(currentQuestIndex));
-            setQuestUIAnchorPaneChild(currentQuestion.get().ask());
-            return currentQuestion.get();
+            currentQuestionProperty.set(questions.get(currentQuestIndex));
+            setQuestUIAnchorPaneChild(currentQuestionProperty.get().ask());
+            onQuestionChange();
+            return currentQuestionProperty.get();
         } else return null;
     }
 

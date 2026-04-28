@@ -6,6 +6,8 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A group of many SelectionContainers. Synchronizes the SelectionContainers to always share the same selection if possible.
@@ -13,6 +15,8 @@ import java.util.*;
  */
 
 public class SelectionGroup<groupSelection> {
+
+    private static final Logger logger = Logger.getLogger(SelectionGroup.class.getName());
 
     //id
     private final String id;
@@ -75,6 +79,7 @@ public class SelectionGroup<groupSelection> {
      * @param remove: to add or to remove the given items from the selection.
      */
     public void changeSelection(Set<groupSelection> selection, boolean clear, boolean remove) {
+        logger.log(Level.CONFIG, "clear: " + clear + ", remove: " + remove + ". selection: " + selection);
         this.failedToSelect.clear();
         if (noUpdating) return;
 

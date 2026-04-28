@@ -63,6 +63,8 @@ public class TreeViewSetup {
 
 
     /**
+     * Creates a hierarchy of TreeItems based on the ANode hierarchy.
+     * Sets TreeView.getRoot with the root. Sets SelectionMode.MULTIPLE for the TreeView.
      * @param treeView will be populated with treeItems.
      * @param modelRoot ANode root. will be root of tree.
      */

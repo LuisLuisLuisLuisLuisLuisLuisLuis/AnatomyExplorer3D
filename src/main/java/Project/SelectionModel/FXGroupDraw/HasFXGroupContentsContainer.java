@@ -13,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.net.URL;
@@ -52,17 +53,34 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
     }
 
     public String[] findAnatomyGroupsForID(String id) {
-        return this.fileGroupingScheme.fileIDstoGroups.getOrDefault(id, null);
+        return this.fileGroupingScheme.fileIDstoGroups.getOrDefault(id, new String[anatomicalGroupLevel]);
     }
 
     public String findAnatomyGroupForID(String id) {
         String[] anatomicalGroups = findAnatomyGroupsForID(id);
-        if (anatomicalGroups != null ) {
+        if (anatomicalGroups.length > anatomicalGroupLevel) {
             return anatomicalGroups[anatomicalGroupLevel];
         } else {
-            logger.log(Level.FINER, "could not find a color-group for " + id + ", returning null.");
-            return null;
+            logger.log(Level.FINER, "could not find a color-group for " + id + ", returning empty.");
+            return "";
         }
+    }
+
+    /**
+     * @param id ID of a MeshView
+     * @return The default color for this id at the default anatomical group level
+     */
+    public Color getDefaultColorForID(String id) {
+        return getColorForGroup(findAnatomyGroupForID(id));
+    }
+
+    /**
+     * @param id ID of a MeshView
+     * @param anatomicalGroupLevel anatomical group level
+     * @return The default color for this id at that anatomical group level
+     */
+    public Color getDefaultColorForID(String id, int anatomicalGroupLevel) {
+        return getColorForGroup(findAnatomyGroupsForID(id)[anatomicalGroupLevel]);
     }
 
 
@@ -125,6 +143,9 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
      * @param hasSelection   : an object that has a selection
      * @param selectionGroup : a SelectionGroup for this container to be part of
      */
+    //shouldnt be used because now that this constructor will acutally call group.addSelectionContainer(this) the group
+    //will instantly update the selection of this which will fail because the rest of the constructor has not been
+    //executed yet, meaning theres no hasSelection or resource locations here.
     public HasFXGroupContentsContainer(HasFXGroupContents hasSelection, @NotNull SelectionGroup<String> selectionGroup) {
         super(hasSelection, selectionGroup);
         this.hasFXGroupContents = hasSelection;
@@ -134,7 +155,7 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
         //TODO: NOT VIA FILE! VIA STREAM OR STH.
         try {
             this.fileGroupingScheme = new ObjectMapper().readValue(
-                    new File(this.getClass().getResource("/Project/3DSupport/fileGroupingScheme_manual_V4.json").getFile().substring(1)),
+                    new File(this.getClass().getResource("/Project/3DSupport/fileGroupingScheme_manual_V5.json").getFile().substring(1)),
                     FileGroupingScheme.class
             );
             this.anatomicalGroupLevel = 0;
@@ -146,7 +167,29 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
+    }
 
+    public HasFXGroupContentsContainer(HasFXGroupContents hasFXGroupContents) {
+        super(hasFXGroupContents);
+        this.hasFXGroupContents = hasFXGroupContents;
+        this.fileDirs = new ArrayList<>(2);
+        this.resourceLocations = new ArrayList<>(3);
+
+        //TODO: NOT VIA FILE! VIA STREAM OR STH.
+        try {
+            this.fileGroupingScheme = new ObjectMapper().readValue(
+                    new File(this.getClass().getResource("/Project/3DSupport/fileGroupingScheme_manual_V5.json").getFile().substring(1)),
+                    FileGroupingScheme.class
+            );
+            this.anatomicalGroupLevel = 0;
+//            this.fileIDtoColorMapping = new ObjectMapper().readValue(
+//                    new File(this.getClass().getResource("/Project/3DSupport/fileIDtoGroup_perplex_MOD120125.json").getFile().substring(1)),
+//                    new TypeReference<HashMap<String, String>>() {
+//                    }
+//            );
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     /**
@@ -198,10 +241,12 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
     private void loadOBJsMulti(File file, Set<String> whiteList) {
         File[] files = file.listFiles();
         if (files == null) return;
-        Task<List<MeshView>> task = new Task() {
+        Task<List<MeshView>> task = new Task<>() {
+
             @Override
-            protected Object call() throws Exception {
+            protected List<MeshView> call() throws Exception {
                 isLoadingOBJs.set(true);
+                updateMessage("Loading OBJ files...");
                 ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
                 List<Future<MeshView>> meshViewF = new ArrayList<>(files.length);
                 for (File file1 : files) {
@@ -227,7 +272,7 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
         };
 
         task.setOnSucceeded(e -> {
-            logger.log(Level.FINE, "loading OBJs task done");
+            logger.log(Level.CONFIG, "loading OBJs task done");
             hasFXGroupContents.addMeshViews(task.getValue());
             isLoadingOBJs.set(false);
         });
@@ -268,6 +313,7 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
         fileDirs.remove(dir);
 //        removeOBJs(dir);
     }
+
     // THEORETICALLY the location lists could also be sets. BUT if 2 models share the same resource location, then removing one of them
     // would remove the location for both, possibly breaking resource loading (not actually since OBJs are now created only once at
     // startup but still, it would be wrong). leaving it as a list has the advantage that locations will occur as often as the number of models

@@ -24,6 +24,7 @@ module com.anatomyExplorer {
     opens Project.window to javafx.fxml;
     opens Project.window.TreeView.TreeAnalysis.MVPPattern to javafx.fxml;
     opens Project.window.Quiz to javafx.fxml;
+    opens Project.window.Quiz.Generating to javafx.fxml;
 
     exports Project;
     opens Project.window.TreeView.TreeAnalysis to javafx.fxml;

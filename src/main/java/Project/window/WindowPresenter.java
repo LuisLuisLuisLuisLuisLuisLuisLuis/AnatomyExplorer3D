@@ -29,6 +29,7 @@ import Project.window.PopUp.Help;
 import Project.window.PopUp.InfoChart;
 import Project.window.PopUp.LittlePopUp;
 import Project.window.Quiz.*;
+import Project.window.Quiz.Generating.RandomUIQuizGenerator;
 import Project.window.Slicing.Plane;
 import Project.window.SupportingUI.FileExplorerInteraction;
 import Project.window.SupportingUI.TextSearch.SearchTree;
@@ -66,6 +67,7 @@ import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.MenuItem;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.input.*;
 import javafx.scene.layout.VBox;
@@ -79,9 +81,10 @@ import javafx.scene.transform.Translate;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -107,9 +110,6 @@ public class WindowPresenter {
     private final ObservableList<Command> undoList = FXCollections.observableList(new LinkedList<>()); //undo-redo
     private final ObservableList<Command> redoList = FXCollections.observableList(new LinkedList<>());
 
-    private final LinkedList<Long> ramConsumOfCommands = new LinkedList<>();
-    long deltaMemOfLastCommand = 0;
-
     private static final PerspectiveCamera camera = new PerspectiveCamera(true); //camera in 3D view
     private static final Point3D initialCameraPosition = new Point3D(0,-10,-1500);
 
@@ -128,7 +128,7 @@ public class WindowPresenter {
     private final Group contentGroup;   //holds the innerGroup
     private final Group innerGroup;     //holds the meshViews
 
-    private final CamMover camMover = new CamMover(camera); // controls camera movement
+    private final CamMover camMover = new CamMover(camera); // controls camera movement. not actually used anymore since i switched to moving group instead of camera..
     private final Group3DRotation contentGroupRotator;      // implements rotation of the 3D view via rotation of a group
     private final Group3DRotation slicePlaneGroupRotator;   // rotates the slicing plane
     private final SetupMouseRotate3D setupMouseRotate3D;    // uses groupRotater to rotate a group using mouse drag
@@ -196,7 +196,7 @@ public class WindowPresenter {
 
         //initialize the contentGroup via Setup3DSubPane
         LinkedList<Group> outerGroups = Setup3DSubPane.setup3DSubPane(controller.getThreeDPane(), camera, initialCameraPosition);
-        root3d = outerGroups.get(0);    // root3d holds contentGroup.
+        root3d = outerGroups.getFirst();    // root3d holds contentGroup.
                                         // If you want to add more content that is independet from the meshes (i.e. independent from innerGroup),
                                         // add a new group to root3d and put it in there. like for example the slice pane.
                                         // It will not be affected by clearing the view or any rotation, mouse drag etc unless you add that group to
@@ -243,7 +243,7 @@ public class WindowPresenter {
                 getClass().getResource("/Project/anatomy/BodyParts3D_3.0_obj_99")
                 );
 
-        this.models.add(mainModel);
+//        this.models.add(mainModel);
 //        this.models.add(partof_v3);
 //        this.models.add(isa_v3);
 
@@ -280,25 +280,23 @@ public class WindowPresenter {
                 if (isModelUnsaved.get(id).get()) if (r) isModelUnsaved.get(id).set(false);
             }
         });
-        controller.getEnableTreeEditingCheckMenu().selectedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                for (TreeView<ANode> treeView : treeViews) {
-                    Model model = models.stream().filter(m -> m.getName().equals(treeView.getId())).toList().getFirst();
-                    treeViewSetup.setCellFactory(treeView, treeViewEditor, model.getRoot(), newValue);
-                }
+        controller.getEnableTreeEditingCheckMenu().selectedProperty().addListener((observable, oldValue, newValue) -> {
+            for (TreeView<ANode> treeView : treeViews) {
+                Model model = models.stream().filter(m -> m.getName().equals(treeView.getId())).toList().getFirst();
+                treeViewSetup.setCellFactory(treeView, treeViewEditor, model.getRoot(), newValue);
             }
         });
         this.treeEditingEnabled = controller.getEnableTreeEditingCheckMenu().selectedProperty();
 
         controller.getEnableBP3DV3checkMenu().setUserData(false); //a flag to prevent this listener from actioning
-        controller.getEnableBP3DV3checkMenu().selectedProperty().addListener(new ChangeListener<Boolean>() {
+        controller.getEnableBP3DV3checkMenu().selectedProperty().addListener(new ChangeListener<>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 if ((boolean) controller.getEnableBP3DV3checkMenu().getUserData()) return;
                 if (newValue) {
                     if (maxSizeOfUserModels - sizeOfLoadedModels < 430) {
                         LittlePopUp.showMsg("Error", "Not enough RAM to load BP3D 3.0. Disable some other models first.", "Ok");
+                        controller.getEnableBP3DV3checkMenu().setSelected(false);
                         return;
                     }
                     if (!LittlePopUp.showMsg("Disclaimer", """
@@ -379,8 +377,8 @@ public class WindowPresenter {
         //---------------initialize 3D selection model-----------
         threeDSelectionGroup = new SelectionGroup<>("3dSelectionGroup");
         hasInnerGroupSelectedItems = new HasFXGroupSelection(hasInnerGroupContents, "hasInnerGroupSelectedItems");
-        threeDSelectionContainer = new FXGroupSelectionContainer(hasInnerGroupSelectedItems, threeDSelectionGroup);
-//        threeDSelectionGroup.addSelectionContainer(threeDSelectionContainer);
+        threeDSelectionContainer = new FXGroupSelectionContainer(hasInnerGroupSelectedItems);//, threeDSelectionGroup);
+        threeDSelectionGroup.addSelectionContainer(threeDSelectionContainer);
         //-----------------------------------------------
 
 
@@ -408,7 +406,10 @@ public class WindowPresenter {
                 while (c.next()) {
                     if (c.wasAdded()) {
                         for (Node node : c.getAddedSubList()) {
-                            if (node.getId() == null) node.setId("null");
+                            if (node.getId() == null) {
+                                node.setId("null");
+                                logger.log(Level.WARNING, "node with null ID drawn. id set to 'null'");
+                            }
                         }
                     }
                 }
@@ -784,16 +785,16 @@ public class WindowPresenter {
          */
 
 
-        //-----------------setup color picking----------------------
-        controller.getApplyColorButton().setOnAction(e -> {
-            if (!hasInnerGroupSelectedItems.getSelection().isEmpty()) executeCommand(new ColorMeshviewsCommand(controller.getColorPicker().getValue(), new HashSet<>(threeDSelectionGroup.getSelection()), hasInnerGroupContents, threeDSelectionGroup));
-        });
-        controller.getApplyColorButton().disableProperty().bind(Bindings.isEmpty(hasInnerGroupSelectedItems.getSelection()));
-
-        controller.getColorPicker().getCustomColors().add(0, HasFXGroupContentsContainer.DEFAULT_COLOR); // default color
+        //-----------------setup color picking----------------------    for now disabled because it messes with saturation selection effect
+//        controller.getApplyColorButton().setOnAction(e -> {
+//            if (!hasInnerGroupSelectedItems.getSelection().isEmpty()) executeCommand(new ColorMeshviewsCommand(controller.getColorPicker().getValue(), new HashSet<>(threeDSelectionGroup.getSelection()), hasInnerGroupContents, hasInnerGroupSelectedItems));
+//        });
+//        controller.getApplyColorButton().disableProperty().bind(Bindings.isEmpty(hasInnerGroupSelectedItems.getSelection()));
+//
+//        controller.getColorPicker().getCustomColors().add(0, HasFXGroupContentsContainer.DEFAULT_COLOR); // default color
         //---------------------------------------------
 
-        //-------------chooose selection mode-------------------------------------
+        //-------------choose selection mode-------------------------------------
 
         controller.getSaturationStyleCheckMenu().selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
@@ -986,6 +987,36 @@ public class WindowPresenter {
 
 
         //------------------cutting-------------------------
+        controller.getTestPlane().setOnAction(e -> {
+            if (slicePlaneGroup.getChildren().isEmpty()) {
+                if (hasInnerGroupSelectedItems.getSelection().size()!=1) return;
+                MeshView meshView = hasInnerGroupSelectedItems.getSelection().getFirst();
+                Group plane = Plane.makeSlicePlane(30);
+
+                Point3D meshViewSceneCenter = meshView.localToScene(Plane.computeCenter(meshView));
+
+                Point3D localNormal = new Point3D(0, 0, 1);
+                Point3D normalScene =
+                        plane.getLocalToSceneTransform()
+                                .deltaTransform(localNormal)
+                                .normalize();
+
+
+                slicePlaneGroup.getChildren().addAll(plane.getChildren());
+
+                slicePlaneGroup.getTransforms().setAll(contentGroup.getTransforms().getFirst());
+
+                Point3D boxLocalCenter = slicePlaneGroup.getChildren().getFirst().sceneToLocal(meshViewSceneCenter);
+
+                for (Node n : slicePlaneGroup.getChildren()) Group3DRotation.applyTranslate(n, boxLocalCenter, t->false);
+
+            } else {
+                if (!hasInnerGroupSelectedItems.getSelection().isEmpty()) new SliceCommand(List.of(hasInnerGroupSelectedItems.getSelection().getFirst()), innerGroup, (Box) slicePlaneGroup.getChildren().getFirst(), hasInnerGroupContents, threeDSelectionGroup).execute();
+                slicePlaneGroup.getChildren().clear();
+            }
+
+        });
+
         controller.getCutButt().setUserData(false);
         ListChangeListener<Object> setupSlicePlaneListener = new ListChangeListener<>() {
             @Override
@@ -1000,7 +1031,6 @@ public class WindowPresenter {
         controller.getCutButt().setOnAction(e -> {
             boolean isCutting = (boolean) controller.getCutButt().getUserData();
             if (isCutting) {
-                //TODO: cancel
                 controller.getCutButt().setUserData(false);
                 controller.getCutButt().setText("Slice");
                 controller.getCutSelectionButton().setDisable(true);
@@ -1059,26 +1089,78 @@ public class WindowPresenter {
 
         //-------------------------------quiz------------------------------
         controller.getQuizButton().setOnAction(e -> {
-            SimpleMultipleChoice3DQuestion<String, Integer> question1 = new SimpleMultipleChoice3DQuestion<>(Difficulty.EASY, 0, 1, "mandible", List.of("mandible", "left maxilla"), List.of(hasInnerGroupContents.getMeshViewWithID("FJ3375"), hasInnerGroupContents.getMeshViewWithID("FJ3269"), hasInnerGroupContents.getMeshViewWithID("FJ3289")), List.of(hasInnerGroupContents.getMeshViewWithID("FJ3289")), hasInnerGroupContents, hasInnerGroupSelectedItems);
+//
+//            SimpleMultipleChoice3DQuestion<String, Integer> question1 = null;
+//            SimpleSelectIn3DUIQuestion<Integer> question3 = null;
+//            SimpleSelectIn3DUIQuestion<Integer> question31 = null;
+//            SimpleSelectIn3DUIQuestion<Integer> question4 = null;
+//
+//            try {
+//                question1 = new SimpleMultipleChoice3DQuestion<>(
+//                        Difficulty.EASY, 0, 1,
+//                        "brachioradialis",
+//                        List.of("brachioradialis", "extensor carpi radialis brevis", "extensor carpi ulnaris"),
+//                        List.of("FJ1487M", "FJ1489M", "FJ1517M", "FJ1517M", "FJ1517M"),
+//                        List.of("FJ1487M"),
+//                        List.of(mainModel.getFilesDirURL().toURI()));
+//                question3 = new SimpleSelectIn3DUIQuestion<>(
+//                        Difficulty.EASY, 0, 1,
+//                        List.of("FJ3289", "FJ3269"),
+//                        List.of("FJ3375", "FJ3269", "FJ3289"),
+//                        List.of(mainModel.getFilesDirURL().toURI()),
+//                        true
+//                );
+//                question31 = new SimpleSelectIn3DUIQuestion<>(
+//                        Difficulty.EASY, 0, 1,
+//                        List.of("FJ3289", "FJ3269"),
+//                        List.of("FJ3375", "FJ3269", "FJ3289"),
+//                        List.of(mainModel.getFilesDirURL().toURI()),
+//                        true
+//                );
+//                question4 = new SimpleSelectIn3DUIQuestion<>(
+//                        Difficulty.EASY, 0, 1,
+//                        List.of("FJ3427", "FJ1932"),
+//                        List.of("FJ3427", "FJ1932", "FJ3411", "FJ3413"),
+//                        List.of(mainModel.getFilesDirURL().toURI()),
+//                        true
+//                );
+//
+//            } catch (URISyntaxException ex) {
+//                throw new RuntimeException(ex);
+//            }
+//
+//            SimpleMultipleChoiceUIQuestion<String, Integer> question2 = new SimpleMultipleChoiceUIQuestion<String, Integer>(
+//                    Difficulty.EASY, 0,1,
+//                    List.of("yess", "maybe"),
+//                    List.of("yess", "noo", "maybe"),
+//                    false);
+//
+//            question1.setName("Question 1");
+//            question1.setInstructions("What is the highlighted anatomical structure called?");
+//            question2.setName("Question 2");
+//            question2.setInstructions("Choose yes and maybe");
+//            question3.setName("Question 3");
+//            question3.setInstructions("Select the mandible and left maxilla");
+//            question31.setName("Question 3");
+//            question31.setInstructions("Select the mandible and left maxilla");
+//            question4.setName("Question 4");
+//            question4.setInstructions("Select the descending aorta i think");
+//            List<UIQuestion<?, Integer>> list = new LinkedList<>();
+//            list.add(question1);
+//            list.add(question2);
+//            list.add(question3);
+//            list.add(question31);
+//            list.add(question4);
+//
+//            UIQuiz<Integer> quiz3 = new UIQuizInt(list, true, true);//, 5, TimeUnit.MINUTES);
+//            quiz3.start();
 
-            SimpleMultipleChoiceUIQuestion<String, Integer> question2 = new SimpleMultipleChoiceUIQuestion<String, Integer>(
-                    Difficulty.EASY, 0,1,List.of("yess", "maybe"), List.of("yess", "noo", "maybe"), false
-            );
-            question1.setName("Question 1");
-            question1.setInstructions("Choose the right item");
-            question2.setName("Question 2");
-            question2.setInstructions("Choose the right item");
-
-            List<UIQuestion<?, Integer>> list = new LinkedList<>();
-            list.add(question1);
-            list.add(question2);
-
-            UIQuiz<Integer> quiz3 = new UIQuizInt(list, true, true);//, 5, TimeUnit.MINUTES);
 //            UIQuiz<Integer> quiz = new UIQuizInt(List.of(question1, question2), true, true);
 //            UIQuiz<Integer> quiz2 = new UIQuizInt(List.of(question1, question2), false, false);
 //            UIQuiz<Integer> quiz4 = new UIQuizInt(List.of(question1, question2), true, false);
-            quiz3.start();
 
+            RandomUIQuizGenerator r = new RandomUIQuizGenerator(models);
+            r.addOnCreateRunnable(() -> {r.getIntegerUIQuiz().start();});
 
 
 //            question.setName("Question 1");
@@ -1401,7 +1483,7 @@ public class WindowPresenter {
         TreeView<ANode> treeView = new TreeView<>();
         treeView.setId(model.getName());
         treeViewSetup.setupTree(treeView, model.getRoot(), this.treeEditingEnabled.get());
-        TreeViewSelectionContainer treeViewSelectionContainer = new TreeViewSelectionContainer(new HasTreeView<ANode>(treeView), this.treeViewSelectionGroup);
+        TreeViewSelectionContainer treeViewSelectionContainer = new TreeViewSelectionContainer(new HasTreeView<ANode>(treeView));//, this.treeViewSelectionGroup);
         this.treeViewSelectionGroup.addSelectionContainer(treeViewSelectionContainer);
         this.treeViewSelectionContainers.add(treeViewSelectionContainer);
         this.selectionMediatorTree3D_Selection.addRoot(model.getRoot());
@@ -1518,21 +1600,34 @@ public class WindowPresenter {
      * Remove the model and also all of its 3D stuff that is currently drawn.
      */
     private class RemoveModelCommand implements Command {
-        private final List<Model> models;
-        private final Set<String> meshViewIDsToRemove;  //meshviews that need to be undrawn when the model is removed
+        private final List<Model> modelsToRm;
+        private Set<String> meshViewIDsToRemove;  //meshviews that need to be undrawn when the model is removed
         private RememberHasFXGroupContents rememberFXGroupContents;
         private RememberFXMeshViewColors rememberFXMeshViewColors;
-        private final List<ContextMenu> contextMenus;
-        public List<String> getModelIDs() {return models.stream().map(Model::getName).toList();}
-        private final boolean[] isUnsaved;  //remember if any model has unsaved changed.
+        private List<ContextMenu> contextMenus;
+        public List<String> getModelIDs() {return modelsToRm.stream().map(Model::getName).toList();}
+        private boolean[] isUnsaved;  //remember if any model has unsaved changed.
 
         public RemoveModelCommand(List<Model> modelsToRm) {
-            this.models = modelsToRm;
+            this.modelsToRm = modelsToRm;
             this.contextMenus = new ArrayList<>(modelsToRm.size());
             this.meshViewIDsToRemove = new HashSet<>();
             this.isUnsaved = new boolean[modelsToRm.size()];
+
+            logger.log(Level.CONFIG, "meshviewIDsToRemove after: " + meshViewIDsToRemove);
+        }
+
+        public RemoveModelCommand(Model model) {
+            this(List.of(model));
+        }
+
+        @Override
+        public void execute() {
+            this.contextMenus.clear();
+            this.meshViewIDsToRemove.clear();
+
             int i = 0;
-            for (Model model : modelsToRm) {
+            for (Model model : this.modelsToRm) {
                 TreeView<ANode> modelTreeView = treeViews.stream().filter(treeView -> treeView.getId().equals(model.getName())).toList().getFirst();
                 TreeViewSelectionContainer modelTreeViewSelectionContainer = treeViewSelectionContainers.stream().filter(treeViewSelectionContainer -> treeViewSelectionContainer.getId().equals(model.getName())).toList().get(0);
                 meshViewIDsToRemove.addAll(selectionMediatorTree_3D_Content.transformAselectionToBSelection(
@@ -1541,12 +1636,13 @@ public class WindowPresenter {
                                         TreeAnalysisUtils.accumulateForEveryNodeBelow(modelTreeView.getRoot(), treeItem -> treeItem)))));
                 Tab tab_ = null;
                 for (Tab tab : tabs) {
-                    if (tab.getText().equals(model.getName())) {contextMenus.add(tab.getContextMenu()); tab_ = tab; break;}
+                    if (tab.getText().equals(model.getName())) {this.contextMenus.add(tab.getContextMenu()); tab_ = tab; break;}
                 }
-                if (tab_ == null) contextMenus.add(null);
+                if (tab_ == null) this.contextMenus.add(null);
 
                 isUnsaved[i] = isModelUnsaved.get(model.getName()).get();
             }
+            logger.log(Level.CONFIG, "meshviewIDsToRemove before: " + meshViewIDsToRemove);
             Collection<String> modelsToRMNames = modelsToRm.stream().map(Model::getName).toList();
             for (TreeView<ANode> treeView : treeViews) {
                 if (modelsToRMNames.contains(treeView.getId())) continue;
@@ -1559,26 +1655,22 @@ public class WindowPresenter {
                 });
             }
 
-        }
-        public RemoveModelCommand(Model model) {this(List.of(model));}
-
-        @Override
-        public void execute() {
             this.rememberFXGroupContents = new RememberHasFXGroupContents(hasInnerGroupContents);
-            this.rememberFXMeshViewColors = new RememberFXMeshViewColors(meshViewIDsToRemove, hasInnerGroupContents, threeDSelectionGroup);
+            this.rememberFXMeshViewColors = new RememberFXMeshViewColors(meshViewIDsToRemove, hasInnerGroupContents, hasInnerGroupSelectedItems);
             threeDContentGroup.changeSelection(meshViewIDsToRemove, false, true);
-            for (Model model : models) {forgetModel(model);}
+            for (Model model : modelsToRm) {forgetModel(model);}
         }
         @Override
         public void undo() {
             SimpleIntegerProperty count = new SimpleIntegerProperty(0);
-            for (int m = 0; m < models.size(); m++) {
-                Model model = models.get(m);
+            for (int m = 0; m < modelsToRm.size(); m++) {
+                Model model = modelsToRm.get(m);
                 loadModel(model, contextMenus.get(m));
                 isModelUnsaved.get(model.getName()).set(this.isUnsaved[m]);
                 count.set(count.getValue()+1);
             }
-            // this is necessary because loadModel() causes HasFXGroupContentsContainer to create MeshViews in a diff Thread
+
+            // getIsLoadingOBJs() is necessary because loadModel() causes HasFXGroupContentsContainer to create MeshViews in a diff Thread
             // before making them drawable by HasFXGroupContents. But bcuz that happens on a diff thread, the FXThread moves on and
             // would like to immediately call restoreSelection(), even tho the MeshViews needed haven't been created yet.
             // -> need to wait.
@@ -1590,7 +1682,7 @@ public class WindowPresenter {
                 hasTheeDContentsContainer.getIsLoadingOBJs().addListener(new ChangeListener<Boolean>() {
                     @Override
                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                        if (!newValue && count.get() == models.size()) {
+                        if (!newValue && count.get() == modelsToRm.size()) {
                             rememberFXGroupContents.restoreSelection();
                             rememberFXMeshViewColors.restoreSelection();
                         }
@@ -1663,14 +1755,16 @@ public class WindowPresenter {
 
         @Override
         public void execute() {
-            super.execute();
+//            super.execute();
             TreeView<ANode> mainModelTreeView = null;
             for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
             if (mainModelTreeView == null) return;
             EnableDisableBP3DV3Parts.removeV3FilesFromTree(mainModelTreeView.getRoot());
-
             selectionMediatorTree3D_Selection.reloadDicts();
             selectionMediatorTree_3D_Content.reloadDicts();
+
+            super.execute();
+
         }
 
         @Override
@@ -1797,11 +1891,12 @@ public class WindowPresenter {
 
     /**
      * Binds the blocking, progress showing UI to a Task.
-     * Does NOT schedule or run or cancel the task.
+     * !!!!!!Does NOT schedule or run or cancel the task.
      * @param task The task
      * @param knowsProgress Can the task report progress or is progress indetermined?
      */
     private <T> void bindBlockingProgress(Task<T> task, boolean knowsProgress) {
+        logger.log(Level.CONFIG, "binding task. " + task.getMessage());
         Function<Boolean, Boolean> blockingEffect = new Function<Boolean, Boolean>() {
             @Override
             public Boolean apply(Boolean flag) {
@@ -1813,7 +1908,6 @@ public class WindowPresenter {
                 else blockingVBox.removeEventFilter(KeyEvent.ANY, Event::consume);
 
                 controller.getMainBorderpain().setEffect(flag ? new GaussianBlur(10) : null);
-
                 return null;
             }
         };
