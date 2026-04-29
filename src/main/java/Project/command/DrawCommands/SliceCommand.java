@@ -18,6 +18,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SliceCommand implements Command {
@@ -32,6 +33,19 @@ public class SliceCommand implements Command {
 
     private final HasFXGroupContents hasFXGroupContents;
     private final SelectionGroup<String> threeDSelectionGroup;
+
+    private Function<Task<Boolean>, Object> handleSlicingTask = null;
+
+    /**
+     * Set a function to handle the Task of loading OBJ files. For example to put it on a new Thread or to bind UI to the task.<P>
+     *     If set, this class WILL NOT run() the task anymore! This must be done by the provided function.
+     * <P>
+     *     The task updates progress and has a message.
+     * @param handleSlicingTask a function that accepts the task. Set to null to make this class run tasks again itself (not on a new Thread).
+     */
+    public void setHandleSlicingTask(Function<Task<Boolean>, Object> handleSlicingTask) {
+        this.handleSlicingTask = handleSlicingTask;
+    }
 
     /**
      * Relies on every MeshView having a unique, consistent ID. Requires that when a MeshView is replaced by a new identical MeshView,
@@ -154,7 +168,8 @@ public class SliceCommand implements Command {
         meshesToSet.clear();
         modMeshesToRemoveFully.clear();
 
-        WindowPresenter.getWindowPresenter().runBlockingTask(task, true);
+        if (handleSlicingTask != null) handleSlicingTask.apply(task);
+        else task.run();
 
     }
 

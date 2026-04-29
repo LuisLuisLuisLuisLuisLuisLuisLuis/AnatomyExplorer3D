@@ -28,7 +28,6 @@ import Project.window.PopUp.About;
 import Project.window.PopUp.Help;
 import Project.window.PopUp.InfoChart;
 import Project.window.PopUp.LittlePopUp;
-import Project.window.Quiz.*;
 import Project.window.Quiz.Generating.RandomUIQuizGenerator;
 import Project.window.Slicing.Plane;
 import Project.window.SupportingUI.FileExplorerInteraction;
@@ -81,7 +80,6 @@ import javafx.scene.transform.Translate;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.List;
@@ -369,6 +367,7 @@ public class WindowPresenter {
         this.hasInnerGroupContents = new HasFXGroupContents(innerGroup, "hasinnergroupMeshes");
         this.threeDContentGroup = new SelectionGroup<String>("3dContentGroup");
         this.hasTheeDContentsContainer = new HasFXGroupContentsContainer(hasInnerGroupContents); //, new String[]{isAFilesLocation.getValue().getAbsolutePath(), partOfFilesLocation.getValue().getAbsolutePath()}
+        this.hasTheeDContentsContainer.setHandleLoadingTask((task) -> {this.runBlockingTask(task, true); return null;});
         this.hasInnerGroupContents.setHasFXGroupContentsContainer(hasTheeDContentsContainer);
         threeDContentGroup.addSelectionContainer(hasTheeDContentsContainer);
         //---------------------------
@@ -1009,9 +1008,12 @@ public class WindowPresenter {
                 Point3D boxLocalCenter = slicePlaneGroup.getChildren().getFirst().sceneToLocal(meshViewSceneCenter);
 
                 for (Node n : slicePlaneGroup.getChildren()) Group3DRotation.applyTranslate(n, boxLocalCenter, t->false);
+                Group3DRotation.applyGlobalRotation(slicePlaneGroup, new Point3D(1,0,0), 90);
 
             } else {
-                if (!hasInnerGroupSelectedItems.getSelection().isEmpty()) new SliceCommand(List.of(hasInnerGroupSelectedItems.getSelection().getFirst()), innerGroup, (Box) slicePlaneGroup.getChildren().getFirst(), hasInnerGroupContents, threeDSelectionGroup).execute();
+                SliceCommand sliceCommand = new SliceCommand(List.of(hasInnerGroupSelectedItems.getSelection().getFirst()), innerGroup, (Box) slicePlaneGroup.getChildren().getFirst(), hasInnerGroupContents, threeDSelectionGroup);
+                sliceCommand.setHandleSlicingTask(task -> {runBlockingTask(task, true); return null;});
+                if (!hasInnerGroupSelectedItems.getSelection().isEmpty()) sliceCommand.execute();
                 slicePlaneGroup.getChildren().clear();
             }
 
@@ -1047,40 +1049,40 @@ public class WindowPresenter {
             }
         });
         //cutSelectionButton will store the last clicked MenuItem under UserData.
-        //Thats what fires when the button is clicked. 'All' is the default behaviour.
+        //That's what fires when the button is clicked. 'All' is the default behaviour.
         controller.getCutSelectionButton().setUserData(controller.getCutSelectionButton().getItems().getFirst());
         controller.getCutSelectionButton().setOnAction(e -> {
             ((MenuItem) controller.getCutSelectionButton().getUserData()).fire();    //fire the menuItem stored in UserData
         });
         // Set the default action and text after the user cut something
-        Function<MenuItem, Boolean> postCutEvent = new Function<MenuItem, Boolean>() {
-            @Override
-            public Boolean apply(MenuItem menuItem) {
-                controller.getCutSelectionButton().setUserData(menuItem);
-                controller.getCutSelectionButton().setText(menuItem.getText());
-                controller.getCutSelectionButton().setDisable(true);
-                controller.getCutButt().setUserData(false);
-                controller.getCutButt().setText("Cut");
-                slicePlaneGroup.getChildren().clear();
-                hasInnerGroupContents.getSelection().removeListener(setupSlicePlaneListener);
-                hasInnerGroupSelectedItems.clearSelection();
-                return true;
-            }
+        Function<MenuItem, Boolean> postCutEvent = menuItem -> {
+            controller.getCutSelectionButton().setUserData(menuItem);
+            controller.getCutSelectionButton().setText(menuItem.getText());
+            controller.getCutSelectionButton().setDisable(true);
+            controller.getCutButt().setUserData(false);
+            controller.getCutButt().setText("Cut");
+            slicePlaneGroup.getChildren().clear();
+            hasInnerGroupContents.getSelection().removeListener(setupSlicePlaneListener);
+            hasInnerGroupSelectedItems.clearSelection();
+            return true;
         };
 
         //actions for the menuitems
         controller.getCutAllMenuItem().setOnAction(e -> {
             LinkedList<MeshView> meshViews = new LinkedList<>();
             for (MeshView node : hasInnerGroupContents.getSelection()) if (node != null) meshViews.add(node);
-            executeCommand(new SliceCommand(meshViews, innerGroup, (Box) slicePlaneGroup.getChildren().getFirst(), hasInnerGroupContents, threeDSelectionGroup));
+            SliceCommand sliceCommand = new SliceCommand(meshViews, innerGroup, (Box) slicePlaneGroup.getChildren().getFirst(), hasInnerGroupContents, threeDSelectionGroup);
+            sliceCommand.setHandleSlicingTask(task -> {runBlockingTask(task, true); return null;});
+            executeCommand(sliceCommand);
             postCutEvent.apply(controller.getCutAllMenuItem());
         });
         controller.getCutSelectedMenuItem().setOnAction(e -> {
             if (hasInnerGroupSelectedItems.getSelection().isEmpty()) return;
-            System.out.println("cut selected");
             LinkedList<MeshView> meshViews = new LinkedList<>();
-            for (Node node : hasInnerGroupSelectedItems.getSelection()) if (node instanceof MeshView) meshViews.add((MeshView) node);
-            executeCommand(new SliceCommand(meshViews, innerGroup, (Box) slicePlaneGroup.getChildren().getFirst(), hasInnerGroupContents, threeDSelectionGroup));
+            for (MeshView node : hasInnerGroupSelectedItems.getSelection()) if (node != null) meshViews.add(node);
+            SliceCommand sliceCommand = new SliceCommand(meshViews, innerGroup, (Box) slicePlaneGroup.getChildren().getFirst(), hasInnerGroupContents, threeDSelectionGroup);
+            sliceCommand.setHandleSlicingTask(task -> {runBlockingTask(task, true); return null;});
+            executeCommand(sliceCommand);
             postCutEvent.apply(controller.getCutSelectedMenuItem());
         });
 

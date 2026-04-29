@@ -4,7 +4,6 @@ import Project.SelectionModel.SelectionContainer;
 import Project.SelectionModel.SelectionGroup;
 import Project.window.ThreeDPaneHandling.Coloring.FileGroupingScheme;
 import Project.window.ThreeDPaneHandling.OBJFile.OpenOBJ;
-import Project.window.WindowPresenter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
@@ -22,6 +21,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -231,12 +231,25 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
     }
 
 
-    private SimpleBooleanProperty isLoadingOBJs = new SimpleBooleanProperty(false);
+    private final SimpleBooleanProperty isLoadingOBJs = new SimpleBooleanProperty(false);
 
     /**
      * @return Are there OBJs being loaded on a different thread right now?
      */
     public SimpleBooleanProperty getIsLoadingOBJs() {return isLoadingOBJs;}
+
+    private Function<Task<List<MeshView>>, Object> handleLoadingTask = null;
+
+    /**
+     * Set a function to handle the Task of loading OBJ files. For example to put it on a new Thread or to bind UI to the task.<P>
+     *     If set, this class WILL NOT run() the task anymore! This must be done by the provided function.
+     * <P>
+     *     The task updates progress and has a message.
+     * @param handleLoadingTask a function that accepts the task. Set to null to make this class run tasks again itself (not on a new Thread).
+     */
+    public void setHandleLoadingTask(Function<Task<List<MeshView>>, Object> handleLoadingTask) {
+        this.handleLoadingTask = handleLoadingTask;
+    }
 
     private void loadOBJsMulti(File file, Set<String> whiteList) {
         File[] files = file.listFiles();
@@ -277,7 +290,8 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
             isLoadingOBJs.set(false);
         });
 
-        WindowPresenter.getWindowPresenter().runBlockingTask(task, true);
+        if (handleLoadingTask != null) handleLoadingTask.apply(task);
+        else task.run();
     }
 
     private void loadOBJs(File file, Set<String> whiteList) {
