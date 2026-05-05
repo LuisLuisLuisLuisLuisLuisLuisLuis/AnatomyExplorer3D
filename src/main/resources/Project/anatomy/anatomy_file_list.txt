@@ -400,71 +400,6 @@ FMA68231	left anterior basal segmental bronchial tree	FJ2536
 FMA68230	left medial basal segmental bronchial tree	FJ2537
 FMA68230	left medial basal segmental bronchial tree	FJ2442
 FMA7396	left main bronchus	FJ2450
-FMA45623	systemic arterial system	FJ2649
-FMA45623	systemic arterial system	FJ2648
-FMA45623	systemic arterial system	FJ2645
-FMA45623	systemic arterial system	FJ2722
-FMA45623	systemic arterial system	FJ2644
-FMA45623	systemic arterial system	FJ2721
-FMA45623	systemic arterial system	FJ2647
-FMA45623	systemic arterial system	FJ2646
-FMA45623	systemic arterial system	FJ2723
-FMA45623	systemic arterial system	FJ2641
-FMA45623	systemic arterial system	FJ2640
-FMA45623	systemic arterial system	FJ2643
-FMA45623	systemic arterial system	FJ2720
-FMA45623	systemic arterial system	FJ2642
-FMA45623	systemic arterial system	FJ2418
-FMA45623	systemic arterial system	FJ2737
-FMA45623	systemic arterial system	FJ2656
-FMA45623	systemic arterial system	FJ2699
-FMA45623	systemic arterial system	FJ2696
-FMA45623	systemic arterial system	FJ2652
-FMA45623	systemic arterial system	FJ2695
-FMA45623	systemic arterial system	FJ2651
-FMA45623	systemic arterial system	FJ2698
-FMA45623	systemic arterial system	FJ2654
-FMA45623	systemic arterial system	FJ2697
-FMA45623	systemic arterial system	FJ2653
-FMA45623	systemic arterial system	FJ2692
-FMA45623	systemic arterial system	FJ2694
-FMA45623	systemic arterial system	FJ2650
-FMA45623	systemic arterial system	FJ2693
-FMA45623	systemic arterial system	FJ2429
-FMA45623	systemic arterial system	FJ2425
-FMA45623	systemic arterial system	FJ2667
-FMA45623	systemic arterial system	FJ2700
-FMA45623	systemic arterial system	FJ2426
-FMA45623	systemic arterial system	FJ2668
-FMA45623	systemic arterial system	FJ2420
-FMA45623	systemic arterial system	FJ2422
-FMA45623	systemic arterial system	FJ2719
-FMA45623	systemic arterial system	FJ2718
-FMA45623	systemic arterial system	FJ2638
-FMA45623	systemic arterial system	FJ2715
-FMA45623	systemic arterial system	FJ2637
-FMA45623	systemic arterial system	FJ2714
-FMA45623	systemic arterial system	FJ2717
-FMA45623	systemic arterial system	FJ2639
-FMA45623	systemic arterial system	FJ2716
-FMA45623	systemic arterial system	FJ2634
-FMA45623	systemic arterial system	FJ2435
-FMA45623	systemic arterial system	FJ2677
-FMA45623	systemic arterial system	FJ2633
-FMA45623	systemic arterial system	FJ2438
-FMA45623	systemic arterial system	FJ2636
-FMA45623	systemic arterial system	FJ2635
-FMA45623	systemic arterial system	FJ2432
-FMA45623	systemic arterial system	FJ2674
-FMA45623	systemic arterial system	FJ2431
-FMA45623	systemic arterial system	FJ2673
-FMA45623	systemic arterial system	FJ2676
-FMA45623	systemic arterial system	FJ2632
-FMA45623	systemic arterial system	FJ2675
-FMA45623	systemic arterial system	FJ2631
-FMA45623	systemic arterial system	FJ2670
-FMA45623	systemic arterial system	FJ2672
-FMA45623	systemic arterial system	FJ2671
 FMA3768	aortic arch	FJ3411
 FMA14177	bronchial branch of aortic arch	FJ3418
 FMA4694	left subclavian artery	FJ3479
@@ -1750,7 +1685,6 @@ FMA71887	lateral superior tributary of left hepatic biliary tree	FJ3088
 FMA15745	hepatovenous segment vii	FJ1858
 FMA15744	hepatovenous segment vi	FJ2822
 FMA15746	hepatovenous segment viii	FJ2824
-FMA15746	hepatovenous segment viii	FJ2823
 FMA15743	hepatovenous segment v	FJ2821
 FMA13365	caudate lobe of liver	FJ2816
 FMA76903	left duct of caudate lobe of liver	FJ3094

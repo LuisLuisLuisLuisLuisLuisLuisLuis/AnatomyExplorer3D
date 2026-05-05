@@ -1,4 +1,6 @@
-package Project.window.Quiz;
+package Project.window.Quiz.Question;
+
+import Project.window.Quiz.Difficulty;
 
 import java.util.logging.Logger;
 

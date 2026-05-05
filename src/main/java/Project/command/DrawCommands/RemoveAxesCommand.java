@@ -1,6 +1,6 @@
 package Project.command.DrawCommands;
 
-import Project.window.ThreeDPaneHandling.Axes;
+import Project.window.ThreeDPaneHandling.Objects.Axes;
 import javafx.scene.Group;
 
 public class RemoveAxesCommand extends GroupCommand {

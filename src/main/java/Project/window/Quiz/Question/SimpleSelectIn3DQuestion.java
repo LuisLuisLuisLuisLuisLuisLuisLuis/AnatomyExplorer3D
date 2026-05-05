@@ -1,5 +1,6 @@
-package Project.window.Quiz;
+package Project.window.Quiz.Question;
 
+import Project.window.Quiz.Difficulty;
 import Project.window.ThreeDPaneHandling.ThreeDGroupHandler;
 import javafx.scene.Node;
 
@@ -8,7 +9,7 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 
-public abstract class SimpleSelectIn3DQuestion<S extends Comparable<S>> extends SimpleMultipleChoiceQuestion<Node, String, S> implements Needs3DAccess{
+public abstract class SimpleSelectIn3DQuestion<S extends Comparable<S>> extends SimpleMultipleChoiceQuestion<Node, String, S> implements Needs3DAccess {
 
     protected ThreeDGroupHandler threeDGroupHandler;
 
@@ -28,7 +29,7 @@ public abstract class SimpleSelectIn3DQuestion<S extends Comparable<S>> extends 
      * @param idsToDraw IDs of MeshViews that will be drawn upon calling ask()
      * @param resourceLocations
      */
-    public SimpleSelectIn3DQuestion(Difficulty difficulty, S minScore, S maxScore, List<String> correctAnswer,List<String> idsToDraw, List<URI> resourceLocations) {
+    public SimpleSelectIn3DQuestion(Difficulty difficulty, S minScore, S maxScore, List<String> correctAnswer, List<String> idsToDraw, List<URI> resourceLocations) {
         super(difficulty, minScore, maxScore, correctAnswer, idsToDraw);
         this.idsToDraw = idsToDraw;
         this.resourceLocations = resourceLocations;

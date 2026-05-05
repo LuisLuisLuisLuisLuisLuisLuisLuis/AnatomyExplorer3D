@@ -1,7 +1,8 @@
-package Project.window.Quiz;
+package Project.window.Quiz.Question;
 
 import Project.command.DrawCommands.ColorMeshviewsCommand;
 import Project.window.PopUp.LegendItem;
+import Project.window.Quiz.Difficulty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Orientation;
@@ -9,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
+import javafx.scene.control.ToolBar;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.MeshView;
@@ -82,6 +84,7 @@ public class SimpleSelectIn3DUIQuestion<S extends Comparable<S>> extends SimpleS
             }
         }
         feedbackBox.setVisible(true);
+        threeDGroupHandler.getHasFXGroupSelection().clearSelection();
     }
 
 
@@ -153,15 +156,22 @@ public class SimpleSelectIn3DUIQuestion<S extends Comparable<S>> extends SimpleS
             submit(correctAnswer);
             // at this point, there is no submit button anymore -> user cannot work on this question.
         }
-        this.threeDGroupHandler.resetModifiables();
+        this.threeDGroupHandler.hardViewReset();
         this.threeDGroupHandler.getHasFXGroupSelection().clearSelection();
         this.threeDGroupHandler.getHasFXGroupContents().setSelection(toDraw);
+        this.threeDGroupHandler.defaultMeshes();
         this.threeDGroupHandler.setClickSelectable(true);
         for (String id : this.colorMapping.keySet()) {
             logger.log(Level.CONFIG, "trying to re-color " + id + " " + this.colorMapping.get(id));
             new ColorMeshviewsCommand(this.colorMapping.get(id), Set.of(id), threeDGroupHandler.getHasFXGroupContents(), threeDGroupHandler.getHasFXGroupSelection()).execute();
         }
         generateUI();
+        Button resetViewButton = new Button("Reset View and Colors");
+        resetViewButton.setOnAction(e -> {
+            threeDGroupHandler.resetView();
+            threeDGroupHandler.resetColors();
+        });
+        uiRoot.setBottom(new ToolBar(resetViewButton));
         return this.uiRoot;
     }
 

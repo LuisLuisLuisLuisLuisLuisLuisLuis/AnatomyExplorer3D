@@ -39,6 +39,13 @@ public class SetupMouseRotate3D {
      */
     private SimpleObjectProperty<Point3D> pivot = new SimpleObjectProperty<>(new Point3D(0,0,0));
 
+    /**
+     Pivot around which all groups rotate. It is the pivot of the first of the groups so that all rotation occurs around the same pivot.
+     */
+    public Point3D getPivot() {
+        return pivot.get();
+    }
+
     public SetupMouseRotate3D(Pane pane, Group[] groups) {
         this.groups = groups;
         setup(pane, groups);
@@ -63,7 +70,6 @@ public class SetupMouseRotate3D {
             xSave = xPrev;
             ySave = yPrev;
             this.stopContinuousRotation();
-            //if (continuousRotator != null) continuousRotator.stop();
         });
 
 
@@ -73,7 +79,6 @@ public class SetupMouseRotate3D {
 
             //implement continous rotation animation if keys are pressed
             if (e.isControlDown() && e.isShiftDown()) {
-                //if (this.continuousRotator != null) this.continuousRotator.stop(); // restart if running
                 this.stopContinuousRotation();
                 //start a new continuous rotation using the axis the user is currently rotating with
                 //as speed of rotation, use the distance the user has dragged the mouse
@@ -82,8 +87,6 @@ public class SetupMouseRotate3D {
                     this.continuousRotators.add(new ContinuousRotator(group, axis, Math.sqrt(Math.pow(xSave - xPrev, 2) + Math.pow(ySave - yPrev, 2)), pivot));
                     this.continuousRotators.getLast().start();
                 }
-//                this.continuousRotator =
-//                this.continuousRotator.start();
             }
         });
 
@@ -104,7 +107,6 @@ public class SetupMouseRotate3D {
     }
     public void stopContinuousRotation() {
         for (ContinuousRotator continuousRotator : continuousRotators) continuousRotator.stop();
-        //if (continuousRotator != null) continuousRotator.stop();
     }
 
     public static class RememberRotation {

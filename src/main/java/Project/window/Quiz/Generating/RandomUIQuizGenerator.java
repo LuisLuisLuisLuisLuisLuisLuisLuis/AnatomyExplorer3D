@@ -4,6 +4,8 @@ import Project.model.ANode;
 import Project.model.Model;
 import Project.window.PopUp.LittlePopUp;
 import Project.window.Quiz.*;
+import Project.window.Quiz.Question.*;
+import Project.window.Slicing.Plane;
 import Project.window.SupportingUI.ReusableUIComponent;
 import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
@@ -54,12 +56,16 @@ public class RandomUIQuizGenerator {
      */
     public UIQuiz<Integer> getIntegerUIQuiz() {return integerUIQuiz;}
 
+    private final Random random;
+
     /**
      * @param fromModels Models from which the Quiz is to be generated.
      */
     public RandomUIQuizGenerator(List<Model> fromModels) {
 
         RandomUIQuizGeneratorView randomUIQuizGeneratorView = null;
+        this.random = new Random();
+
         try {
              randomUIQuizGeneratorView = new RandomUIQuizGeneratorView();
         } catch (IOException e) {
@@ -67,6 +73,7 @@ public class RandomUIQuizGenerator {
             LittlePopUp.showMsg("Error", "Failed to start quiz generator", "OK");
             return;
         }
+
         QuizPropertyChooserController controller = randomUIQuizGeneratorView.getController();
         Scene scene = LittlePopUp.showPopup(randomUIQuizGeneratorView.getRoot(), "Choose quiz properties", 700,500);
 
@@ -76,10 +83,10 @@ public class RandomUIQuizGenerator {
             // Allow empty field (so user can delete)
             if (newText.isEmpty()) {return change;}
             try {
-                // only 1-100 questions allowed
+                // only 1-30 questions allowed
                 int value = Integer.parseInt(newText);
 
-                if (value > 0 && value < 101) return change;
+                if (value > 0 && value < 31) return change;
 
             } catch (NumberFormatException ignored) {} // only numbers allowed
 
@@ -144,15 +151,16 @@ public class RandomUIQuizGenerator {
             TreeView<ANode> treeView = new TreeView<>();
             treeViewSetup.setupTree(treeView, model.getRoot(), false);
             treeViews.add(treeView);
+            treeView.setId(model.getName());
         }
 
         controller.getAddTreeItemButton().setOnAction(e -> {
-            LittlePopUp.SelectTreeItemResult pickTreeItemResult = LittlePopUp.selectTreeItemDialog(treeViews.stream().map(TreeView::getRoot).toList(), fromModels.stream().map(Model::getName).toList(), "Select a TreeItem", "Select a subtree from which the quiz will be generated.");
-            if (selectTreeItemResults.contains(pickTreeItemResult)) return;
+            LittlePopUp.SelectTreeItemResult pickTreeItemResult = LittlePopUp.selectTreeItemDialog(treeViews.stream().map(TreeView::getRoot).toList(), fromModels.stream().map(Model::getName).toList(), "Select a TreeItem", "Select a subtree from which the quiz will be generated:");
+            if (selectTreeItemResults.contains(pickTreeItemResult) || pickTreeItemResult == null || pickTreeItemResult.result() == null) return;
             selectTreeItemResults.add(pickTreeItemResult);
         });
 
-        controller.getTreeItemDisplayScrollpane().maxWidthProperty().bind(controller.getTreeItemChoosingToolbar().widthProperty().multiply(0.8));   // otherwise it will grow so large it will be clipped
+        controller.getTreeItemDisplayScrollpane().maxWidthProperty().bind(controller.getTreeItemChoosingToolbar().widthProperty().multiply(0.7));   // otherwise it will grow so large it will be clipped
 
 
         controller.getAcceptButton().setOnAction(e -> {
@@ -177,8 +185,8 @@ public class RandomUIQuizGenerator {
                 case 300 -> Difficulty.MEDIUM;
                 case 400 -> Difficulty.HARD;
                 case 500 -> Difficulty.VERY_HARD;
-                default -> new Difficulty((int) controller.getDifficultySlider().getValue(), "Custom: " + controller.getDifficultySlider().getValue());
-                    };
+                default -> new Difficulty((int) controller.getDifficultySlider().getValue(), "Custom: " + (int) controller.getDifficultySlider().getValue());
+            };
             int time = controller.getTimeUnitChoiceBox().getValue().equals("No Limit") ? -1 : Integer.parseInt(controller.getTimeTextField().getText());
             TimeUnit timeUnit = switch (controller.getTimeUnitChoiceBox().getValue()) {
                 case "Hours" -> TimeUnit.HOURS;
@@ -189,7 +197,114 @@ public class RandomUIQuizGenerator {
             onCreate();
         });
 
+        // find treeItems of aorta, vena cava
+        for (Model model : fromModels) {
+            if (model.getName().equals("anatomy")) {
+                logger.log(Level.CONFIG, "main model exists");
+                List<TreeView<ANode>> mainTreeViewMaybe = treeViews.stream().filter(t -> t.getId().equals("anatomy")).toList();
+                if (mainTreeViewMaybe.isEmpty()) break;
+                logger.log(Level.CONFIG, "treeview of main model exists");
+                //setting some of the needed treeItems
 
+                ANode aortaANode = TreeAnalysisUtils.getANodeWithName("aorta", model.getRoot());
+                ANode supVenaCavaANode = TreeAnalysisUtils.getANodeWithName("superior vena cava", model.getRoot());
+                ANode infVenaCavaANode = TreeAnalysisUtils.getANodeWithName("inferior vena cava", model.getRoot());
+                ANode respiratoryANode = TreeAnalysisUtils.getANodeWithName("respiratory system", model.getRoot());
+                ANode linfPulmVeinNode = TreeAnalysisUtils.getANodeWithName("left inferior pulmonary vein", model.getRoot());
+                ANode rinfPulmVeinNode = TreeAnalysisUtils.getANodeWithName("right inferior pulmonary vein", model.getRoot());
+                ANode lsupPulmVeinNode = TreeAnalysisUtils.getANodeWithName("left superior pulmonary vein", model.getRoot());
+                ANode rsupPulmVeinNode = TreeAnalysisUtils.getANodeWithName("right superior pulmonary vein", model.getRoot());
+                ANode pulmTrunkNode = TreeAnalysisUtils.getANodeWithName("pulmonary trunk", model.getRoot());
+                ANode hepPortalNode = TreeAnalysisUtils.getANodeWithName("hepatic portal vein", model.getRoot());
+                ANode prehepPortalNode = TreeAnalysisUtils.getANodeWithName("pre-hepatic portal vein", model.getRoot());
+
+                if (aortaANode != null) aortaTreeItem = TreeAnalysisUtils.getTreeItemWANodeId(aortaANode.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
+                if (supVenaCavaANode != null) superiorVenaCava = TreeAnalysisUtils.getTreeItemWANodeId(supVenaCavaANode.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
+                if (infVenaCavaANode != null) inferiorVenaCava = TreeAnalysisUtils.getTreeItemWANodeId(infVenaCavaANode.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
+                if (respiratoryANode != null) respiratorySystem = TreeAnalysisUtils.getTreeItemWANodeId(respiratoryANode.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
+                if (pulmTrunkNode != null) pulmonaryTrunk = TreeAnalysisUtils.getTreeItemWANodeId(pulmTrunkNode.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
+                if (linfPulmVeinNode != null) linfPulmVein = TreeAnalysisUtils.getTreeItemWANodeId(linfPulmVeinNode.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
+                if (rinfPulmVeinNode != null) rinfPulmVein = TreeAnalysisUtils.getTreeItemWANodeId(rinfPulmVeinNode.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
+                if (lsupPulmVeinNode != null) lsupPulmVein = TreeAnalysisUtils.getTreeItemWANodeId(lsupPulmVeinNode.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
+                if (rsupPulmVeinNode != null) rsupPulmVein = TreeAnalysisUtils.getTreeItemWANodeId(rsupPulmVeinNode.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
+                if (hepPortalNode != null) hepaticPortal = TreeAnalysisUtils.getTreeItemWANodeId(hepPortalNode.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
+                if (prehepPortalNode != null) prehepPortal = TreeAnalysisUtils.getTreeItemWANodeId(prehepPortalNode.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
+
+                break;
+            }
+        }
+
+
+    }
+
+    /**
+     * @param target A treeItem
+     * @return The types of questions this class can make for that treeItem
+     */
+    private List<AllQuestionTypes> getQuestTypesForTarget(TreeItem<ANode> target) {
+        List<AllQuestionTypes> result = new LinkedList<>();
+        result.add(AllQuestionTypes.IDENTIFY_IN_3D);
+        if (!forbiddenIDsForSelectIn3D.contains(target.getValue().conceptId()) && !TreeAnalysisUtils.isPartOfTree(respiratorySystem, target)) result.add(AllQuestionTypes.SELECT_IN_3D);  // resp system has many (leaf) nodes with broad names that still have fileIDs because
+                                                                                                                    // they represent an important category. but they are difficult to pin down in such a selection question.
+        for (TreeItem<ANode> tI : List.of(aortaTreeItem, pulmonaryTrunk)) {
+            if (tI != null) {
+                if (TreeAnalysisUtils.isPartOfTree(tI, target)) {
+                    if (!target.getChildren().isEmpty()) result.add(AllQuestionTypes.ARTERY_BRANCH);
+                    if (target != tI) result.add(AllQuestionTypes.ARTERY_SOURCE);
+                    return result;
+                }
+            }
+        }
+
+        for (TreeItem<ANode> tI : List.of(inferiorVenaCava, superiorVenaCava, linfPulmVein, rinfPulmVein, lsupPulmVein, rsupPulmVein, hepaticPortal, prehepPortal)) {
+            if (tI != null) {
+                if (TreeAnalysisUtils.isPartOfTree(tI, target)) {
+                    if (!target.getChildren().isEmpty()) result.add(AllQuestionTypes.VEIN_SOURCE);
+                    if (target != tI) result.add(AllQuestionTypes.VEIN_DRAIN);
+                    return result;
+                }
+            }
+        }
+        if (target.getValue().fileIds().size() == 1) result.add(AllQuestionTypes.IDENTIFY_IN_SLICE);
+        return result;
+    }
+
+    /**
+     * Possible types of questions this class can make.
+     */
+    private enum AllQuestionTypes {
+        IDENTIFY_IN_3D,
+        SELECT_IN_3D,
+        IDENTIFY_IN_SLICE,
+        VEIN_DRAIN,
+        VEIN_SOURCE,
+        ARTERY_SOURCE,
+        ARTERY_BRANCH
+    }
+
+    // all of those can qualify for vein/artery questions, but only in downwards direction because they have no parent vessel.
+    private TreeItem<ANode> aortaTreeItem = null;
+    private TreeItem<ANode> inferiorVenaCava = null;
+    private TreeItem<ANode> superiorVenaCava = null;
+    private TreeItem<ANode> respiratorySystem = null;
+    private TreeItem<ANode> linfPulmVein = null;
+    private TreeItem<ANode> rinfPulmVein = null;
+    private TreeItem<ANode> lsupPulmVein = null;
+    private TreeItem<ANode> rsupPulmVein = null;
+    private TreeItem<ANode> pulmonaryTrunk = null;
+    private TreeItem<ANode> hepaticPortal = null;
+    private TreeItem<ANode> prehepPortal = null;
+
+
+    private Set<String> forbiddenIDsForSelectIn3D = Set.of("FJ1913");
+
+
+    /** Default number of options in a multiple choice question*/
+    private final int DEFAULT_NO_MC_OPTIONS = 6;
+
+
+    private int difficultyToN(Difficulty difficulty) {
+        return 12 - difficulty.getDifficultyLevel() / 100;
     }
 
     /**
@@ -204,40 +319,66 @@ public class RandomUIQuizGenerator {
      * @return the UIQuiz
      */
     public UIQuiz<Integer> simpleIntQuizFromTree(List<TreeItem<ANode>> roots, List<URI> resourceLocations, int nquestions, Difficulty difficulty, int time, TimeUnit timeUnit, boolean showCorrectAnswerOnWrong) {
-//        TreeItem<ANode> target = TreeAnalysisUtils.getTreeItemWANodeId("FMA7202", roots.getFirst());
         List<UIQuestion<?, Integer>> questions = new ArrayList<>(roots.size());
+
         int topicInd = 0;
-        boolean questSwitch = true;
+        int sliceAxisInd = 0;
+
+        HashMap<AllQuestionTypes, Integer> countQuestTypes = new HashMap<>(AllQuestionTypes.values().length);
+        for (AllQuestionTypes qType : AllQuestionTypes.values()) countQuestTypes.put(qType, 0);
+
         for (int i = 0; i < nquestions; i++) {
+            String questionName = "Question " + (i+1);
             TreeItem<ANode> topic = roots.get(topicInd);
             TreeItem<ANode> target = randomTreeItemWFileIDsBelow(topic);
-            if (questSwitch) {
-                questions.add(makeSimpleMultipleChoice3DQuestion("Question " + i, "Which item is highlighted?", difficulty, target, resourceLocations));
-                questSwitch = false;
+
+            List<AllQuestionTypes> possibleQuestTypes = new ArrayList<>(getQuestTypesForTarget(target));
+            if (possibleQuestTypes.isEmpty()) continue;
+            possibleQuestTypes.sort(Comparator.comparingInt(countQuestTypes::get));
+            AllQuestionTypes qType = possibleQuestTypes.getFirst(); // choose the most underrepresented question type
+
+            switch (qType) {
+                case VEIN_DRAIN -> questions.add(makeVeinDrainQuestion(target, questionName, difficulty, 0,1));
+                case ARTERY_SOURCE -> questions.add(makeArterySourceQuestion(target, questionName, difficulty, 0,1));
+                case VEIN_SOURCE -> questions.add(makeVeinSourceQuestion(target, questionName, difficulty, 0,1));
+                case ARTERY_BRANCH -> questions.add(makeArteryBranchQuestion(target, questionName, difficulty, 0,1));
+                case IDENTIFY_IN_3D -> questions.add(makeSimpleMultipleChoice3DQuestion(questionName, "Which item is highlighted?", difficulty, target, resourceLocations));
+                case SELECT_IN_3D -> questions.add(makeSimpleSelectIn3DUIQuestion(questionName, "Select the " + target.getValue().name(), difficulty, 0, 1, target, resourceLocations, showCorrectAnswerOnWrong));
+                case IDENTIFY_IN_SLICE -> {
+                    Plane.BodyAxis bodyAxis = switch (sliceAxisInd){case 0 -> Plane.BodyAxis.AXIAL; case 1 -> Plane.BodyAxis.SAGGITAL; default -> Plane.BodyAxis.CORONAL;};
+                    if (sliceAxisInd == 2) sliceAxisInd = 0; else sliceAxisInd++;
+                    questions.add(makeSimpleSliceQuestion(questionName, "Which item is highlighted?", difficulty, target, resourceLocations, bodyAxis, random.nextBoolean()));
+                }
             }
-            else {
-                questSwitch = true;
-                questions.add(makeSimpleSelectIn3DUIQuestion("Question " + i, "Select the " + target.getValue().name(), difficulty, 0, 1, target, resourceLocations, showCorrectAnswerOnWrong));
-            }
-            if (topicInd == roots.size()-1) topicInd = 0;
-            else topicInd++;
+            countQuestTypes.put(qType, countQuestTypes.get(qType) + 1);
+
+            if (topicInd == roots.size()-1) topicInd = 0; else topicInd++;
+
         }
+
         UIQuiz<Integer> quiz = new UIQuizInt(questions, true, showCorrectAnswerOnWrong, time, timeUnit);
         return quiz;
     }
 
+
     public SimpleMultipleChoice3DQuestion<String, Integer> makeSimpleMultipleChoice3DQuestion(String name, String instructions, Difficulty difficulty, TreeItem<ANode> target, List<URI> resourceLocations) {
 
-        Set<TreeItem<ANode>> relativesIncludingTarget = findRelatives2(target, 6);  //TODO: vary n
+        Set<TreeItem<ANode>> relativesIncludingTarget = findRelatives2(target, difficultyToN(difficulty));
         List<String> toDraw = new LinkedList<>();
         for (TreeItem<ANode> treeItem : relativesIncludingTarget) {
             toDraw.addAll(treeItem.getValue().fileIds());
         }
+
+        String correctAnswer = target.getValue().name();
+        List<String> possibleOptions = new ArrayList<>(DEFAULT_NO_MC_OPTIONS);
+        possibleOptions.add(correctAnswer);
+        possibleOptions.addAll(relativesIncludingTarget.stream().map(t -> t.getValue().name()).toList().subList(0, Math.min(DEFAULT_NO_MC_OPTIONS-1, relativesIncludingTarget.size())));
+
         logger.log(Level.CONFIG, "relativesIncTarget: " + relativesIncludingTarget + "\nwhereas toDraw= " + toDraw);
         SimpleMultipleChoice3DQuestion<String, Integer> question = new SimpleMultipleChoice3DQuestion<>(
                 difficulty, 0, 1,
                 target.getValue().toString(),
-                relativesIncludingTarget.stream().map(t -> t.getValue().name()).toList(),
+                possibleOptions, //                relativesIncludingTarget.stream().map(t -> t.getValue().name()).toList(),
                 toDraw,
                 target.getValue().fileIds().stream().toList(),
                 resourceLocations);
@@ -247,12 +388,13 @@ public class RandomUIQuizGenerator {
     }
 
     public SimpleSelectIn3DUIQuestion<Integer> makeSimpleSelectIn3DUIQuestion(String name, String instructions, Difficulty difficulty, Integer minScore, Integer maxScore, TreeItem<ANode> target, List<URI> resourceLocations, boolean showHintOnWrongAnswer) {
-        Set<TreeItem<ANode>> relativesIncludingTarget = findRelatives2(target, 6);  //TODO: vary n
+
+        Set<TreeItem<ANode>> relativesIncludingTarget = findRelatives2(target, difficultyToN(difficulty));
         List<String> toDraw = new LinkedList<>();
         for (TreeItem<ANode> treeItem : relativesIncludingTarget) {
             toDraw.addAll(treeItem.getValue().fileIds());
         }
-
+        logger.log(Level.CONFIG, "relativesIncTarget: " + relativesIncludingTarget + "\nwhereas toDraw= " + toDraw);
         SimpleSelectIn3DUIQuestion<Integer> question = new SimpleSelectIn3DUIQuestion<>(
                 difficulty, minScore, maxScore,
                 target.getValue().fileIds().stream().toList(),
@@ -265,111 +407,99 @@ public class RandomUIQuizGenerator {
         return question;
     }
 
-    private <T> Set<TreeItem<T>> findCloseRelatives(TreeItem<T> item, int n, Function<TreeItem<T>, Boolean> accept) {
-        //TODO: ONLY collect those that have fileIDs
-        if (n == 1) return Set.of(item);
-        Set<TreeItem<T>> result = new HashSet<>(n);
-        result.add(item);
-        int np = n / 2;
-        int nc = n / 2;
-        if (np + nc < n) nc++;
-        if (item.getParent() != null) {
-            if (!item.getChildren().isEmpty()) {
-                recParent(item.getParent(), np, result, item, accept);
-                recChildren(item, nc, result, accept);
-            } else recParent(item.getParent(), np + nc, result, item, accept);
-        } else {
-            if (!item.getChildren().isEmpty()) {
-                recChildren(item, nc + np, result, accept);
-            } else return Set.of(item);
-        }
-        return result;
+    public SimpleSliceMCQuestion<String, Integer> makeSimpleSliceQuestion(String name, String instructions, Difficulty difficulty, TreeItem<ANode> target, List<URI> resourceLocations, Plane.BodyAxis sliceAxis, boolean positiveDir) {
+
+        //get the names of the target and some other nodes for multiple choice
+        List<String> namesForMCOptions = findRelatives2(target, DEFAULT_NO_MC_OPTIONS).stream().map(t -> t.getValue().getName()).toList();
+
+        Set<String> toDraw = new HashSet<>(target.getValue().fileIds());    //will hold all fileIDs of the tree
+
+        TreeItem<ANode> root = new Function<TreeItem<ANode>, TreeItem<ANode>>(){
+            @Override
+            public TreeItem<ANode> apply(TreeItem<ANode> treeItem) {
+                return treeItem.getParent() == null ? treeItem : this.apply(treeItem.getParent());
+            }
+        }.apply(target);    //find root of tree
+
+        TreeAnalysisUtils.applyRec(root, (t -> {toDraw.addAll(t.getValue().fileIds()); return null;})); //accumulate all fileIDs of the tree
+
+        SimpleSliceMCQuestion<String, Integer> question = new SimpleSliceMCQuestion<>(
+                difficulty, 0, 1,
+                target.getValue().name(),
+                namesForMCOptions,
+                toDraw.stream().toList(),
+                target.getValue().fileIds().stream().toList(),
+                resourceLocations);
+
+        question.setName(name);
+        question.setInstructions(instructions);
+        question.setSliceTarget(target.getValue().fileIds().stream().toList().getFirst());  //only one can be the target
+        question.setSliceAxis(sliceAxis, positiveDir);
+
+        return question;
     }
 
-    private <T> int recParent(TreeItem<T> parent, int n, Set<TreeItem<T>> result, TreeItem<T> childAvoid, Function<TreeItem<T>, Boolean> accept) {
-        logger.log(Level.CONFIG, parent.toString() + " n=" + n + " avoid=" + childAvoid.toString() + "\n" + result.toString());
-        if (n==0) return 0;
-        if (accept.apply(parent) && !result.contains(parent)) {
-            result.add(parent);
-            n--;
-        }
-        if (n > 0) {
-            int np = n / 2;
-            int nc = n / 2;
-            if (np + nc != n) nc++;
-            int leftOvernp = np;
-            if (parent.getParent() != null) {
-                leftOvernp = recParent(parent.getParent(), leftOvernp, result, parent, accept);
-            }
-            int leftOvernc = nc;
-            if (nc <= parent.getChildren().stream().filter(accept::apply).toList().size()) {
-                for (TreeItem<T> child : parent.getChildren()) {
-                    if (nc == 0) break;
-                    if (child == childAvoid || !accept.apply(child)) continue;
-                    result.add(child);
-                    nc--;
-                }
-            } else {
-                int ndiv = nc / parent.getChildren().stream().filter(accept::apply).toList().size();
-                int leftOver = 0;
-                for (int i = 0; i < parent.getChildren().size(); i++) {
-                    if (parent.getChildren().get(i) == childAvoid || !accept.apply(parent.getChildren().get(i))) continue;
 
-//                    if (i == parent.getChildren().size()) if ((double) nc / parent.getChildren().size() > nc / parent.getChildren().size()) ndiv += nc - ndiv * parent.getChildren().size();
-//                    if (result.contains(parent.getChildren().get(i))) {
-//                        if (!parent.getChildren().get(i).getChildren().isEmpty()) leftOver = recChildren(parent.getChildren().get(i).getChildren().getFirst(), ndiv + leftOver, result, accept);
-//                        else continue;
-//                    } else leftOver = recChildren(parent.getChildren().get(i), ndiv, result, accept);
-                    recChildren(parent.getChildren().get(i), ndiv, result, accept);
-                }
-                leftOvernc = leftOver;
-            }
-            if (leftOvernp != 0) {
-                if (leftOvernc != 0) return leftOvernc + leftOvernp;
-                else {
-                    return recChildren(parent, leftOvernp, result, accept);
-                }
-            } else {
-                if (leftOvernc != 0) {
-                    if (parent.getParent() != null ) return recParent(parent.getParent(), leftOvernc, result, parent, accept);
-                }
-                return leftOvernc;
-            }
-        } else return 0;
+    public SimpleMultipleChoiceUIQuestion<String, Integer> makeVeinDrainQuestion(TreeItem<ANode> target, String name, Difficulty difficulty, Integer minScore, Integer maxScore) {
+
+        List<String> possibleAnswers = new ArrayList<>(findRelatives2(target, DEFAULT_NO_MC_OPTIONS).stream().map(t -> t.getValue().name()).toList());
+        String correctAnswer = target.getParent().getValue().name();
+        if (!possibleAnswers.contains(correctAnswer)) {
+            possibleAnswers.removeLast();
+            possibleAnswers.add(correctAnswer);
+        }
+        SimpleMultipleChoiceUIQuestion<String, Integer> question = new SimpleMultipleChoiceUIQuestion<>(
+                difficulty, minScore, maxScore, correctAnswer, possibleAnswers, true
+        );
+        question.setName(name);
+        question.setInstructions("Where does the " + target.getValue().name() + " drain to?");
+        return question;
     }
 
-    private <T> int recChildren(TreeItem<T> child, int n, Set<TreeItem<T>> acc, Function<TreeItem<T>, Boolean> accept) {
-        logger.log(Level.CONFIG, child.toString() + " n=" + n + "\n" + acc.toString());
-        if (n==0) return 0;
-        if (accept.apply(child)) {
-            acc.add(child);
-            n--;
+    public SimpleMultipleChoiceUIQuestion<String, Integer> makeArterySourceQuestion(TreeItem<ANode> target, String name, Difficulty difficulty, Integer minScore, Integer maxScore) {
+
+        List<String> possibleAnswers = new ArrayList<>(findRelatives2(target, DEFAULT_NO_MC_OPTIONS - 1).stream().map(t -> t.getValue().name()).toList());
+        String correctAnswer = target.getParent().getValue().name();
+        if (!possibleAnswers.contains(correctAnswer)) {
+            possibleAnswers.removeLast();
+            possibleAnswers.add(correctAnswer);
         }
-        if (n > 0) {
-            if (n <= child.getChildren().size()) {
-                for (TreeItem<T> grandChild : child.getChildren()) {
-                    acc.add(grandChild);
-                    n--;
-                    if (n==0) break;
-                }
-                return 0;
-            } else {
-                int ndiv = n / child.getChildren().size();
-                int leftOvern = 0;
-                for (int i = 0; i < child.getChildren().size(); i++) {
-                    if (i == child.getChildren().size()) if ((double) n / child.getChildren().size() > n / child.getChildren().size()) ndiv += n - ndiv * child.getChildren().size();
-                    if (acc.contains(child.getChildren().get(i))) {
-                        if (!child.getChildren().get(i).getChildren().isEmpty()) leftOvern = recChildren(child.getChildren().get(i).getChildren().getFirst(), ndiv + leftOvern, acc, accept);
-                        else continue;
-                    } else {
-                        leftOvern = recChildren(child.getChildren().get(i), ndiv + leftOvern, acc, accept);
-                    }
-                }
-                return leftOvern;   //falsch, aber vllt das nächstbeste.
-            }
-        }
-        return 0;
+        SimpleMultipleChoiceUIQuestion<String, Integer> question = new SimpleMultipleChoiceUIQuestion<>(
+                difficulty, minScore, maxScore, correctAnswer, possibleAnswers, true
+        );
+        question.setName(name);
+        question.setInstructions("What's the source of the " + target.getValue().name() + "?");
+        return question;
     }
+
+    public SimpleMultipleChoiceUIQuestion<String, Integer> makeArteryBranchQuestion(TreeItem<ANode> target, String name, Difficulty difficulty, Integer minScore, Integer maxScore) {
+        List<String> possibleAnswers = findRelatives2(target, DEFAULT_NO_MC_OPTIONS).stream().map(t -> t.getValue().name()).toList();
+        List<String> correctAnswers = new LinkedList<>();
+        for (TreeItem<ANode> child : target.getChildren()) if (possibleAnswers.contains(child.getValue().name())) correctAnswers.add(child.getValue().name());
+
+        SimpleMultipleChoiceUIQuestion<String, Integer> question = new SimpleMultipleChoiceUIQuestion<>(
+                difficulty, minScore, maxScore, correctAnswers, possibleAnswers, false
+        );
+        question.setName(name);
+        question.setInstructions("What does the " + target.getValue().name() + " branch into?");
+        return question;
+    }
+
+    public SimpleMultipleChoiceUIQuestion<String, Integer> makeVeinSourceQuestion(TreeItem<ANode> target, String name, Difficulty difficulty, Integer minScore, Integer maxScore) {
+        List<String> possibleAnswers = findRelatives2(target, DEFAULT_NO_MC_OPTIONS).stream().map(t -> t.getValue().name()).toList();
+        List<String> correctAnswers = new LinkedList<>();
+        for (TreeItem<ANode> child : target.getChildren()) if (possibleAnswers.contains(child.getValue().name())) correctAnswers.add(child.getValue().name());
+
+        SimpleMultipleChoiceUIQuestion<String, Integer> question = new SimpleMultipleChoiceUIQuestion<>(
+                difficulty, minScore, maxScore, correctAnswers, possibleAnswers, false
+        );
+        question.setName(name);
+        question.setInstructions("Which veins drain into the " + target.getValue().name() + "?");
+        return question;
+    }
+
+
+
 
     private final float np_fraction = 0.25f;
 
@@ -399,22 +529,16 @@ public class RandomUIQuizGenerator {
             n--;
         }
         if (n < 1) return 0;
-//        Function<TreeItem<T>, Boolean> acceptAndIgnoreThis = new Function<TreeItem<T>, Boolean>() { //funktioniert? weil die kinder von tTreeItem ja trotzdem angeschaut werden?
-//            @Override
-//            public Boolean apply(TreeItem<T> tTreeItem) {
-//                return (tTreeItem != item) && accept.apply(tTreeItem);
-//            }
-//        };
-        if (parent.getParent() == null) return recChildren2(parent, n, result, accept); //AndIgnoreThis
+
+        if (parent.getParent() == null) return recChildren2(parent, n, result, accept); 
 
         int np = (int) (n * np_fraction);
         int nc = n-np;
-        int leftc = recChildren2(parent, nc, result, accept);   //AndIgnoreThis
+        int leftc = recChildren2(parent, nc, result, accept);   
         np += leftc;
         int leftp = recParent2(parent, np, result, accept);
         if (leftp > 0 && leftc > 0) return leftp + leftc;
-        if (leftp > 0) return recChildren2(parent, leftp, result, t -> !result.contains(t) && accept.apply(t)); //AndIgnoreThis
-        if (leftc > 0) return recParent2(parent, leftc, result, t -> !result.contains(t) && accept.apply(t));
+        if (leftp > 0) return recChildren2(parent, leftp, result, t -> !result.contains(t) && accept.apply(t)); 
         return 0;
     }
 
@@ -448,7 +572,7 @@ public class RandomUIQuizGenerator {
 
         for (int i = 0; i < children.size(); i++) {
             if (ncount == n) break;
-            if (ncount + (children.size() - i) * ndiv < n) {
+            if (ncount + (children.size() - i) * (ndiv + leftn) < n) {  // helps if more is necessary or in case casting ndiv to int causes it to round to zero
                 logger.log(Level.CONFIG, ncount + " + (" + children.size() + "-" + i + ") * " + ndiv + "<" + n + " -> " +leftn + "++");
                 leftn++;
             }
@@ -494,7 +618,7 @@ public class RandomUIQuizGenerator {
     private TreeItem<ANode> randomTreeItemWFileIDsBelow(TreeItem<ANode> root) {
         List<TreeItem<ANode>> applicable = new LinkedList<>();
         TreeAnalysisUtils.applyRec(root, t -> {if (!t.getValue().getFileIds().isEmpty()) applicable.add(t); return true;});
-        return applicable.get(new Random().nextInt(0, applicable.size()));
+        return applicable.get(random.nextInt(0, applicable.size()));
     }
 
 }

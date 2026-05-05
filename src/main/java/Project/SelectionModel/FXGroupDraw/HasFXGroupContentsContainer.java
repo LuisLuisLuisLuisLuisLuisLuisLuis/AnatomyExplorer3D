@@ -267,6 +267,7 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
                     if (!file1.getName().endsWith(".obj")) continue;
                     String name = file1.getName().substring(0, file1.getName().lastIndexOf("."));
                     if (!whiteList.contains(name)) continue;
+                    if (hasFXGroupContents.getMeshViewWithID(name) != null) continue;
                     meshViewF.add(executor.submit(() -> createMeshView(name)));
                 }
                 executor.shutdown();

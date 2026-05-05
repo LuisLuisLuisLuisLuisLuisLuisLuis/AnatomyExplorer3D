@@ -1,4 +1,4 @@
-package Project.window.Quiz;
+package Project.window.Quiz.Question;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;

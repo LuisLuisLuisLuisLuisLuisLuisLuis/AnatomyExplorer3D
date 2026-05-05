@@ -1,4 +1,4 @@
-package Project.window.ThreeDPaneHandling;
+package Project.window.ThreeDPaneHandling.Objects;
 
 import javafx.geometry.Point3D;
 import javafx.scene.Group;

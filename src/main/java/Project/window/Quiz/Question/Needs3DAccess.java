@@ -1,8 +1,5 @@
-package Project.window.Quiz;
+package Project.window.Quiz.Question;
 
-import Project.SelectionModel.FXGroupDraw.HasFXGroupContents;
-import Project.SelectionModel.FXGroupDraw.HasFXGroupContentsContainer;
-import Project.SelectionModel.FXGroupSelection.HasFXGroupSelection;
 import Project.window.ThreeDPaneHandling.ThreeDGroupHandler;
 
 /**

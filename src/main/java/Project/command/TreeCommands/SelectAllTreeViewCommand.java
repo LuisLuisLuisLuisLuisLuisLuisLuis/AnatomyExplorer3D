@@ -4,6 +4,7 @@ import Project.command.Remember.RememberTreeViewSelection;
 import Project.model.ANode;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -11,11 +12,11 @@ import java.util.List;
 
 public class SelectAllTreeViewCommand extends TreeCommand {
     private RememberTreeViewSelection rememberTreeViewSelection;
-    private List<TreeItem<ANode>> previouslyCollapsed = new LinkedList<>();
+    private final List<TreeItem<ANode>> previouslyCollapsed = new LinkedList<>();
     public SelectAllTreeViewCommand(TreeView<ANode> treeView) {
         super(treeView);
     }
-    private HashSet<TreeItem<ANode>> itemsToSelect = new HashSet<>();   // using a Set so that the same item is not added twice
+    private final HashSet<TreeItem<ANode>> itemsToSelect = new HashSet<>();   // using a Set so that the same item is not added twice
                                                                         // and thus also not selected twice. HUGE time saving.
 
     /**
@@ -75,7 +76,7 @@ public class SelectAllTreeViewCommand extends TreeCommand {
         }
     }
 
-    public static void bulkSelect(HashSet<TreeItem<ANode>> itemsToSelect, TreeView<ANode> treeView) {
+    public static void bulkSelect(@NotNull HashSet<TreeItem<ANode>> itemsToSelect, @NotNull TreeView<ANode> treeView) {
         if (itemsToSelect.isEmpty()) return;
         for (TreeItem<ANode> treeItem : itemsToSelect) treeItem.setExpanded(true);
         if (itemsToSelect.size() == 1) {

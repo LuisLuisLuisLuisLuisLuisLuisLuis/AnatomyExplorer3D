@@ -31,5 +31,6 @@ module com.anatomyExplorer {
     opens Project.model to javafx.fxml;
     opens Project.window.TreeView.TreeRestructuring to javafx.fxml;
     opens Project.window.TreeView.TreeViewEditing to javafx.fxml;
+    opens Project.window.Quiz.Question to javafx.fxml;
 
 }

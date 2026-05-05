@@ -35,7 +35,6 @@ public abstract class SelectionContainer<selectionType, groupSelectionType> {
      */
     protected boolean setGroup(SelectionGroup<groupSelectionType> selectionGroup) {
         if (isPartOfGroup()) {
-            //System.err.println("Container already part of group");
             return false;
         }
         this.selectionGroup = selectionGroup;
@@ -60,6 +59,7 @@ public abstract class SelectionContainer<selectionType, groupSelectionType> {
     protected void isUpdatingGroup(boolean state) {isUpdatingGroup = state;}    //TODO: ALWAYS FALSE correct?
 
     private boolean noUpdating = false;
+
     protected void setNoUpdating(boolean state) {
         this.noUpdating = state;
     }

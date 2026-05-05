@@ -1,7 +1,7 @@
-package Project.window.Quiz;
+package Project.window.Quiz.Question;
 
 
-import Project.command.Command;
+import Project.window.Quiz.Difficulty;
 
 /**
  * @param <Q> type of the question

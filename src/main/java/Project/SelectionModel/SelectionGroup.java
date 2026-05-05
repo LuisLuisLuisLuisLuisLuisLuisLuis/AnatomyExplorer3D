@@ -62,10 +62,13 @@ public class SelectionGroup<groupSelection> {
     public ObservableSet<groupSelection> getFailedToSelect() {return failedToSelect;}
 
     private boolean noUpdating = false;
+
+    /** If set, this group's selection will not be able to be updated by calling changeSelection(). Further, SelectionContainers will not attempt to update this group.*/
     public void setNoUpdating(boolean value) {
         this.noUpdating = value;
         setNoUpdatingInContainers();
     }
+
     private void setNoUpdatingInContainers() {
         for (SelectionContainer selectionContainer: selectionContainers) {
             selectionContainer.setNoUpdating(noUpdating);
@@ -79,9 +82,9 @@ public class SelectionGroup<groupSelection> {
      * @param remove: to add or to remove the given items from the selection.
      */
     public void changeSelection(Set<groupSelection> selection, boolean clear, boolean remove) {
-        logger.log(Level.CONFIG, "clear: " + clear + ", remove: " + remove + ". selection: " + selection);
         this.failedToSelect.clear();
         if (noUpdating) return;
+        logger.log(Level.CONFIG, "clear: " + clear + ", remove: " + remove + ". selection: " + selection);
 
         LinkedList<groupSelection> change = new LinkedList<>(selection); // remember the changes in case someone asks
         if (clear) {

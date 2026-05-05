@@ -4,11 +4,24 @@ import Project.model.ANode;
 import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
 import Project.window.TreeView.TreeViewEditing.TreeViewSetup;
 import javafx.scene.control.TreeItem;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Function;
 
 public class TreeAnalysisUtils {
+
+    /**
+     *
+     * @param root The root of a tree
+     * @param node A node
+     * @return is the node part of the tree of root?
+     */
+    public static <T> boolean isPartOfTree(TreeItem<T> root, @NotNull TreeItem<T> node) {
+        if (node.equals(root)) return true;
+        if (node.getParent() == null) return false;
+        return isPartOfTree(root, node.getParent());
+    }
 
     /**
      * Modify the tree so that no two ANodes have the same conceptID.
@@ -19,6 +32,7 @@ public class TreeAnalysisUtils {
         accumulateForEveryNodeBelow(root, allTreeItems, t -> t);
         for (TreeItem<ANode> treeItem : allTreeItems) findAndChangeIdenticalIDsOfNode(root, treeItem, root);
     }
+
     /**
      * Exchange all Anodes in the tree that have the same conceptID as ogTreeItem by a copy of themselves with a different conceptID.
      */
@@ -26,7 +40,6 @@ public class TreeAnalysisUtils {
         if (root != ogTreeItem && root.getValue().conceptId().equals(ogTreeItem.getValue().conceptId())) replaceANodeByCopy(root, masterRoot);
         for (TreeItem<ANode> child : root.getChildren()) findAndChangeIdenticalIDsOfNode(child, ogTreeItem, masterRoot);
     }
-
 
     /**
      * Replace ANode by a copy that has a different conceptID that does not occur in the tree of root and modify the ANode relationships accordingly.
@@ -444,7 +457,5 @@ public class TreeAnalysisUtils {
         };
         TreeAnalysisUtils.applyRec(root, changeName);
     }
-
-
 
 }

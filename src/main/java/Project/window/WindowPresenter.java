@@ -41,6 +41,7 @@ import Project.window.ThreeDPaneHandling.Movement.CamMover;
 import Project.window.ThreeDPaneHandling.Movement.Group3DRotation;
 import Project.window.ThreeDPaneHandling.Movement.MouseScrolling3D;
 import Project.window.ThreeDPaneHandling.Movement.SetupMouseRotate3D;
+import Project.window.ThreeDPaneHandling.Objects.Arrow;
 import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import Project.command.TreeCommands.TreeEditorMockCommand;
 import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
@@ -86,6 +87,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static Project.model.FileUtil.*;
 
@@ -109,7 +111,7 @@ public class WindowPresenter {
     private final ObservableList<Command> redoList = FXCollections.observableList(new LinkedList<>());
 
     private static final PerspectiveCamera camera = new PerspectiveCamera(true); //camera in 3D view
-    private static final Point3D initialCameraPosition = new Point3D(0,-10,-1500);
+    private static final Point3D initialCameraPosition = ThreeDGroupHandler.DEFAULT_INITIAL_CAMERA_POSITION;
 
     private static final Affine initialTransform = new Affine( //initial transform of the group holding the 3D contents. serves as reset position
             1.0, 0.0, 0.0, 0.0,
@@ -262,8 +264,8 @@ public class WindowPresenter {
         controller.getRedoButton().disableProperty().bind(Bindings.isEmpty(redoList));
 
         //select all, select none button
-        controller.getTreeSelectAllButton().setOnAction(e -> new SelectAllTreeViewCommand(getSelectedTreeView()).execute());
-        controller.getTreeSelectNoneButton().setOnAction(e -> new SelectNoneTreeViewCommand(getSelectedTreeView()).execute());
+        controller.getTreeSelectAllButton().setOnAction(e -> new SelectAllTreeViewCommand(getSelectedTreeView()).execute());    // not undoable because its unintuitive and can produce unexpected behaviour
+        controller.getTreeSelectNoneButton().setOnAction(e -> new SelectNoneTreeViewCommand(getSelectedTreeView()).execute());  // since click-based selection is of course not undoable.
 
         //menu: File
         controller.getMenuClose().setOnAction(e -> requestExit());
@@ -622,7 +624,6 @@ public class WindowPresenter {
                 } else executeCommand(new RemoveObjFrom3DCommand(meshViews, hasInnerGroupContents, hasInnerGroupSelectedItems));
 
             }
-//            executeCommand(new RemoveObjFrom3DCommand(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionGroup.getSelection()), threeDContentGroup, hasInnerGroupContents, threeDSelectionGroup));
         });
         //-----------------------------------------------------------
 
@@ -994,53 +995,9 @@ public class WindowPresenter {
         controller.getMenuGuide().setOnAction(e -> LittlePopUp.showPopup(Help.getHelp(), "Help", 1000, 500));
         controller.getMenuAbout().setOnAction(e -> LittlePopUp.showPaddedPopup(About.getAbout(), "About", 400, 100));
 
-        //------------------optional sync tree + 3D selection
-        HasGroup<ANode> hasTreeSelectionGroup = new HasGroup<>(treeViewSelectionGroup);
-        HasTreeSelectionGroupContainer hasTreeSelectionGroupContainer = new HasTreeSelectionGroupContainer(hasTreeSelectionGroup, selectionMediatorTree3D_Selection);
-
-        controller.getSelectionSynchCheck().setOnAction(e -> {
-            if (controller.getSelectionSynchCheck().isSelected()) {
-                threeDSelectionGroup.addSelectionContainer(hasTreeSelectionGroupContainer);
-            } else threeDSelectionGroup.removeSelectionContainer(hasTreeSelectionGroupContainer);
-        });
-        //-----------------------------
-
 
 
         //------------------cutting-------------------------
-        controller.getTestPlane().setOnAction(e -> {
-            if (slicePlaneGroup.getChildren().isEmpty()) {
-                if (hasInnerGroupSelectedItems.getSelection().size()!=1) return;
-                MeshView meshView = hasInnerGroupSelectedItems.getSelection().getFirst();
-                Group plane = Plane.makeSlicePlane(30);
-
-                Point3D meshViewSceneCenter = meshView.localToScene(Plane.computeCenter(meshView));
-
-                Point3D localNormal = new Point3D(0, 0, 1);
-                Point3D normalScene =
-                        plane.getLocalToSceneTransform()
-                                .deltaTransform(localNormal)
-                                .normalize();
-
-
-                slicePlaneGroup.getChildren().addAll(plane.getChildren());
-
-                slicePlaneGroup.getTransforms().setAll(contentGroup.getTransforms().getFirst());
-
-                Point3D boxLocalCenter = slicePlaneGroup.getChildren().getFirst().sceneToLocal(meshViewSceneCenter);
-
-                for (Node n : slicePlaneGroup.getChildren()) Group3DRotation.applyTranslate(n, boxLocalCenter, t->false);
-                Group3DRotation.applyGlobalRotation(slicePlaneGroup, new Point3D(1,0,0), 90);
-
-            } else {
-                SliceCommand sliceCommand = new SliceCommand(List.of(hasInnerGroupSelectedItems.getSelection().getFirst()), innerGroup, (Box) slicePlaneGroup.getChildren().getFirst(), hasInnerGroupContents, threeDSelectionGroup);
-                sliceCommand.setHandleSlicingTask(task -> {runBlockingTask(task, true); return null;});
-                if (!hasInnerGroupSelectedItems.getSelection().isEmpty()) sliceCommand.execute();
-                slicePlaneGroup.getChildren().clear();
-            }
-
-        });
-
         controller.getCutButt().setUserData(false);
         ListChangeListener<Object> setupSlicePlaneListener = new ListChangeListener<>() {
             @Override
@@ -1093,7 +1050,7 @@ public class WindowPresenter {
         controller.getCutAllMenuItem().setOnAction(e -> {
             LinkedList<MeshView> meshViews = new LinkedList<>();
             for (MeshView node : hasInnerGroupContents.getSelection()) if (node != null) meshViews.add(node);
-            SliceCommand sliceCommand = new SliceCommand(meshViews, innerGroup, (Box) slicePlaneGroup.getChildren().getFirst(), hasInnerGroupContents, threeDSelectionGroup);
+            SliceCommand sliceCommand = new SliceCommand(meshViews, innerGroup, (Box) slicePlaneGroup.getChildren().getFirst(), hasInnerGroupContents, hasInnerGroupSelectedItems);
             sliceCommand.setHandleSlicingTask(task -> {runBlockingTask(task, true); return null;});
             executeCommand(sliceCommand);
             postCutEvent.apply(controller.getCutAllMenuItem());
@@ -1102,7 +1059,7 @@ public class WindowPresenter {
             if (hasInnerGroupSelectedItems.getSelection().isEmpty()) return;
             LinkedList<MeshView> meshViews = new LinkedList<>();
             for (MeshView node : hasInnerGroupSelectedItems.getSelection()) if (node != null) meshViews.add(node);
-            SliceCommand sliceCommand = new SliceCommand(meshViews, innerGroup, (Box) slicePlaneGroup.getChildren().getFirst(), hasInnerGroupContents, threeDSelectionGroup);
+            SliceCommand sliceCommand = new SliceCommand(meshViews, innerGroup, (Box) slicePlaneGroup.getChildren().getFirst(), hasInnerGroupContents, hasInnerGroupSelectedItems);
             sliceCommand.setHandleSlicingTask(task -> {runBlockingTask(task, true); return null;});
             executeCommand(sliceCommand);
             postCutEvent.apply(controller.getCutSelectedMenuItem());
@@ -1863,7 +1820,7 @@ public class WindowPresenter {
      * and size of new TriangleMeshes they create.
      */
     private void manageRAM() {
-        if (undoList.size() > 60 || (double) freeMemory() / totalMemory() < freeRamFractionThreshold) {
+        if (undoList.size() > 60 || isRAMcritical()) {
             int us = undoList.size();
             Iterator<Command> iterator = undoList.listIterator();
             while (iterator.hasNext()) {
@@ -1873,6 +1830,13 @@ public class WindowPresenter {
             }
             System.out.println("Removed " + (us - undoList.size()) + " commands");
         }
+    }
+
+    /**
+     * @return if RAM usage has passed a threshold.
+     */
+    public static boolean isRAMcritical() {
+        return (double) freeMemory() / totalMemory() < freeRamFractionThreshold;
     }
 
 
@@ -1908,18 +1872,12 @@ public class WindowPresenter {
         return 0;
     }
 
-    public <T> void runBlockingTask(Task<T> task, boolean knowsProgress) {
-        bindBlockingProgress(task, knowsProgress);
-        new Thread(task).start();
-    }
-
     /**
-     * Binds the blocking, progress showing UI to a Task.
-     * !!!!!!Does NOT schedule or run or cancel the task.
+     * Binds a progress showing UI to a Task and runs it on a new Thread. Blurrs the main window while the task is running.
      * @param task The task
      * @param knowsProgress Can the task report progress or is progress indetermined?
      */
-    private <T> void bindBlockingProgress(Task<T> task, boolean knowsProgress) {
+    public <T> void runBlockingTask(Task<T> task, boolean knowsProgress) {
         logger.log(Level.CONFIG, "binding task. " + task.getMessage());
         Function<Boolean, Boolean> blockingEffect = new Function<Boolean, Boolean>() {
             @Override
@@ -1928,8 +1886,7 @@ public class WindowPresenter {
 
                 blockingVBox.setManaged(flag);
                 blockingVBox.setVisible(flag);
-                if (flag) blockingVBox.addEventFilter(KeyEvent.ANY, Event::consume);
-                else blockingVBox.removeEventFilter(KeyEvent.ANY, Event::consume);
+                controller.getMainBorderpain().setDisable(flag);
 
                 controller.getMainBorderpain().setEffect(flag ? new GaussianBlur(10) : null);
                 return null;
@@ -1948,6 +1905,8 @@ public class WindowPresenter {
             if (newState == Worker.State.CANCELLED || newState == Worker.State.SUCCEEDED || newState == Worker.State.FAILED) blockingEffect.apply(false);
             if (newState == Worker.State.RUNNING) blockingEffect.apply(true);
         });
+
+        new Thread(task).start();
     }
 
 }

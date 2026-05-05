@@ -1,4 +1,6 @@
-package Project.window.Quiz;
+package Project.window.Quiz.Question;
+
+import Project.window.Quiz.Difficulty;
 
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +34,7 @@ public abstract class SimpleMultipleChoiceQuestion<Q,T,S extends Comparable<S>> 
      * @param maxScore      max score
      * @param correctAnswer correct answer
      * @param possibleAnswers choices for this question. it is only possible to answer with one of the choices
+     * @throws IllegalArgumentException if not all correct answer options are contained in the list of possible answers
      */
     public SimpleMultipleChoiceQuestion(Difficulty difficulty, S minScore, S maxScore, List<T> correctAnswer, List<T> possibleAnswers) {
         this(difficulty, minScore, maxScore, correctAnswer, possibleAnswers, false);
@@ -46,21 +49,23 @@ public abstract class SimpleMultipleChoiceQuestion<Q,T,S extends Comparable<S>> 
      * @param correctAnswer correct answer
      * @param possibleAnswers choices for this question. it is only possible to answer with one of the choices
      * @param exposesNumberOfCorrectChoices whether to expose how many of the choices are correct
+     * @throws IllegalArgumentException if not all correct answer options are contained in the list of possible answers
      */
     public SimpleMultipleChoiceQuestion(Difficulty difficulty, S minScore, S maxScore, List<T> correctAnswer, List<T> possibleAnswers, boolean exposesNumberOfCorrectChoices) {
         super(difficulty, minScore, maxScore, correctAnswer);
+        if (!new HashSet<>(possibleAnswers).containsAll(correctAnswer)) throw new IllegalArgumentException("All correct answer options must be contained in the list of possible answers. But\ncorrect answer=" + correctAnswer + "\npossible answers=" + possibleAnswers);
         this.possibleAnswers = possibleAnswers;
         this.exposesNumberOfCorrectChoices = exposesNumberOfCorrectChoices;
     }
 
     /**
-     * Submit an answer. The answer must be one of the choices
+     * Submit an answer. The answer must only contain options from the possible answers of this question.
      * @param answer answer
-     * @throws IllegalArgumentException if the answer is not one of the choices
+     * @throws IllegalArgumentException if one or more elements of the answer are not among the possible options.
      */
     @Override
     public void submit(List<T> answer) throws IllegalArgumentException{
-        if (!new HashSet<>(possibleAnswers).containsAll(answer)) throw new IllegalArgumentException("Answer must be one of " + possibleAnswers + " but was " + answer);
+        if (!new HashSet<>(possibleAnswers).containsAll(answer)) throw new IllegalArgumentException("Answer must only contain " + possibleAnswers + " but was " + answer);
         super.submit(answer);
     }
 

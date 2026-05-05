@@ -1,16 +1,21 @@
 package Project.window.Quiz;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.ToolBar;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 
 public class UIQuizController {
 
+    @FXML
+    private BorderPane mainBorderpane;
+    @FXML
+    private VBox mainProgressVBox;
+    @FXML
+    private ProgressIndicator mainProgressInd;
+    @FXML
+    private ProgressBar mainProgressBar;
+    @FXML
+    private Label mainProgressLabel;
     @FXML
     private SplitPane questSplitPane;
     @FXML
@@ -68,11 +73,44 @@ public class UIQuizController {
         return questProgressLabel;
     }
 
-    public ToolBar getTitleToolbar() {return questInfoToolbar;}
+    public ToolBar getTitleToolbar() {
+        return questInfoToolbar;
+    }
 
-    public Region getTopSpacer2() {return topSpacer2;}
+    public Region getTopSpacer2() {
+        return topSpacer2;
+    }
 
-    public Region getTopSpacer1() {return topSpacer1;}
+    public Region getTopSpacer1() {
+        return topSpacer1;
+    }
 
-    public SplitPane getQuestSplitPane() {return questSplitPane;}
+    public SplitPane getQuestSplitPane() {
+        return questSplitPane;
+    }
+
+    public VBox getMainProgressVBox() {
+        return mainProgressVBox;
+    }
+
+    public BorderPane getMainBorderpane() {
+        return mainBorderpane;
+    }
+
+    public ProgressIndicator getMainProgressInd() {
+        return mainProgressInd;
+    }
+
+    public ProgressBar getMainProgressBar() {
+        return mainProgressBar;
+    }
+
+    public Label getMainProgressLabel() {
+        return mainProgressLabel;
+    }
+
+    public ToolBar getQuestInfoToolbar() {
+        return questInfoToolbar;
+    }
 }
+

@@ -1,5 +1,7 @@
 package Project.window.Quiz;
 
+import Project.window.Quiz.Question.UIQuestion;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 

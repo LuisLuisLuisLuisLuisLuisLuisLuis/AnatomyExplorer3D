@@ -1,5 +1,7 @@
 package Project.window.Quiz;
 
+import Project.window.Quiz.Question.Question;
+
 import java.util.List;
 
 /**

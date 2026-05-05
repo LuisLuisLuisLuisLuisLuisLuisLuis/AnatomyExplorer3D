@@ -23,7 +23,7 @@ public class ColorMeshviewsCommand implements Command {
 
     /**
      * @param color: Color all nodes with this color.
-     * @param nodeIDs: Nodes to color.
+     * @param nodeIDs: IDs of Nodes to color.
      * @param hasFXGroupContents: contains the nodes
      * @param hasFXGroupSelection: holds
      */

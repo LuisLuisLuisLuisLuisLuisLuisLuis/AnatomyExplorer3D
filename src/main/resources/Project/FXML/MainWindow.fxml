@@ -141,7 +141,6 @@
                                                     <MenuItem fx:id="cutSelectedMenuItem" mnemonicParsing="false" text="Selected" />
                                                   </items>
                                                 </SplitMenuButton>
-                                                <Button fx:id="testPlane" mnemonicParsing="false" text="Button" />
                                                 <Separator orientation="VERTICAL" />
                                                 <MenuButton fx:id="selectionStyleButton" mnemonicParsing="false" text="Selection style">
                                                   <items>

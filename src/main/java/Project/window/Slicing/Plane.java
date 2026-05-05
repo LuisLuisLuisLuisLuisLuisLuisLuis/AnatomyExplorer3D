@@ -2,7 +2,7 @@ package Project.window.Slicing;
 
 import java.util.List;
 import java.util.ArrayList;
-import Project.window.ThreeDPaneHandling.Axes;
+import Project.window.ThreeDPaneHandling.Objects.Axes;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
@@ -10,11 +10,19 @@ import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
-import javafx.scene.shape.MeshView;
 import javafx.scene.transform.NonInvertibleTransformException;
 
 
 public class Plane {
+
+    public enum BodyAxis {
+        /** Corresponds to z-axis in BP3D, where bottom -> top is positive direction.*/
+        AXIAL,
+        /** Corresponds to x-axis in BP3D, where right -> left is positive direction.*/
+        SAGGITAL,
+        /** Corresponds to y-axis in BP3D, where front -> back is positive direction.*/
+        CORONAL,
+    }
 
     /**
      * Makes a plane with a red and green side by drawing two thin red and green boxes.

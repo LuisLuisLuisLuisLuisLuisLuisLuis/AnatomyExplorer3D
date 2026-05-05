@@ -1,8 +1,11 @@
 package Project.window.Quiz;
 
-import Project.window.MainWindowController;
 import Project.window.PopUp.LittlePopUp;
-import Project.window.ThreeDPaneHandling.Effects.SelectionEffect;
+import Project.window.Quiz.Question.Needs3DAccess;
+import Project.window.Quiz.Question.Question;
+import Project.window.Quiz.Question.SimpleMultipleChoice3DQuestion;
+import Project.window.Quiz.Question.UIQuestion;
+import Project.window.ThreeDPaneHandling.Movement.Group3DRotation;
 import Project.window.ThreeDPaneHandling.ThreeDGroupHandler;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -10,23 +13,34 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
+import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Point3D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.effect.GaussianBlur;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
-import javafx.scene.shape.MeshView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import javax.xml.stream.EventFilter;
+import javax.xml.stream.events.XMLEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -70,17 +84,16 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
         AnchorPane.setBottomAnchor(child, 0.0);
         AnchorPane.setLeftAnchor(child, 0.0);
         AnchorPane.setRightAnchor(child, 0.0);
+        questUIAnchorPane.prefHeightProperty().bind(controller.getQuestSplitPane().heightProperty().multiply(0.999));
         questUIAnchorPane.getChildren().clear();
         questUIAnchorPane.getChildren().add(child);
     }
 
     protected UIQuizController controller;
 
-    protected Button resetViewButton = new Button("Reset view and colors");
-    protected ToolBar topToolbar = new ToolBar(resetViewButton);
     protected Pane threeDPane = new Pane();
     protected Label threeDSelectedLabel = new Label();
-    protected VBox threeDUI = new VBox(topToolbar, threeDPane, threeDSelectedLabel);
+    protected VBox threeDUI = new VBox(threeDPane, threeDSelectedLabel);
 
     /**
      * @return if there are any SimpleMultipleChoice3DQuestion in this quiz
@@ -148,14 +161,22 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
 
 
     protected Parent makeUI() throws IOException{
+        this.runningTasks.addListener(new ListChangeListener<Task>() {
+            @Override
+            public void onChanged(Change<? extends Task> c) {
+                logger.log(Level.CONFIG, "running tasks: " + runningTasks.size());
+            }
+        });
         UIQuizView uiQuizView = new UIQuizView();
         this.controller = uiQuizView.getController();
         this.questUIAnchorPane = controller.getQuestUIAnchorPane();
 
         if (has3DQuestions()) {
-            resetViewButton.setOnAction(e -> threeDGroupHandler.resetModifiables());
+            this.threeDGroupHandler = new ThreeDGroupHandler(this.threeDPane, new PerspectiveCamera(true), ThreeDGroupHandler.DEFAULT_INITIAL_CAMERA_POSITION, "quiz3DHandler");
+            this.threeDGroupHandler.getHasFXGroupContentsContainer().setHandleLoadingTask(task -> {runBlockingTask(task, true); return null;});
+            this.threeDGroupHandler.setHandleLoadingTask((task -> {runBlockingTask(task, true);return null;}));
+
             VBox.setVgrow(threeDPane, Priority.ALWAYS);
-            this.threeDGroupHandler = new ThreeDGroupHandler(this.threeDPane, new PerspectiveCamera(true), ThreeDGroupHandler.DEFAULT_INIAL_CAMERA_POSITION, "quiz3DHandler");
             for (UIQuestion<?, S> question : this.questions) {
                 if (question instanceof Needs3DAccess needs3DAccessQuestion) {
                     needs3DAccessQuestion.giveAccess(this.threeDGroupHandler);
@@ -223,6 +244,76 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
         return uiQuizView.getRoot();
     }
 
+    protected ObservableList<Task> runningTasks = FXCollections.observableList(new LinkedList<>());
+
+    /*
+     * blurs the UI and also halts the timer of the quiz.
+     */
+    protected void blockingEffect(boolean flag) {
+        logger.log(Level.CONFIG, "Applying blurr="+flag);
+        VBox blockingVBox = controller.getMainProgressVBox();
+
+        blockingVBox.setManaged(flag);
+        blockingVBox.setVisible(flag);
+        controller.getMainBorderpane().setDisable(flag);    // to disable buttons and all
+
+        if (flag) {
+            if (timeline != null) timeline.pause();
+        } else {
+            if (timeline != null) timeline.play();
+        }
+
+        controller.getMainBorderpane().setEffect(flag ? new GaussianBlur(10) : null);
+    }
+
+    /**
+     * Binds a progress showing UI to a Task and runs it on a new Thread. Blurrs the main window while the task is running.
+     * @param task The task
+     * @param knowsProgress Can the task report progress or is progress indetermined?
+     */
+    public <T> void runBlockingTask(Task<T> task, boolean knowsProgress) {
+
+        logger.log(Level.CONFIG, "binding task. " + task.getMessage());
+
+        task.stateProperty().addListener((obs, oldState, newState) -> {
+            if (newState == Worker.State.CANCELLED || newState == Worker.State.SUCCEEDED || newState == Worker.State.FAILED) {
+                runningTasks.remove(task);
+                if (!runningTasks.isEmpty()) {
+                    controller.getMainProgressBar().progressProperty().unbind();
+                    controller.getMainProgressInd().progressProperty().unbind();
+                    controller.getMainProgressLabel().labelForProperty().unbind();
+                    Task nextTask = runningTasks.getFirst();
+                    controller.getMainProgressLabel().textProperty().bind(nextTask.messageProperty());
+                    controller.getMainProgressBar().progressProperty().bind(nextTask.progressProperty());
+                    controller.getMainProgressInd().progressProperty().bind(nextTask.progressProperty());
+
+                } else {
+                    blockingEffect(false);
+                }
+
+            } else if (newState == Worker.State.RUNNING) {
+                blockingEffect(true);
+                if (runningTasks.isEmpty()) {
+                    logger.log(Level.CONFIG, "binding first task " + task.getMessage());
+
+                    controller.getMainProgressLabel().textProperty().bind(task.messageProperty());
+
+                    if (knowsProgress) {
+                        controller.getMainProgressBar().progressProperty().bind(task.progressProperty());
+                        controller.getMainProgressInd().progressProperty().bind(task.progressProperty());
+                    } else {
+                        controller.getMainProgressInd().setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+                        controller.getMainProgressBar().setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+                    }
+                }
+                runningTasks.add(task);
+            }
+        });
+
+        new Thread(task).start();
+        blockingEffect(true);
+    }
+
     /**
      * does things that need to be done every time the current question changes
      */
@@ -242,11 +333,12 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
         finishedProperty.set(false);
         runningProperty.set(true);
         try {
-            Scene scene = new Scene(makeUI(),800,600);
+            Scene scene = new Scene(makeUI(),900,700);
             scene.getStylesheets().add(getClass().getResource("/Project/Styles/fonts.css").toExternalForm());
             Stage popupStage = new Stage();
             popupStage.setTitle(this.getName());
             popupStage.setScene(scene);
+            setKeyControls(scene);
             popupStage.show();
             if (timeline != null) timeline.play();
         } catch (IOException e) {
@@ -317,8 +409,9 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
         if (canNext()){
             currentQuestIndex++;
             currentQuestionProperty.set(questions.get(currentQuestIndex));
-            setQuestUIAnchorPaneChild(currentQuestionProperty.get().ask());
             onQuestionChange();
+            logger.log(Level.CONFIG, "Asking next question: " + currentQuestionProperty.get().getName() + "\n" + currentQuestionProperty.get().getInstructions());
+            setQuestUIAnchorPaneChild(currentQuestionProperty.get().ask());
             return currentQuestionProperty.get();
         } else return null;
     }
@@ -328,10 +421,25 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
         if (canPrevious()) {
             currentQuestIndex--;
             currentQuestionProperty.set(questions.get(currentQuestIndex));
+            logger.log(Level.CONFIG, "Asking previous question: " + currentQuestionProperty.get().getName() + "\n" + currentQuestionProperty.get().getInstructions());
             setQuestUIAnchorPaneChild(currentQuestionProperty.get().ask());
             onQuestionChange();
             return currentQuestionProperty.get();
         } else return null;
+    }
+
+    /**
+     * Enables controlling the UI via keyboard shortcuts by adding EventFilter to the given Scene.
+     */
+    protected void setKeyControls(Scene scene) {
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            boolean alt = event.isAltDown();
+            boolean shift = event.isShiftDown();
+            KeyCode keyCode = event.getCode();
+            if (event.isControlDown() || alt) {
+                if (List.of(KeyCode.LEFT, KeyCode.RIGHT, KeyCode.UP, KeyCode.DOWN, KeyCode.PLUS, KeyCode.MINUS).contains(keyCode)) threeDGroupHandler.rotationControl(keyCode, alt, shift);
+            }
+        });
     }
 
 }

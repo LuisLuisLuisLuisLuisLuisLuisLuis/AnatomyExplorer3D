@@ -1,6 +1,7 @@
 package Project.command.DrawCommands;
 
 import Project.SelectionModel.FXGroupDraw.HasFXGroupContents;
+import Project.SelectionModel.FXGroupSelection.HasFXGroupSelection;
 import Project.SelectionModel.SelectionGroup;
 import Project.command.Command;
 import Project.command.Remember.RememberHasFXGroupContents;
@@ -19,9 +20,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class SliceCommand implements Command {
+
+    private static final Logger logger = Logger.getLogger(SliceCommand.class.getName());
 
     private final HashSet<String> meshViewIDs;
     private final Group meshViewGroup;
@@ -32,7 +37,8 @@ public class SliceCommand implements Command {
     private RememberHasFXGroupContents rememberHasFXGroupContents;  //remembers Meshes that are fully removed by this slice and are not in their original state when this happens
 
     private final HasFXGroupContents hasFXGroupContents;
-    private final SelectionGroup<String> threeDSelectionGroup;
+//    private final SelectionGroup<String> threeDSelectionGroup;
+    private final HasFXGroupSelection hasFXGroupSelection;
 
     private Function<Task<Boolean>, Object> handleSlicingTask = null;
 
@@ -51,19 +57,20 @@ public class SliceCommand implements Command {
      * Relies on every MeshView having a unique, consistent ID. Requires that when a MeshView is replaced by a new identical MeshView,
      * that ID is kept.
      * Relies on MeshView.getUserData() == null -> MeshView's Mesh is the default one.
-     * @param meshViews
-     * @param meshViewGroup
-     * @param box
+     * @param meshViews list of MeshViews to be sliced. NOTE that they will only be sliced if they are selected by HasFXGroupContents.
+     * @param meshViewGroup Group that holds the MeshViews.
+     * @param box The plane along which the MeshViews will be sliced, represented by a thin Box. The plane is given by width and height of the box.
      */
-    public SliceCommand(List<MeshView> meshViews, Group meshViewGroup, Box box, HasFXGroupContents hasInnerGroupContents, SelectionGroup<String> threeDSelectionGroup) {
+    public SliceCommand(List<MeshView> meshViews, Group meshViewGroup, Box box, HasFXGroupContents hasInnerGroupContents, HasFXGroupSelection hasFXGroupSelection) {
         this.meshViewGroup = meshViewGroup;
         this.meshViewIDs = new HashSet<>();
         for (MeshView meshView : meshViews) meshViewIDs.add(meshView.getId());
 
-        meshViewIDToOgMesh = Collections.synchronizedMap(new HashMap(meshViews.size()));
+        meshViewIDToOgMesh = Collections.synchronizedMap(new HashMap<>(meshViews.size()));
 
         this.hasFXGroupContents = hasInnerGroupContents;
-        this.threeDSelectionGroup = threeDSelectionGroup;
+//        this.threeDSelectionGroup = threeDSelectionGroup;
+        this.hasFXGroupSelection = hasFXGroupSelection;
 
         double[] temp = null;           //needed to satisfy nxyd final constraint
         try {temp = Plane.extractPlaneFromBox(box, meshViewGroup);}
@@ -103,6 +110,7 @@ public class SliceCommand implements Command {
         Task<Boolean> task = new Task<>() {
             @Override
             protected Boolean call() throws Exception {
+                logger.log(Level.CONFIG, "Slicing task started");
                 updateMessage("Slicing MeshViews...");
                 ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
                 int total = meshViewGroup.getChildren().size();
@@ -150,7 +158,8 @@ public class SliceCommand implements Command {
         };
         task.setOnSucceeded(e -> {
             if (!unmodMeshesToRemoveFully.isEmpty()) {
-                threeDSelectionGroup.changeSelection(unmodMeshesToRemoveFully.stream().map(Node::getId).collect(Collectors.toSet()), false, true);
+//                threeDSelectionGroup.changeSelection(unmodMeshesToRemoveFully.stream().map(Node::getId).collect(Collectors.toSet()), false, true);
+                hasFXGroupSelection.unselect(unmodMeshesToRemoveFully);
                 for (MeshView meshView : unmodMeshesToRemoveFully) this.hasFXGroupContents.unselect(meshView);
             }
             for (MeshView meshView : meshesToSet.keySet()) {
@@ -160,7 +169,8 @@ public class SliceCommand implements Command {
             }
             if (!modMeshesToRemoveFully.isEmpty()) {
                 this.rememberHasFXGroupContents = new RememberHasFXGroupContents(hasFXGroupContents, modMeshesToRemoveFully);
-                threeDSelectionGroup.changeSelection(modMeshesToRemoveFully.stream().map(Node::getId).collect(Collectors.toSet()), false, true);
+//                threeDSelectionGroup.changeSelection(modMeshesToRemoveFully.stream().map(Node::getId).collect(Collectors.toSet()), false, true);
+                hasFXGroupSelection.unselect(modMeshesToRemoveFully);
                 for (MeshView meshView : modMeshesToRemoveFully) this.hasFXGroupContents.unselect(meshView);
             }
         });

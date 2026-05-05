@@ -58,7 +58,7 @@
                   </ToolBar>
                   <ToolBar prefHeight="40.0" prefWidth="200.0">
                      <items>
-                        <CheckBox fx:id="showCorrectAnswerCheckbox" mnemonicParsing="false" text="Show correct answer upon wrong answer" />
+                        <CheckBox fx:id="showCorrectAnswerCheckbox" mnemonicParsing="false" text="Show correct answer upon wrong answer" selected="true"/>
                         <Label text="🛈">
                            <tooltip>
                               <Tooltip text="Show the correct answer if a wrong answer is given." />
@@ -72,7 +72,7 @@
                   <ToolBar fx:id="difficultyToolbar" prefHeight="40.0" prefWidth="200.0">
                     <items>
                         <Label text="Difficulty" />
-                        <Slider fx:id="difficultySlider" majorTickUnit="100.0" max="500.0" min="100" minorTickCount="0" prefHeight="24.0" prefWidth="254.0" showTickMarks="true" snapToTicks="true" value="300.0" />
+                        <Slider fx:id="difficultySlider" majorTickUnit="100.0" max="500.0" min="100" minorTickCount="0" prefHeight="24.0" prefWidth="254.0" showTickMarks="true" value="300.0" />
                     </items>
                   </ToolBar>
                   <ToolBar fx:id="nquestionsToolbar" prefHeight="40.0" prefWidth="200.0">

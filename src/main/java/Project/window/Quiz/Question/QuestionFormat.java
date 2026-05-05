@@ -1,18 +1,11 @@
-package Project.window.Quiz;
+package Project.window.Quiz.Question;
 
-import Project.Util.Lorem;
+import Project.window.Quiz.Difficulty;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.ToolBar;
 import javafx.scene.layout.*;
-import org.w3c.dom.Text;
-
-import javax.swing.*;
-import java.util.LinkedList;
 
 public class QuestionFormat {
 
@@ -26,15 +19,22 @@ public class QuestionFormat {
 
         top.setPadding(DEFAULT_PADDING);
         top.setSpacing(25);
-        top.getChildren().add(new Label((name != null && !name.isBlank() ? name : "")));
+        Label nameLabel = new Label((name != null && !name.isBlank() ? name : ""));
+        nameLabel.setMinWidth(Region.USE_PREF_SIZE);
+
+        top.getChildren().add(nameLabel);
         Region topSpacer1 = new Region();
         HBox.setHgrow(topSpacer1, Priority.ALWAYS);
         top.getChildren().add(topSpacer1);
-        top.getChildren().add(new Label((difficulty != null ? "Difficulty: " + difficulty : "")));
+        Label diffLabel = new Label((difficulty != null ? "Difficulty: " + difficulty : ""));
+        diffLabel.setMinWidth(Region.USE_PREF_SIZE);
+        top.getChildren().add(diffLabel);
         Region topSpacer2 = new Region();
         HBox.setHgrow(topSpacer2, Priority.ALWAYS);
         top.getChildren().add(topSpacer2);
-        top.getChildren().add(new Label("Pts (min/max): " + minScore + "/" + maxScore));
+        Label ptsLabel = new Label("Pts (min/max): " + minScore + "/" + maxScore);
+        ptsLabel.setMinWidth(Region.USE_PREF_SIZE);
+        top.getChildren().add(ptsLabel);
 
         result.setTop(top);
         VBox centerBox = new VBox();
@@ -48,12 +48,12 @@ public class QuestionFormat {
 
         BorderPane.setMargin(uiContainer, new Insets(10));
 
-        Label instructionArea = new Label(instructions);
-        instructionArea.setWrapText(true);
-        ScrollPane scrollPane = new ScrollPane(instructionArea);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        Label instructionsLabel = new Label(instructions);
+        instructionsLabel.setMinWidth(Region.USE_PREF_SIZE);
+        ScrollPane scrollPane = new ScrollPane(instructionsLabel);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        scrollPane.setMinHeight(0);
+        scrollPane.setPrefHeight(instructionsLabel.getPrefHeight());
         scrollPane.setFitToWidth(true);
         Region centerSpacer = new Region();
         VBox.setVgrow(centerSpacer, Priority.ALWAYS);
