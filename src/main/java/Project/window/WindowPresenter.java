@@ -521,6 +521,18 @@ public class WindowPresenter {
         });
 
 
+        //------------------optional sync tree + 3D selection
+        HasGroup<ANode> hasTreeSelectionGroup = new HasGroup<>(treeViewSelectionGroup);
+        HasTreeSelectionGroupContainer hasTreeSelectionGroupContainer = new HasTreeSelectionGroupContainer(hasTreeSelectionGroup, selectionMediatorTree3D_Selection);
+
+        controller.getSelectionSynchCheck().setOnAction(e -> {
+            if (controller.getSelectionSynchCheck().isSelected()) {
+                threeDSelectionGroup.addSelectionContainer(hasTreeSelectionGroupContainer);
+            } else threeDSelectionGroup.removeSelectionContainer(hasTreeSelectionGroupContainer);
+        });
+        //-----------------------------
+
+
         //------expand and collapse button for the tree view-----------------
         controller.getTreeExpandButton().setOnAction(e -> {
             treeViewSelectionGroup.setNoUpdating(true);
@@ -548,8 +560,12 @@ public class WindowPresenter {
 
         //-----------------buttons to draw / undraw------------------------------
         controller.getRemoveObjButton().setOnAction(e -> {
-            executeCommand(new RemoveObjFrom3DCommand(new HashSet<>(hasInnerGroupSelectedItems.getSelection()), hasInnerGroupContents, hasInnerGroupSelectedItems));
-//            executeCommand(new RemoveObjFrom3DCommand(new HashSet<>(threeDSelectionGroup.getSelection()), threeDContentGroup, hasInnerGroupContents, threeDSelectionGroup));
+            if (hasInnerGroupSelectedItems.getSelection().isEmpty()) return;
+            if (controller.getSelectionSynchCheck().isSelected()) {
+                Set<MeshView> toRemove = new HashSet<>(hasInnerGroupSelectedItems.getSelection());
+                threeDSelectionGroup.changeSelection(Set.of(),true, false); //this will be the result of the operation anyway so i can save time by doing this here instead of updating per item during the remove operation.
+                executeCommand(new RemoveObjFrom3DCommand(toRemove, hasInnerGroupContents, hasInnerGroupSelectedItems));
+            } else executeCommand(new RemoveObjFrom3DCommand(new HashSet<>(hasInnerGroupSelectedItems.getSelection()), hasInnerGroupContents, hasInnerGroupSelectedItems));
         });
         controller.getRemoveObjButton().disableProperty().bind(Bindings.isEmpty(hasInnerGroupContents.getSelection()));
 
@@ -584,7 +600,7 @@ public class WindowPresenter {
             for (TreeViewSelectionContainer treeViewSelectionContainer1 : this.treeViewSelectionContainers) if (treeViewSelectionContainer1.getId().equals(getSelectedTreeView().getId())) treeViewSelectionContainer = treeViewSelectionContainer1;
             if (treeViewSelectionContainer == null) {System.out.println("drawin3dButton: treeViewSelectionContainer is null!"); return;}
             HashSet<String> toRemove = new HashSet<>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()));
-            for (String item : new HashSet<>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()))) {  //need to create this again to not concurrently modify doDraw
+            for (String item : new HashSet<>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()))) {  //need to create this again to not concurrently modify toRemove
                 if (!threeDContentGroup.getSelection().contains(item)) {
                     toRemove.remove(item);    //remove items that aren't even drawn
                 }
@@ -592,13 +608,19 @@ public class WindowPresenter {
             if (!toRemove.isEmpty()) {
                 Set<MeshView> meshViews = new HashSet<>();
                 for (String id : toRemove) meshViews.addAll(hasTheeDContentsContainer.transformGroupItemToSelectionItem(id));
-                executeCommand(new RemoveObjFrom3DCommand(meshViews, hasInnerGroupContents, hasInnerGroupSelectedItems));
-//                executeCommand(new RemoveObjFrom3DCommand(toRemove, threeDContentGroup, hasInnerGroupContents, threeDSelectionGroup));
+
+//                executeCommand(new RemoveObjFrom3DCommand(meshViews, hasInnerGroupContents, hasInnerGroupSelectedItems));
+//                if (controller.getSelectionSynchCheck().isSelected()) {
+//                    treeViewSelectionGroup.setNoUpdating(true);
+//                    threeDSelectionGroup.changeSelection(toRemove, false, false);
+//                    treeViewSelectionGroup.setNoUpdating(false);
+//                }
+
                 if (controller.getSelectionSynchCheck().isSelected()) {
-                    treeViewSelectionGroup.setNoUpdating(true);
-                    threeDSelectionGroup.changeSelection(toRemove, false, false);
-                    treeViewSelectionGroup.setNoUpdating(false);
-                }
+                    treeViewSelectionGroup.changeSelection(selectionMediatorTree3D_Selection.transformBSelectionToASelection(toRemove), false, true);   //prevents lengthy updating of treeviewgroup during removecommand by unselecting those items before already.
+                    executeCommand(new RemoveObjFrom3DCommand(meshViews, hasInnerGroupContents, hasInnerGroupSelectedItems));
+                } else executeCommand(new RemoveObjFrom3DCommand(meshViews, hasInnerGroupContents, hasInnerGroupSelectedItems));
+
             }
 //            executeCommand(new RemoveObjFrom3DCommand(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionGroup.getSelection()), threeDContentGroup, hasInnerGroupContents, threeDSelectionGroup));
         });
