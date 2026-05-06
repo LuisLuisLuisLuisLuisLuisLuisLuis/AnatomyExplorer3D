@@ -65,8 +65,8 @@ public class SimpleSliceMCQuestion<T,S extends Comparable<S>> extends SimpleMult
      * @param idsToSelect       Meshviews that will be selected upon asking the question. In the format of filenames of OBJ files.
      * @param resourceLocations where to find the OBJ files specified by idsToDraw and idsToSelect
      */
-    public SimpleSliceMCQuestion(Difficulty difficulty, S minScore, S maxScore, T correctAnswer, List<T> possibleAnswers, List<String> idsToDraw, List<String> idsToSelect, List<URI> resourceLocations) {
-        super(difficulty, minScore, maxScore, correctAnswer, possibleAnswers, idsToDraw, idsToSelect, resourceLocations);
+    public SimpleSliceMCQuestion(Difficulty difficulty, S minScore, S maxScore, T correctAnswer, List<T> possibleAnswers, List<String> idsToDraw, List<String> idsToSelect, boolean forceOnlyOneAnswer, List<URI> resourceLocations) {
+        super(difficulty, minScore, maxScore, correctAnswer, possibleAnswers, idsToDraw, idsToSelect, forceOnlyOneAnswer, resourceLocations);
     }
 
     /** between 0 and 5 incl.*/

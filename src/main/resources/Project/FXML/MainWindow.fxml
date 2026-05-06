@@ -234,7 +234,7 @@
                   </ToolBar>
                </top>
             </BorderPane>
-            <VBox fx:id="blockingProgressVBox" alignment="CENTER" managed="false" style="-fx-background-color: rgba(0,0,0,0.4);" visible="false" StackPane.alignment="CENTER">
+            <VBox fx:id="blockingProgressVBox" alignment="CENTER" managed="false" visible="false" StackPane.alignment="CENTER"> <!-- for dark background style="-fx-background-color: rgba(0,0,0,0.4);"-->
                <children>
                   <ProgressIndicator fx:id="blockingProgressInd" progress="0.0" />
                   <ProgressBar fx:id="blockingProgressBar" prefWidth="200.0" progress="0.0" />

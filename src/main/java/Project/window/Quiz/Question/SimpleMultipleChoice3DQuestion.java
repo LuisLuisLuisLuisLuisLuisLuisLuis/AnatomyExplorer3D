@@ -56,6 +56,27 @@ public class SimpleMultipleChoice3DQuestion<T,S extends Comparable<S>> extends S
         this.resourceLocations = resourceLocations;
     }
 
+    /**
+     * A simple multiple choice question model with only one correct answer. Draws some stuff in 3D and asks via multiple choice.
+     * Only one correct answer.
+     *
+     * @param difficulty      difficulty of the question
+     * @param minScore        minimum score
+     * @param maxScore        max score
+     * @param correctAnswer   correct answer
+     * @param possibleAnswers choices this question. it is only possible to answer with one of the choices
+     * @param idsToDraw Meshview IDs that will be drawn upon asking the question. In the format of filenames of OBJ files.
+     * @param idsToSelect Meshviews that will be selected upon asking the question. In the format of filenames of OBJ files.
+     * @param resourceLocations where to find the OBJ files specified by idsToDraw and idsToSelect
+     */
+    public SimpleMultipleChoice3DQuestion(Difficulty difficulty, S minScore, S maxScore, T correctAnswer, List<T> possibleAnswers, List<String> idsToDraw, List<String> idsToSelect, boolean forceOnlyOneAnsewr, List<URI> resourceLocations) {
+        super(difficulty, minScore, maxScore, correctAnswer, possibleAnswers, forceOnlyOneAnsewr);
+
+        this.idsToDraw = idsToDraw;
+        this.idsToSelect = idsToSelect;
+        this.resourceLocations = resourceLocations;
+    }
+
     protected void checkIDs() {
         nonExist = new LinkedList<>();
         for (String id : idsToDraw) {

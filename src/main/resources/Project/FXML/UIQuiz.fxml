@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Project.window.Quiz.UIQuizController">
    <children>
@@ -23,7 +24,7 @@
                     <items>
                       <Button fx:id="prevButton" mnemonicParsing="false" text="Previous" />
                         <Button fx:id="nextButton" mnemonicParsing="false" text="Next" />
-                        <Button fx:id="endButton" mnemonicParsing="false" text="End" />
+                        <Button fx:id="endButton" mnemonicParsing="false" text="Quit" />
                     </items>
                   </ToolBar>
                </bottom>
@@ -50,11 +51,24 @@
                   </SplitPane>
                </center>
             </BorderPane>
-            <VBox fx:id="mainProgressVBox" alignment="CENTER" managed="false" style="-fx-background-color: rgba(0,0,0,0.4);" visible="false">
+            <VBox fx:id="mainProgressVBox" alignment="CENTER" managed="false" visible="false"> <!-- style="-fx-background-color: rgba(0,0,0,0.4);" for dark effect -->
                <children>
                   <ProgressIndicator fx:id="mainProgressInd" progress="0.0" />
                   <ProgressBar fx:id="mainProgressBar" prefWidth="200.0" progress="0.0" />
                   <Label fx:id="mainProgressLabel" text="Label" />
+               </children>
+            </VBox>
+            <VBox fx:id="timeupVbox" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" visible="false">
+               <children>
+                  <Label text="Time up">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font></Label>
+                  <Label fx:id="timeupPtsLabel">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font></Label>
+                  <Button fx:id="timeupQuitButton" mnemonicParsing="false" text="Quit" />
                </children>
             </VBox>
          </children>

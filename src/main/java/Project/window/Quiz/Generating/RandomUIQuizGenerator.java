@@ -129,8 +129,8 @@ public class RandomUIQuizGenerator {
         controller.getDifficultySlider().setShowTickLabels(true);
 
         controller.getTimeUnitChoiceBox().getItems().addAll("Seconds", "Minutes", "Hours", "No Limit");
-        controller.getTimeUnitChoiceBox().setValue("Minutes");
         controller.getTimeTextField().disableProperty().bind(Bindings.equal("No Limit", controller.getTimeUnitChoiceBox().valueProperty()));
+        controller.getTimeUnitChoiceBox().setValue("No Limit");
 
         ObservableSet<LittlePopUp.SelectTreeItemResult> selectTreeItemResults = FXCollections.observableSet(new HashSet<>());
         selectTreeItemResults.addListener(new SetChangeListener<LittlePopUp.SelectTreeItemResult>() {
@@ -371,8 +371,11 @@ public class RandomUIQuizGenerator {
 
         String correctAnswer = target.getValue().name();
         List<String> possibleOptions = new ArrayList<>(DEFAULT_NO_MC_OPTIONS);
-        possibleOptions.add(correctAnswer);
-        possibleOptions.addAll(relativesIncludingTarget.stream().map(t -> t.getValue().name()).toList().subList(0, Math.min(DEFAULT_NO_MC_OPTIONS-1, relativesIncludingTarget.size())));
+        possibleOptions.addAll(relativesIncludingTarget.stream().map(t -> t.getValue().name()).toList().subList(0, Math.min(DEFAULT_NO_MC_OPTIONS, relativesIncludingTarget.size())));
+        if (!possibleOptions.contains(correctAnswer)) {
+            possibleOptions.removeFirst();
+            possibleOptions.add(correctAnswer);
+        }
 
         logger.log(Level.CONFIG, "relativesIncTarget: " + relativesIncludingTarget + "\nwhereas toDraw= " + toDraw);
         SimpleMultipleChoice3DQuestion<String, Integer> question = new SimpleMultipleChoice3DQuestion<>(
@@ -381,6 +384,7 @@ public class RandomUIQuizGenerator {
                 possibleOptions, //                relativesIncludingTarget.stream().map(t -> t.getValue().name()).toList(),
                 toDraw,
                 target.getValue().fileIds().stream().toList(),
+                true,
                 resourceLocations);
         question.setName(name);
         question.setInstructions(instructions);
@@ -429,6 +433,7 @@ public class RandomUIQuizGenerator {
                 namesForMCOptions,
                 toDraw.stream().toList(),
                 target.getValue().fileIds().stream().toList(),
+                true,
                 resourceLocations);
 
         question.setName(name);
@@ -442,7 +447,8 @@ public class RandomUIQuizGenerator {
 
     public SimpleMultipleChoiceUIQuestion<String, Integer> makeVeinDrainQuestion(TreeItem<ANode> target, String name, Difficulty difficulty, Integer minScore, Integer maxScore) {
 
-        List<String> possibleAnswers = new ArrayList<>(findRelatives2(target, DEFAULT_NO_MC_OPTIONS).stream().map(t -> t.getValue().name()).toList());
+        List<String> possibleAnswers = new ArrayList<>(findRelatives2(target, DEFAULT_NO_MC_OPTIONS+1).stream().map(t -> t.getValue().name()).toList());
+        possibleAnswers.remove(target.getValue().name());
         String correctAnswer = target.getParent().getValue().name();
         if (!possibleAnswers.contains(correctAnswer)) {
             possibleAnswers.removeLast();

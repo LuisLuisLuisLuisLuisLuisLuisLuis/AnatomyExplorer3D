@@ -88,6 +88,8 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
         questUIAnchorPane.getChildren().clear();
         questUIAnchorPane.getChildren().add(child);
     }
+    /** The stage of this quiz.*/
+    protected Stage popupStage = new Stage();
 
     protected UIQuizController controller;
 
@@ -222,6 +224,14 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
             );
             timeline.setCycleCount(cycleCount.get());
 
+            timeline.setOnFinished(e -> {
+                controller.getMainBorderpane().setDisable(true);
+                controller.getMainBorderpane().setEffect(new GaussianBlur(10));
+                controller.getTimeupVbox().setVisible(true);
+                controller.getTimeupPtsLabel().setText("Score: " + getScore());
+                controller.getTimeupQuitButton().setOnAction(ev -> stop());
+            });
+
         } else controller.getTimeLabel().setText("        ");   // for correct spacing
 
         HBox.setHgrow(controller.getTopSpacer1(), Priority.ALWAYS);
@@ -239,7 +249,9 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
 
         controller.getNextButton().setOnAction(e -> next());
         controller.getPrevButton().setOnAction(e -> previous());
-        controller.getEndButton().setOnAction(e -> stop());
+        controller.getEndButton().setOnAction(e -> {
+            if (LittlePopUp.showMsg("Quit", "Do you really want to quit?", "Yes", "No")) stop();
+        });
 
         return uiQuizView.getRoot();
     }
@@ -335,7 +347,6 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
         try {
             Scene scene = new Scene(makeUI(),900,700);
             scene.getStylesheets().add(getClass().getResource("/Project/Styles/fonts.css").toExternalForm());
-            Stage popupStage = new Stage();
             popupStage.setTitle(this.getName());
             popupStage.setScene(scene);
             setKeyControls(scene);
@@ -349,9 +360,9 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
 
     @Override
     public void stop() {
-        //TODO: allow stop if not all questions have been answered / looked at? -> warn message
         runningProperty.set(false);
         finishedProperty.set(true);
+        popupStage.close();
     }
 
     @Override
@@ -412,6 +423,7 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
             onQuestionChange();
             logger.log(Level.CONFIG, "Asking next question: " + currentQuestionProperty.get().getName() + "\n" + currentQuestionProperty.get().getInstructions());
             setQuestUIAnchorPaneChild(currentQuestionProperty.get().ask());
+            controller.getNextButton().requestFocus();
             return currentQuestionProperty.get();
         } else return null;
     }
@@ -423,6 +435,7 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
             currentQuestionProperty.set(questions.get(currentQuestIndex));
             logger.log(Level.CONFIG, "Asking previous question: " + currentQuestionProperty.get().getName() + "\n" + currentQuestionProperty.get().getInstructions());
             setQuestUIAnchorPaneChild(currentQuestionProperty.get().ask());
+            controller.getPrevButton().requestFocus();
             onQuestionChange();
             return currentQuestionProperty.get();
         } else return null;

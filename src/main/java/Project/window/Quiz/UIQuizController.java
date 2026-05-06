@@ -7,6 +7,12 @@ import javafx.scene.layout.*;
 public class UIQuizController {
 
     @FXML
+    private Button timeupQuitButton;
+    @FXML
+    private VBox timeupVbox;
+    @FXML
+    private Label timeupPtsLabel;
+    @FXML
     private BorderPane mainBorderpane;
     @FXML
     private VBox mainProgressVBox;
@@ -111,6 +117,18 @@ public class UIQuizController {
 
     public ToolBar getQuestInfoToolbar() {
         return questInfoToolbar;
+    }
+
+    public Label getTimeupPtsLabel() {
+        return timeupPtsLabel;
+    }
+
+    public VBox getTimeupVbox() {
+        return timeupVbox;
+    }
+
+    public Button getTimeupQuitButton() {
+        return timeupQuitButton;
     }
 }
 
