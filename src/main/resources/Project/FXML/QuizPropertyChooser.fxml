@@ -24,17 +24,13 @@
                <children>
                   <ToolBar fx:id="treeItemChoosingToolbar">
                      <items>
-                        <Label text="Topics ">
-                           <tooltip>
-                              <Tooltip text="Trees from which questions will be generated. Topics will be distributed evenly across questions." />
-                           </tooltip>
-                        </Label>
+                        <Label text="Topics"/>
                         <Label text="🛈">
-                           <tooltip>
-                              <Tooltip text="Trees from which questions will be generated" />
-                           </tooltip>
+                            <tooltip>
+                                <Tooltip text="Trees from which questions will be generated. Topics will be distributed evenly across questions." />
+                            </tooltip>
                            <font>
-                              <Font size="15.0" />
+                              <Font size="14.0" />
                            </font>
                         </Label>
                          <HBox fx:id="treeItemDisplayOuterHBox">
@@ -58,21 +54,31 @@
                   </ToolBar>
                   <ToolBar prefHeight="40.0" prefWidth="200.0">
                      <items>
-                        <CheckBox fx:id="showCorrectAnswerCheckbox" mnemonicParsing="false" text="Show correct answer upon wrong answer" selected="true"/>
+                        <CheckBox fx:id="showCorrectAnswerCheckbox" mnemonicParsing="false" selected="true" text="Show correct answer upon wrong answer" />
                         <Label text="🛈">
                            <tooltip>
                               <Tooltip text="Show the correct answer if a wrong answer is given." />
                            </tooltip>
                            <font>
-                              <Font size="15.0" />
+                              <Font size="14.0" />
                            </font>
                         </Label>
                      </items>
                   </ToolBar>
                   <ToolBar fx:id="difficultyToolbar" prefHeight="40.0" prefWidth="200.0">
                     <items>
-                        <Label text="Difficulty" />
-                        <Slider fx:id="difficultySlider" majorTickUnit="100.0" max="500.0" min="100" minorTickCount="0" prefHeight="24.0" prefWidth="254.0" showTickMarks="true" value="300.0" />
+                        <Label text="How much to draw in 3D questions">
+                        </Label>
+                        <Label text="🛈">
+                           <tooltip>
+                              <Tooltip text="How many objects to draw in 3D questions (excl. cross section) besides the object that is asked about" />
+                           </tooltip>
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+<!--                        <Slider fx:id="difficultySlider" majorTickUnit="100.0" max="500.0" min="100.0" minorTickCount="0" prefHeight="24.0" prefWidth="254.0" showTickMarks="true" value="300.0" />-->
+                        <Slider fx:id="howMuchDrawSlider" value="15" majorTickUnit="5" max="30" minorTickCount="50" prefHeight="24.0" prefWidth="254.0" showTickMarks="true" snapToTicks="true" />
                     </items>
                   </ToolBar>
                   <ToolBar fx:id="nquestionsToolbar" prefHeight="40.0" prefWidth="200.0">

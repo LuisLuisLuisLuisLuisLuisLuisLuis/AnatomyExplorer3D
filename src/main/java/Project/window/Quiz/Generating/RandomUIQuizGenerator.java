@@ -10,6 +10,7 @@ import Project.window.SupportingUI.ReusableUIComponent;
 import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
 import Project.window.TreeView.TreeViewEditing.TreeViewSetup;
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
@@ -109,18 +110,29 @@ public class RandomUIQuizGenerator {
 
         controller.getNquestionsTextfield().setTextFormatter(new TextFormatter<>(nquestionsFilter));
         controller.getTimeTextField().setTextFormatter(new TextFormatter<>(timeFilter));
+//        controller.getDifficultySlider().setLabelFormatter(new StringConverter<Double>() {    // when the slider still encoded difficulty
+//            @Override
+//            public String toString(Double value) {
+//                return switch (value.intValue()) {
+//                    case 100 -> "Very easy";
+//                    case 200 -> "Easy";
+//                    case 300 -> "Medium";
+//                    case 400 -> "Hard";
+//                    case 500 -> "Very hard";
+//                    default -> controller.getDifficultySlider().getValue() + "";
+//                };
+//            }
+//            @Override
+//            public Double fromString(String string) {
+//                return 0.0;
+//            }
+//        });
         controller.getDifficultySlider().setLabelFormatter(new StringConverter<Double>() {
             @Override
-            public String toString(Double value) {
-                return switch (value.intValue()) {
-                    case 100 -> "Very easy";
-                    case 200 -> "Easy";
-                    case 300 -> "Medium";
-                    case 400 -> "Hard";
-                    case 500 -> "Very hard";
-                    default -> controller.getDifficultySlider().getValue() + "";
-                };
+            public String toString(Double object) {
+                return "" + object.intValue();
             }
+
             @Override
             public Double fromString(String string) {
                 return 0.0;
@@ -178,22 +190,25 @@ public class RandomUIQuizGenerator {
                     resourceLocations.add(model.getFilesDir().toURI());
                 }
             }
-            Difficulty difficulty =
-                    switch ((int) controller.getDifficultySlider().getValue()) {
-                case 100 -> Difficulty.VERY_EASY;
-                case 200 -> Difficulty.EASY;
-                case 300 -> Difficulty.MEDIUM;
-                case 400 -> Difficulty.HARD;
-                case 500 -> Difficulty.VERY_HARD;
-                default -> new Difficulty((int) controller.getDifficultySlider().getValue(), "Custom: " + (int) controller.getDifficultySlider().getValue());
-            };
+
+//            Difficulty difficulty =
+//                    switch ((int) controller.getDifficultySlider().getValue()) {
+//                case 100 -> Difficulty.VERY_EASY;
+//                case 200 -> Difficulty.EASY;
+//                case 300 -> Difficulty.MEDIUM;
+//                case 400 -> Difficulty.HARD;
+//                case 500 -> Difficulty.VERY_HARD;
+//                default -> new Difficulty((int) controller.getDifficultySlider().getValue(), "Custom: " + (int) controller.getDifficultySlider().getValue());
+//            };
+            HOW_MUCH_TO_DRAW = (int) controller.getDifficultySlider().getValue() + 1;   //+1 because at least the target needs to be drawn
+
             int time = controller.getTimeUnitChoiceBox().getValue().equals("No Limit") ? -1 : Integer.parseInt(controller.getTimeTextField().getText());
             TimeUnit timeUnit = switch (controller.getTimeUnitChoiceBox().getValue()) {
                 case "Hours" -> TimeUnit.HOURS;
                 case "Seconds" -> TimeUnit.SECONDS;
                 default -> TimeUnit.MINUTES;
             };
-            this.integerUIQuiz = simpleIntQuizFromTree(roots, resourceLocations, Integer.parseInt(controller.getNquestionsTextfield().getText()), difficulty, time,timeUnit, controller.getShowCorrectAnswerCheckbox().isSelected());
+            this.integerUIQuiz = simpleIntQuizFromTree(roots, resourceLocations, Integer.parseInt(controller.getNquestionsTextfield().getText()), null, time,timeUnit, controller.getShowCorrectAnswerCheckbox().isSelected());
             onCreate();
         });
 
@@ -302,6 +317,8 @@ public class RandomUIQuizGenerator {
     /** Default number of options in a multiple choice question*/
     private final int DEFAULT_NO_MC_OPTIONS = 6;
 
+    private int HOW_MUCH_TO_DRAW = 12;
+
 
     private int difficultyToN(Difficulty difficulty) {
         return 12 - difficulty.getDifficultyLevel() / 100;
@@ -363,7 +380,7 @@ public class RandomUIQuizGenerator {
 
     public SimpleMultipleChoice3DQuestion<String, Integer> makeSimpleMultipleChoice3DQuestion(String name, String instructions, Difficulty difficulty, TreeItem<ANode> target, List<URI> resourceLocations) {
 
-        Set<TreeItem<ANode>> relativesIncludingTarget = findRelatives2(target, difficultyToN(difficulty));
+        Set<TreeItem<ANode>> relativesIncludingTarget = findRelatives2(target, difficulty !=  null ? difficultyToN(difficulty) : HOW_MUCH_TO_DRAW);
         List<String> toDraw = new LinkedList<>();
         for (TreeItem<ANode> treeItem : relativesIncludingTarget) {
             toDraw.addAll(treeItem.getValue().fileIds());
@@ -393,7 +410,7 @@ public class RandomUIQuizGenerator {
 
     public SimpleSelectIn3DUIQuestion<Integer> makeSimpleSelectIn3DUIQuestion(String name, String instructions, Difficulty difficulty, Integer minScore, Integer maxScore, TreeItem<ANode> target, List<URI> resourceLocations, boolean showHintOnWrongAnswer) {
 
-        Set<TreeItem<ANode>> relativesIncludingTarget = findRelatives2(target, difficultyToN(difficulty));
+        Set<TreeItem<ANode>> relativesIncludingTarget = findRelatives2(target, difficulty != null ? difficultyToN(difficulty) : HOW_MUCH_TO_DRAW);
         List<String> toDraw = new LinkedList<>();
         for (TreeItem<ANode> treeItem : relativesIncludingTarget) {
             toDraw.addAll(treeItem.getValue().fileIds());

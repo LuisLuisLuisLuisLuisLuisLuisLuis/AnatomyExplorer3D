@@ -9,8 +9,6 @@ public class QuizPropertyChooserController {
     @FXML
     private Label noTreeSelectedLabel;
     @FXML
-    private Label topicsInfoLabel;
-    @FXML
     private ToolBar treeItemChoosingToolbar;
     @FXML
     private HBox treeItemDisplayOuterHBox;
@@ -19,7 +17,7 @@ public class QuizPropertyChooserController {
     @FXML
     private ChoiceBox<String> timeUnitChoicebox;
     @FXML
-    private Slider difficultySlider;
+    private Slider howMuchDrawSlider;
     @FXML
     private Button acceptButton;
     @FXML
@@ -29,13 +27,9 @@ public class QuizPropertyChooserController {
     @FXML
     private TextField timeTextField;
     @FXML
-    private MenuButton timeUnitMenuButton;
-    @FXML
     private CheckBox showCorrectAnswerCheckbox;
     @FXML
     private ToolBar difficultyToolbar;
-    @FXML
-    private MenuButton difficutlyMenuButton;
     @FXML
     private ToolBar nquestionsToolbar;
     @FXML
@@ -53,20 +47,12 @@ public class QuizPropertyChooserController {
         return timeTextField;
     }
 
-    public MenuButton getTimeUnitMenuButton() {
-        return timeUnitMenuButton;
-    }
-
     public CheckBox getShowCorrectAnswerCheckbox() {
         return showCorrectAnswerCheckbox;
     }
 
     public ToolBar getDifficultyToolbar() {
         return difficultyToolbar;
-    }
-
-    public MenuButton getDifficutlyMenuButton() {
-        return difficutlyMenuButton;
     }
 
     public ToolBar getNquestionsToolbar() {
@@ -82,7 +68,7 @@ public class QuizPropertyChooserController {
     }
 
     public Slider getDifficultySlider() {
-        return difficultySlider;
+        return howMuchDrawSlider;
     }
 
     public ChoiceBox<String> getTimeUnitChoiceBox() {
@@ -99,10 +85,6 @@ public class QuizPropertyChooserController {
 
     public ToolBar getTreeItemChoosingToolbar() {
         return treeItemChoosingToolbar;
-    }
-
-    public Label getTopicsInfoLabel() {
-        return topicsInfoLabel;
     }
 
     public Label getNoTreeSelectedLabel() {
