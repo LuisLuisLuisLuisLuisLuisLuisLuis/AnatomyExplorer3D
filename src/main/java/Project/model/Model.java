@@ -47,7 +47,7 @@ public class Model {
      * @param fileIDs List of format: concept id\tname\tfilename, where filename corresponds to the name of an .obj file excluding the .obj extension.
      * @param filesDirURL Directory that holds the Files.
      */
-    public Model(InputStream relations, InputStream fileIDs, String name, URL filesDirURL) {
+    public Model(InputStream relations, InputStream fileIDs, String name, URL filesDirURL) throws IllegalArgumentException {
         this.root = TreeLoader.load(fileIDs, relations);
         this.name = name;
         this.filesDirURL = filesDirURL;

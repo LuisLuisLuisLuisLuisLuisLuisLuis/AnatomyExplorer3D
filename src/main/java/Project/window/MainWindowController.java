@@ -11,6 +11,8 @@ import javafx.scene.layout.VBox;
 public class MainWindowController {
 
     @FXML
+    private Label treeInfoLabel;
+    @FXML
     private Button quizButton;
     @FXML
     private MenuButton selectionStyleButton;
@@ -466,5 +468,7 @@ public class MainWindowController {
 
     public Button getQuizButton() {return quizButton;}
 
-
+    public Label getTreeInfoLabel() {
+        return treeInfoLabel;
+    }
 }

@@ -2362,7 +2362,6 @@ FMA24439	right triquetral	FJ3390
 FMA24437	right lunate	FJ3374
 FMA24441	right pisiform	FJ3382
 FMA24435	right scaphoid	FJ3383
-FMA11345	right forearm	FJ1471
 FMA23707	interosseous membrane of right forearm	FJ1476
 FMA23464	right radius	FJ3349
 FMA23467	right ulna	FJ3391

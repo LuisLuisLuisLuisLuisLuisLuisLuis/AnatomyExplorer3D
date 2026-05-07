@@ -200,6 +200,7 @@ public class RandomUIQuizGenerator {
 //                case 500 -> Difficulty.VERY_HARD;
 //                default -> new Difficulty((int) controller.getDifficultySlider().getValue(), "Custom: " + (int) controller.getDifficultySlider().getValue());
 //            };
+
             HOW_MUCH_TO_DRAW = (int) controller.getDifficultySlider().getValue() + 1;   //+1 because at least the target needs to be drawn
 
             int time = controller.getTimeUnitChoiceBox().getValue().equals("No Limit") ? -1 : Integer.parseInt(controller.getTimeTextField().getText());
@@ -257,6 +258,7 @@ public class RandomUIQuizGenerator {
      * @return The types of questions this class can make for that treeItem
      */
     private List<AllQuestionTypes> getQuestTypesForTarget(TreeItem<ANode> target) {
+        if (forbiddenIDs.contains(target.getValue().conceptId())) return List.of();
         List<AllQuestionTypes> result = new LinkedList<>();
         result.add(AllQuestionTypes.IDENTIFY_IN_3D);
         if (!forbiddenIDsForSelectIn3D.contains(target.getValue().conceptId()) && !TreeAnalysisUtils.isPartOfTree(respiratorySystem, target)) result.add(AllQuestionTypes.SELECT_IN_3D);  // resp system has many (leaf) nodes with broad names that still have fileIDs because
@@ -311,8 +313,16 @@ public class RandomUIQuizGenerator {
     private TreeItem<ANode> prehepPortal = null;
 
 
-    private Set<String> forbiddenIDsForSelectIn3D = Set.of("FJ1913");
+    /** these must not be target for select in 3d questions*/
+    private final Set<String> forbiddenIDsForSelectIn3D = Set.of("FJ1913");
 
+    /** these must not be drawn at all*/
+    private final Set<String> forbiddenIDs; //for now only skin. reason: it hides everything else.
+    {
+        Set<String> result = HashSet.newHashSet(2);
+        result.add("FJ2810");
+        forbiddenIDs = result;
+    }
 
     /** Default number of options in a multiple choice question*/
     private final int DEFAULT_NO_MC_OPTIONS = 6;
@@ -325,7 +335,6 @@ public class RandomUIQuizGenerator {
     }
 
     /**
-     *
      * @param roots
      * @param resourceLocations
      * @param nquestions
@@ -337,7 +346,7 @@ public class RandomUIQuizGenerator {
      */
     public UIQuiz<Integer> simpleIntQuizFromTree(List<TreeItem<ANode>> roots, List<URI> resourceLocations, int nquestions, Difficulty difficulty, int time, TimeUnit timeUnit, boolean showCorrectAnswerOnWrong) {
         List<UIQuestion<?, Integer>> questions = new ArrayList<>(roots.size());
-
+        for (TreeItem<ANode> root : new LinkedList<>(roots)) if (root.getChildren().isEmpty() && forbiddenIDs.contains(root.getValue().conceptId())) roots.remove(root);
         int topicInd = 0;
         int sliceAxisInd = 0;
 
@@ -350,7 +359,10 @@ public class RandomUIQuizGenerator {
             TreeItem<ANode> target = randomTreeItemWFileIDsBelow(topic);
 
             List<AllQuestionTypes> possibleQuestTypes = new ArrayList<>(getQuestTypesForTarget(target));
-            if (possibleQuestTypes.isEmpty()) continue;
+            if (possibleQuestTypes.isEmpty()) {
+                i--;
+                continue;
+            }
             possibleQuestTypes.sort(Comparator.comparingInt(countQuestTypes::get));
             AllQuestionTypes qType = possibleQuestTypes.getFirst(); // choose the most underrepresented question type
 
@@ -528,7 +540,7 @@ public class RandomUIQuizGenerator {
 
     private Set<TreeItem<ANode>> findRelatives2(TreeItem<ANode> root, int n) {
         Set<TreeItem<ANode>> result = new HashSet<>(n);
-        Function<TreeItem<ANode>, Boolean> accept = (t) -> !t.getValue().getFileIds().isEmpty() && !result.contains(t);
+        Function<TreeItem<ANode>, Boolean> accept = (t) -> !t.getValue().getFileIds().isEmpty() && !result.contains(t) && !forbiddenIDs.contains(t.getValue().conceptId());
         int np = (int) (n*np_fraction);
         int nc = n - np;
 

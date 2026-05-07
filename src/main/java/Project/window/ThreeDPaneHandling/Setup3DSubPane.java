@@ -38,8 +38,6 @@ public class Setup3DSubPane {
         camera.setTranslateX(initialCameraPosition.getX());
         camera.setTranslateY(initialCameraPosition.getY());
 
-        //camera.setTranslateZ(initialCameraPosition); // back away from the origin ...
-        //camera.setTranslateY(-10); // move the camera a little bit up to center the objects
         subScene.setCamera(camera);
 
 

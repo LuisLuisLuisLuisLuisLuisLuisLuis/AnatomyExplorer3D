@@ -155,7 +155,7 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
         //TODO: NOT VIA FILE! VIA STREAM OR STH.
         try {
             this.fileGroupingScheme = new ObjectMapper().readValue(
-                    new File(this.getClass().getResource("/Project/3DSupport/fileGroupingScheme_manual_V5.json").getFile().substring(1)),
+                    new File(this.getClass().getResource("/Project/3DSupport/fileGroupingScheme_manual_V6.json").getFile().substring(1)),
                     FileGroupingScheme.class
             );
             this.anatomicalGroupLevel = 0;
@@ -178,7 +178,7 @@ public class HasFXGroupContentsContainer extends SelectionContainer<MeshView, St
         //TODO: NOT VIA FILE! VIA STREAM OR STH.
         try {
             this.fileGroupingScheme = new ObjectMapper().readValue(
-                    new File(this.getClass().getResource("/Project/3DSupport/fileGroupingScheme_manual_V5.json").getFile().substring(1)),
+                    new File(this.getClass().getResource("/Project/3DSupport/fileGroupingScheme_manual_V6.json").getFile().substring(1)),
                     FileGroupingScheme.class
             );
             this.anatomicalGroupLevel = 0;

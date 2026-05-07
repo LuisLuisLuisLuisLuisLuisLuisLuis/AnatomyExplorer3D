@@ -351,6 +351,10 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
             popupStage.setScene(scene);
             setKeyControls(scene);
             popupStage.show();
+            popupStage.setOnCloseRequest(e -> {
+                e.consume();
+                stop();
+            });
             if (timeline != null) timeline.play();
         } catch (IOException e) {
             logger.log(Level.WARNING, "Failed to start quiz:\n" + e.getMessage() + Arrays.toString(e.getStackTrace()));

@@ -31,7 +31,7 @@ public class TreeLoader {
      * @param relationsFile of format: concept id (parent) | name (parent) | concept id (child) | name (child). File name: xxx_inclusion_relation_list.txt
      * @return the root of the tree
      */
-    public static ANode load(InputStream elementsFile, InputStream relationsFile) {
+    public static ANode load(InputStream elementsFile, InputStream relationsFile) throws IllegalArgumentException{
         HashMap<String, HashSet<String>> fileList  = loadFileList (elementsFile);
         LinkedList<Relation> relations = Relation.loadFromFile(relationsFile);
 

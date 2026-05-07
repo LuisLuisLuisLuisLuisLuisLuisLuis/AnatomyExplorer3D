@@ -77,6 +77,7 @@ public class SelectionEffect {
     }
 
 
+    //not functional yet
     public static void viaColor(MeshView meshView, boolean selected, Color defaultColor) {
         Color color = Color.CRIMSON;
         if (meshView.getMaterial() instanceof PhongMaterial material) {

@@ -20,17 +20,17 @@ public class SearchTree {
     private final String id;
     public String getId() {return id;}
 
-    private StringProperty query = new SimpleStringProperty(""); //query which this class is currently working with if its a string
+    private final StringProperty query = new SimpleStringProperty(""); //query which this class is currently working with if it's a string
     private Pattern pattern;    //query if its regex
-    private SimpleBooleanProperty regex = new SimpleBooleanProperty(false); //are we searching with regex?
+    private final SimpleBooleanProperty regex = new SimpleBooleanProperty(false); //are we searching with regex?
 
     private final TreeView<ANode> treeView; //treeview to be searched
-    private ObservableList<FoundText> undoStack = FXCollections.observableList(new LinkedList<>());
-    private ObservableList<FoundText> redoStack = FXCollections.observableList(new LinkedList<>());
+    private final ObservableList<FoundText> undoStack = FXCollections.observableList(new LinkedList<>());
+    private final ObservableList<FoundText> redoStack = FXCollections.observableList(new LinkedList<>());
     private boolean changingTheTree = false;    // prevents infinite listener firing
-    private SimpleBooleanProperty hasPrevious = new SimpleBooleanProperty(); //so that someone else can listen and use this as binding for buttons
-    private SimpleBooleanProperty hasNext = new SimpleBooleanProperty();    //so that someone else can listen and use this as binding for buttons
-    private SimpleBooleanProperty foundSomething = new SimpleBooleanProperty(true); //did the last search find something? (if no it would not make sense to click next button)
+    private final SimpleBooleanProperty hasPrevious = new SimpleBooleanProperty(); //so that someone else can listen and use this as binding for buttons
+    private final SimpleBooleanProperty hasNext = new SimpleBooleanProperty();    //so that someone else can listen and use this as binding for buttons
+    private final SimpleBooleanProperty foundSomething = new SimpleBooleanProperty(true); //did the last search find something? (if no it would not make sense to click next button)
 
     public SimpleBooleanProperty getHasPreviousObservable() {
         return hasPrevious;
@@ -39,9 +39,9 @@ public class SearchTree {
         return hasNext;
     }
 
-    private boolean busy = false;   //are we currently working? dont think its actually necessary
+    private boolean busy = false;   //are we currently working? don't think its actually necessary
 
-    private LinkedList<TreeItem<ANode>> bulkSelectList = new LinkedList<>();
+    private final LinkedList<TreeItem<ANode>> bulkSelectList = new LinkedList<>();
 
 
     /**

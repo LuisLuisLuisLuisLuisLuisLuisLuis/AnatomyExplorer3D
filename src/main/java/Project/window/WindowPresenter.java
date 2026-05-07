@@ -41,11 +41,12 @@ import Project.window.ThreeDPaneHandling.Movement.CamMover;
 import Project.window.ThreeDPaneHandling.Movement.Group3DRotation;
 import Project.window.ThreeDPaneHandling.Movement.MouseScrolling3D;
 import Project.window.ThreeDPaneHandling.Movement.SetupMouseRotate3D;
-import Project.window.ThreeDPaneHandling.Objects.Arrow;
 import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import Project.command.TreeCommands.TreeEditorMockCommand;
 import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
 import Project.window.TreeView.TreeViewEditing.TreeViewSetup;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -59,7 +60,6 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
-import javafx.event.Event;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point3D;
 import javafx.scene.Group;
@@ -77,6 +77,8 @@ import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
+import javafx.util.Duration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -87,7 +89,6 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static Project.model.FileUtil.*;
 
@@ -167,9 +168,9 @@ public class WindowPresenter {
     private final ArrayList<Tab> tabs;
 
     private final ArrayList<Model> models;
-    private final Model mainModel;
-    private final Model partof_v3;
-    private final Model isa_v3;
+    private Model mainModel = null;
+    private Model partof_v3 = null;
+    private Model isa_v3 = null;
 
     private long sizeOfLoadedModels = 0;   // this counts the size of OBJ files associated with models loaded by the user; in MB. (excluding the anatomy models shipped with this software).
                                         // The user is not allowed to load more than maxSizeOfUserModels MB of OBJ files.
@@ -223,25 +224,31 @@ public class WindowPresenter {
         //----------------create the models----------------
 
         this.models = new ArrayList<>();
+        try {
+            mainModel = new Model(
+                    getClass().getResourceAsStream("/Project/anatomy/anatomy_edge_list.txt"),
+                    getClass().getResourceAsStream("/Project/anatomy/anatomy_file_list.txt"),
+                    "anatomy",
+                    WindowPresenter.class.getResource("/Project/anatomy/BP3D_4.0_obj_99/"));
+        } catch (IllegalArgumentException illegalArgumentException) {LittlePopUp.showMsg("Error", "Failed to load main model. Perhaps the files were modified or moved.\nError: " + illegalArgumentException.getMessage(), "OK");}
 
-        mainModel = new Model(
-                getClass().getResourceAsStream("/Project/anatomy/anatomy_edge_list.txt"),
-                getClass().getResourceAsStream("/Project/anatomy/anatomy_file_list.txt"),
-                "anatomy",
-                WindowPresenter.class.getResource("/Project/anatomy/BP3D_4.0_obj_99/"));
+        try {
+            partof_v3 = new Model(
+                    getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_conventional_partof.txt"),
+                    getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_parts_v4_format_cleaned.txt"),
+                    "BP3D 3.0 part-of",
+                    getClass().getResource("/Project/anatomy/BodyParts3D_3.0_obj_99")
+            );
+        } catch (IllegalArgumentException e) {LittlePopUp.showMsg("Error", "Failed to load BP3D part-of. Perhaps the files were modified or moved.\nError: " + e.getMessage(), "OK");}
 
-        partof_v3 = new Model(
-                getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_conventional_partof.txt"),
-                getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_parts_v4_format_cleaned.txt"),
-                "BP3D 3.0 part-of",
-                getClass().getResource("/Project/anatomy/BodyParts3D_3.0_obj_99")
-                );
-        isa_v3 = new Model(
-                getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_composite_isa.txt"),
-                getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_parts_v4_format_cleaned.txt"),
-                "BP3D 3.0 is-a",
-                getClass().getResource("/Project/anatomy/BodyParts3D_3.0_obj_99")
-                );
+        try {
+            isa_v3 = new Model(
+                    getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_composite_isa.txt"),
+                    getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_parts_v4_format_cleaned.txt"),
+                    "BP3D 3.0 is-a",
+                    getClass().getResource("/Project/anatomy/BodyParts3D_3.0_obj_99")
+            );
+        } catch (IllegalArgumentException e) {LittlePopUp.showMsg("Error", "Failed to load BP3D is-a. Perhaps the files were modified or moved.\nError: " + e.getMessage(), "OK");}
 
 //        this.models.add(mainModel);
 //        this.models.add(partof_v3);
@@ -294,6 +301,10 @@ public class WindowPresenter {
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 if ((boolean) controller.getEnableBP3DV3checkMenu().getUserData()) return;
                 if (newValue) {
+                    if (partof_v3 == null || isa_v3 == null) {
+                        LittlePopUp.showMsg("Error", "BP3D 3.0 was not loaded properly", "OK");
+                        return;
+                    }
                     if (maxSizeOfUserModels - sizeOfLoadedModels < 430) {
                         LittlePopUp.showMsg("Error", "Not enough RAM to load BP3D 3.0. Disable some other models first.", "Ok");
                         controller.getEnableBP3DV3checkMenu().setSelected(false);
@@ -391,10 +402,12 @@ public class WindowPresenter {
         this.selectionMediatorTree3D_Selection = new SelectionMediator_Tree_3D(treeViewSelectionGroup, threeDSelectionGroup);
 
         //------------load main model------------
-        MenuItem mmSave = new MenuItem("Save");
-        loadModel(mainModel, new ContextMenu(mmSave)); //not as command because it should not be undoable / removable
-        mmSave.setOnAction(actionEvent -> tryToSaveTree(treeViews.stream().filter(t -> t.getId().equals(mainModel.getName())).toList().getFirst()));
-        mmSave.disableProperty().bind(isModelUnsaved.get(mainModel.getName()).not());
+        if (mainModel != null) {
+            MenuItem mmSave = new MenuItem("Save");
+            loadModel(mainModel, new ContextMenu(mmSave)); //not as command because it should not be undoable / removable
+            mmSave.setOnAction(actionEvent -> tryToSaveTree(treeViews.stream().filter(t -> t.getId().equals(mainModel.getName())).toList().getFirst()));
+            mmSave.disableProperty().bind(isModelUnsaved.get(mainModel.getName()).not());
+        }
         //---------------------------------------
 
         hasInnerGroupContents.getSelection().addListener((InvalidationListener) e -> centerGroupToItself(innerGroup));  //should be called after the command below, otherwise it'll fire every loop
@@ -571,6 +584,10 @@ public class WindowPresenter {
         });
         controller.getRemoveObjButton().disableProperty().bind(Bindings.isEmpty(hasInnerGroupContents.getSelection()));
 
+
+        Timeline treeInfoTimeline = new Timeline(new KeyFrame(Duration.seconds(4))); //used to set the show duration of the treeInfolabel.
+        treeInfoTimeline.setOnFinished(tef -> controller.getTreeInfoLabel().setText(""));
+
         controller.getDrawIn3DButton().setOnAction(e -> {
             TreeViewSelectionContainer treeViewSelectionContainer = null;
             for (TreeViewSelectionContainer treeViewSelectionContainer1 : this.treeViewSelectionContainers) if (treeViewSelectionContainer1.getId().equals(getSelectedTreeView().getId())) treeViewSelectionContainer = treeViewSelectionContainer1;
@@ -579,6 +596,11 @@ public class WindowPresenter {
 //            HashSet<String> toDraw = new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionGroup.getSelection()));
 //            for (String item : new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionGroup.getSelection()))) {  //need to create this again to not concurrently modify doDraw
             HashSet<String> toDraw = new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()));
+            if (toDraw.isEmpty()) {
+                controller.getTreeInfoLabel().setText("No 3D Files in selection");
+                treeInfoTimeline.playFromStart();
+                return;
+            }
             for (String item : new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()))) {  //need to create this again to not concurrently modify doDraw
                 if (threeDContentGroup.getSelection().contains(item)) {
                     toDraw.remove(item);    //remove already present items
@@ -695,7 +717,13 @@ public class WindowPresenter {
 
 
             try {
-                Model model = filesListFile == null ? new Model(relationsStream, name) : new Model(relationsStream, makeStream(filesListFile), name, filesDir);
+                Model model;
+                try {
+                    model = filesListFile == null ? new Model(relationsStream, name) : new Model(relationsStream, makeStream(filesListFile), name, filesDir);
+                } catch (IllegalArgumentException illegalArgumentException) {
+                    LittlePopUp.showMsg("Error", "Failed to load " + name + ".\nError: " + illegalArgumentException.getMessage(), "OK");
+                    return;
+                }
                 ContextMenu contextMenu = new ContextMenu();
                 MenuItem remove = new MenuItem("Remove");
                 MenuItem save = new MenuItem("Save");
@@ -1271,7 +1299,7 @@ public class WindowPresenter {
     /**
      * Rotates/Translates 3D objects depending on the keycode and boolean.
      * @param keyCode controls the direction
-     * @param rotating false -> the camera is moved. true -> the objects are rotated
+     * @param rotating false -> the objects are moved. true -> the objects are rotated
      * @param shift If shift is pressed, move the slice plane.
      */
     public void rotationControl(KeyCode keyCode, boolean rotating, boolean shift) {
@@ -1447,9 +1475,6 @@ public class WindowPresenter {
      */
     public BooleanProperty getFullScreenCheckProperty() {return controller.getFullScreenCheck().selectedProperty();}
 
-    private void loadModel(Model model) {
-        loadModel(model, null);
-    }
     /**
      * - generate TreeView
      * - create SelectionContainer
@@ -1459,7 +1484,7 @@ public class WindowPresenter {
      * - create a Tab and return it
      * Does *not* make the model accessible yet by showing the tab
      */
-    private void loadModel(Model model, ContextMenu contextMenu) {
+    private void loadModel(@NotNull Model model, ContextMenu contextMenu) {
         this.models.add(model);
         TreeView<ANode> treeView = new TreeView<>();
         treeView.setId(model.getName());
@@ -1736,7 +1761,6 @@ public class WindowPresenter {
 
         @Override
         public void execute() {
-//            super.execute();
             TreeView<ANode> mainModelTreeView = null;
             for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
             if (mainModelTreeView == null) return;

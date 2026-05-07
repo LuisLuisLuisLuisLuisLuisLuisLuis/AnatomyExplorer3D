@@ -106,7 +106,8 @@
                                  <bottom>
                                     <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="288.0" BorderPane.alignment="CENTER">
                                        <children>
-                                          <Label fx:id="botLabel_Tree" text="0 items selected." />
+                                          <Label fx:id="botLabel_Tree" text="0 items selected.  " />
+                                          <Label fx:id="treeInfoLabel" />
                                        </children>
                                     </HBox>
                                  </bottom>
@@ -160,7 +161,7 @@
                                  <bottom>
                                     <HBox alignment="CENTER_LEFT" prefHeight="22.0" prefWidth="583.0" BorderPane.alignment="CENTER">
                                        <children>
-                                          <Label fx:id="botLabelDrawCount" text="0 items drawn." />
+                                          <Label fx:id="botLabelDrawCount" text="0 items drawn. " />
                                           <Label fx:id="botLabel_3D" text="0 items selected." />
                                           <TextField fx:id="fileIDTextfield" editable="false" prefHeight="26.0" prefWidth="111.0" HBox.hgrow="ALWAYS" />
                                        </children>
