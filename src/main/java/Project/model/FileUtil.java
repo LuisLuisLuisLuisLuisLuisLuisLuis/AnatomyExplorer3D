@@ -62,6 +62,12 @@ public class FileUtil {
         return result;
     }
 
+    /**
+     * Collects the file IDs in the tree of root.
+     * To print as column of fileIDs, do collectFileIDsBelow(this.getTreeItem().getValue()).keySet().toString().replace("[", "").replace("]", "").replace(", ", "\n")
+     * @param root
+     * @return
+     */
     public static HashMap<String, LinkedList<ANode>> collectFileIDsBelow(ANode root) {
         HashMap<String, LinkedList<ANode>> fileIDtoANode = new HashMap<>();
         collectFileIDsBelowRec(root, fileIDtoANode);

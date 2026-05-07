@@ -167,9 +167,17 @@ public class TreeExport {
         return stringBuilder.toString();
     }
 
-    private static void generateFileListRec(TreeItem<ANode> root, StringBuilder stringBuilder) {
+    /** Creates the File List of the tree below root by appending to the stringbuilder.*/
+    public static void generateFileListRec(TreeItem<ANode> root, StringBuilder stringBuilder) {
         for (String fileID : root.getValue().fileIds()) stringBuilder.append(root.getValue().conceptId() + "\t" + root.getValue().name() + "\t" + fileID + "\n");
         for (TreeItem<ANode> child : root.getChildren()) generateFileListRec(child, stringBuilder);
+    }
+
+    /** Creates the File List of the tree below root and returns as Stringbuilder.*/
+    public static StringBuilder generateFileListRec(TreeItem<ANode> root) {
+        StringBuilder result = new StringBuilder();
+        generateFileListRec(root,result);
+        return result;
     }
 
     public static String printSubtreeBelow(TreeItem<ANode> root, boolean inclID) {

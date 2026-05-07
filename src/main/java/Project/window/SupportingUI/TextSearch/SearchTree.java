@@ -127,8 +127,8 @@ public class SearchTree {
      * @return true if not busy
      */
     public boolean find(String query, boolean all, boolean regex) {
-
         if (!busy) {
+            if (!regex) query = query.toLowerCase();
             if (!all && Objects.equals(this.query.get(), query) && foundSomething.get() && (regex == this.regex.get())) next(); //if were in a next-scenario, call next() instead of new search
             else { //new search for query
                 clearThis();
@@ -162,10 +162,7 @@ public class SearchTree {
     private boolean find(TreeItem<ANode> treeItem, String query, int skip, Counter counter, boolean all) {
         counter.plus();
         if (counter.get() >= skip) {
-            //System.out.println("Checking " + treeItem.getValue().name() + " at pos " + counter.get());
-            //if (treeItem.getValue().name().contains(query)) {
             if (match(treeItem.getValue().toString(), query, this.regex.get())) {
-                //System.out.println("yes found"); //shows that all items are found!
                 if (!all) {
                     undoStack.add(new FoundText(treeItem, counter.get()));
                     select(treeItem, true);
@@ -185,10 +182,10 @@ public class SearchTree {
         return false;
     }
 
-    public boolean match(String s1, String s2, boolean regex) {
+    public boolean match(String target, String query, boolean regex) {
         if (regex) { //discriminating between search styles because internet says contains() is faster
-            return pattern.matcher(s1).find();
-        } else return s1.contains(s2);
+            return pattern.matcher(target).find();
+        } else return target.toLowerCase().contains(query);
     }
 
 //    private void bulkSelect() {

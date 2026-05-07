@@ -157,7 +157,7 @@ public class TreeViewSetup {
                             }
                         });
                         print.setOnAction(e -> LittlePopUp.showScrollableTextPopup("Subtree of " + this.getTreeItem().getValue().name() + "(" + this.getTreeItem().getValue().conceptId() + ")", TreeExport.printSubtreeBelow(this.getTreeItem(), true), false));
-                        printF.setOnAction(e -> LittlePopUp.showScrollableTextPopup("FileIDs of " + this.getTreeItem().getValue().name() + "(" + this.getTreeItem().getValue().conceptId() + ")", collectFileIDsBelow(this.getTreeItem().getValue()).keySet().toString().replace("[", "").replace("]", "").replace(", ", "\n"), false));
+                        printF.setOnAction(e -> LittlePopUp.showScrollableTextPopup("File List of " + this.getTreeItem().getValue().name() + "(" + this.getTreeItem().getValue().conceptId() + "). Format: node ID | node name | File ID", TreeExport.generateFileListRec(this.getTreeItem()).toString(), false));
 
 //                        splitLeftRight.setOnAction(e -> {UndoableANodeTreeViewEditor.splitSubtreeLeftRight(this.getTreeItem(), modelRoot);});
 
