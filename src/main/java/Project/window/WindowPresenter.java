@@ -83,6 +83,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.List;
@@ -224,12 +225,13 @@ public class WindowPresenter {
         //----------------create the models----------------
 
         this.models = new ArrayList<>();
+        logger.log(Level.CONFIG, "null check:" + (getClass().getResource("/Project/anatomy/BP3D_4.0_obj_99/FJ1252.obj") == null));
         try {
             mainModel = new Model(
                     getClass().getResourceAsStream("/Project/anatomy/anatomy_edge_list.txt"),
                     getClass().getResourceAsStream("/Project/anatomy/anatomy_file_list.txt"),
                     "anatomy",
-                    WindowPresenter.class.getResource("/Project/anatomy/BP3D_4.0_obj_99/"));
+                    "/Project/anatomy/BP3D_4.0_obj_99/");
         } catch (IllegalArgumentException illegalArgumentException) {LittlePopUp.showMsg("Error", "Failed to load main model. Perhaps the files were modified or moved.\nError: " + illegalArgumentException.getMessage(), "OK");}
 
         try {
@@ -237,7 +239,7 @@ public class WindowPresenter {
                     getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_conventional_partof.txt"),
                     getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_parts_v4_format_cleaned.txt"),
                     "BP3D 3.0 part-of",
-                    getClass().getResource("/Project/anatomy/BodyParts3D_3.0_obj_99")
+                    "/Project/anatomy/BodyParts3D_3.0_obj_99"
             );
         } catch (IllegalArgumentException e) {LittlePopUp.showMsg("Error", "Failed to load BP3D part-of. Perhaps the files were modified or moved.\nError: " + e.getMessage(), "OK");}
 
@@ -246,7 +248,7 @@ public class WindowPresenter {
                     getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_composite_isa.txt"),
                     getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_parts_v4_format_cleaned.txt"),
                     "BP3D 3.0 is-a",
-                    getClass().getResource("/Project/anatomy/BodyParts3D_3.0_obj_99")
+                    "/Project/anatomy/BodyParts3D_3.0_obj_99"
             );
         } catch (IllegalArgumentException e) {LittlePopUp.showMsg("Error", "Failed to load BP3D is-a. Perhaps the files were modified or moved.\nError: " + e.getMessage(), "OK");}
 
@@ -380,7 +382,7 @@ public class WindowPresenter {
         this.hasInnerGroupContents = new HasFXGroupContents(innerGroup, "hasinnergroupMeshes");
         this.threeDContentGroup = new SelectionGroup<String>("3dContentGroup");
         this.hasTheeDContentsContainer = new HasFXGroupContentsContainer(hasInnerGroupContents); //, new String[]{isAFilesLocation.getValue().getAbsolutePath(), partOfFilesLocation.getValue().getAbsolutePath()}
-        this.hasTheeDContentsContainer.setHandleLoadingTask((task) -> {this.runBlockingTask(task, true); return null;});
+        this.hasInnerGroupContents.setHandleLoadingTask((task) -> {this.runBlockingTask(task, true); return null;});
         this.hasInnerGroupContents.setHasFXGroupContentsContainer(hasTheeDContentsContainer);
         threeDContentGroup.addSelectionContainer(hasTheeDContentsContainer);
         //---------------------------
@@ -751,7 +753,6 @@ public class WindowPresenter {
                 LittlePopUp.showMsg("Error", "Failed to parse model:\n" + x.getMessage(), "OK");
                 return;
             }
-
         });
         //-----------------------------------------
 
@@ -766,8 +767,8 @@ public class WindowPresenter {
 
 
 
-        // TODO: it seems this only works because of the selectionGroups. when i try in AITreeIntegration without selectiongroups it only selects one item.
-        // TODO: consider fixing so that it works without selectiongroups too.
+        //TODO: it seems this only works because of the selectionGroups. when i try in AITreeIntegration without selectiongroups it only selects one item.
+        // consider fixing so that it works without selectiongroups too.
         controller.getTreeSearchAllButton().setOnAction(e -> {
             if (!controller.getTreeSearchField().getText().isEmpty()) {
                 treeViewSelectionGroup.setNoUpdating(true);
@@ -1500,10 +1501,27 @@ public class WindowPresenter {
         Tab tab = new Tab(model.getName(), treeView);
         this.tabs.add(tab);
         tab.setContextMenu(contextMenu);
-        if (model.getFilesDirURL() != null) this.hasTheeDContentsContainer.addResourceLocation(model.getFilesDirURL(), FileUtil.collectFileIDsBelowToSet(model.getRoot())); // make the model drawable by adding the file location
-        else if (model.getFilesDir() != null) this.hasTheeDContentsContainer.addFileDir(model.getFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot()));
+        if (model.getResourceFilesDir() != null) {
+            logger.log(Level.CONFIG, "Adding filesdirURL " + model.getResourceFilesDir() + " to model " + model.getName());
+            this.hasInnerGroupContents.addResourceLocation(model.getResourceFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot())); // make the model drawable by adding the file location
+        }
+        else {
+            if (model.getFilesDir() != null) {
+                try {
+                    this.hasInnerGroupContents.addFileDir(model.getFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot()));
+                } catch (IllegalArgumentException e) {
+                    LittlePopUp.showMsg("Error", "Failed to load 3D files of model " + model.getName() + "\n" + e.getMessage(), "OK");
+                    logger.log(Level.SEVERE,"Failed to load 3D files of model " + model.getName(),e);
+                }
+            } else logger.log(Level.CONFIG, "filesDirURL and filesDir of model are null");
+        }
         controller.getTreeTabPane().getTabs().add(tab);
-        sizeOfLoadedModels += model.getFilesDir() != null ? estimateSizeOfOBJsInDir(model.getFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot())) : (model.getFilesDirURL() != null ? estimateSizeOfOBJsInDir(new File(model.getFilesDirURL().getFile()), collectFileIDsBelowToSet(model.getRoot())) : 0);
+        try {
+            sizeOfLoadedModels += model.getFilesDir() != null ? estimateSizeOfOBJsInDir(model.getFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot())) : (model.getResourceFilesDir() != null ? estimateSizeOfOBJsInDir(new File(getClass().getResource(model.getResourceFilesDir()).getFile()), collectFileIDsBelowToSet(model.getRoot())) : 0);
+        } catch (NullPointerException n) {
+            logger.log(Level.WARNING, "Model=" + model.getName() + ": new File(getClass().getResource(model.getResourceFilesDir())) produced null", n);
+        }
+
         this.isModelUnsaved.put(model.getName(), new SimpleBooleanProperty(false));
         Circle circle = new Circle(3,Color.GRAY);
         this.isModelUnsaved.get(model.getName()).addListener((observable, oldValue, newValue) -> {
@@ -1518,10 +1536,10 @@ public class WindowPresenter {
      * @param model The model to remove
      */
     private void forgetModel(Model model) {
-        if (model.getFilesDirURL() != null) this.hasTheeDContentsContainer.removeResourceLocation(model.getFilesDirURL());
-        else if (model.getFilesDir() != null) this.hasTheeDContentsContainer.removeFileDir(model.getFilesDir());
+        if (model.getResourceFilesDir() != null) this.hasInnerGroupContents.removeResourceLocation(model.getResourceFilesDir());
+        else if (model.getFilesDir() != null) this.hasInnerGroupContents.removeFileDir(model.getFilesDir());
 
-        TreeViewSelectionContainer modelTreeViewSelectionContainer = treeViewSelectionContainers.stream().filter(treeViewSelectionContainer -> treeViewSelectionContainer.getId().equals(model.getName())).toList().get(0);
+        TreeViewSelectionContainer modelTreeViewSelectionContainer = treeViewSelectionContainers.stream().filter(treeViewSelectionContainer -> treeViewSelectionContainer.getId().equals(model.getName())).toList().getFirst();
 
         TreeView<ANode> modelTreeView = this.treeViews.stream().filter(treeView -> treeView.getId().equals(model.getName())).toList().getFirst();
         treeViewSelectionGroup.removeSelectionContainer(modelTreeViewSelectionContainer);
@@ -1554,9 +1572,12 @@ public class WindowPresenter {
         this.tabs.removeIf(tab -> tab.getText().equals(model.getName()));
         controller.getTreeTabPane().getTabs().removeIf(tab -> tab.getText().equals(model.getName()));
         this.models.remove(model);
-        sizeOfLoadedModels -= model.getFilesDir() != null ? estimateSizeOfOBJsInDir(model.getFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot())) : (model.getFilesDirURL() != null ? estimateSizeOfOBJsInDir(new File(model.getFilesDirURL().getFile()), FileUtil.collectFileIDsBelowToSet(model.getRoot())) : 0);
+        try {
+            sizeOfLoadedModels -= model.getFilesDir() != null ? estimateSizeOfOBJsInDir(model.getFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot())) : (model.getResourceFilesDir() != null ? estimateSizeOfOBJsInDir(new File(getClass().getResource(model.getResourceFilesDir()).getFile()), collectFileIDsBelowToSet(model.getRoot())) : 0);
+        } catch (NullPointerException n) {
+            logger.log(Level.WARNING, "Model=" + model.getName() + ": new File(getClass().getResource(model.getResourceFilesDir())) produced null", n);
+        }
         this.isModelUnsaved.remove(model.getName());
-//        this.unsavedCircle.removeLast();
     }
 
     // This class sits here and not in Command because it depends entirely on the implementation of WindowPresenter.
@@ -1684,8 +1705,8 @@ public class WindowPresenter {
             // has completed loading OBJs, which will lead to the same scenario. To avoid this, it is necessary to make sure
             // that the listener only actions if loading OBJs of the last model is completed and that's done by making sure all
             // loops have gone thru using the count variable.
-            if (hasTheeDContentsContainer.getIsLoadingOBJs().get()) {
-                hasTheeDContentsContainer.getIsLoadingOBJs().addListener(new ChangeListener<Boolean>() {
+            if (hasInnerGroupContents.getIsLoadingOBJs().get()) {
+                hasInnerGroupContents.getIsLoadingOBJs().addListener(new ChangeListener<Boolean>() {
                     @Override
                     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                         if (!newValue && count.get() == modelsToRm.size()) {
@@ -1860,7 +1881,9 @@ public class WindowPresenter {
      * @return if RAM usage has passed a threshold.
      */
     public static boolean isRAMcritical() {
-        return (double) freeMemory() / totalMemory() < freeRamFractionThreshold;
+        boolean result = (double) freeMemory() / totalMemory() < freeRamFractionThreshold;
+        logger.log(Level.CONFIG, "free memory=" + freeMemory() + ". total memory=" + totalMemory() + " -> " + result);
+        return result;
     }
 
 

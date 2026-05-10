@@ -1,18 +1,29 @@
 package Project.SelectionModel.FXGroupDraw;
 
 import Project.SelectionModel.HasSelection;
-import Project.command.Remember.RememberHasFXGroupContents;
+import Project.window.ThreeDPaneHandling.Coloring.FileGroupingScheme;
+import Project.window.ThreeDPaneHandling.OBJFile.OpenOBJ;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.*;
+import javafx.concurrent.Task;
 import javafx.scene.Group;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.CullFace;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,6 +51,8 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
     public HasFXGroupContents(Group group, String id) {
         this.group = group;
         this.id = id;
+        this.fileDirs = new ArrayList<>(2);
+        this.resourceLocations = new ArrayList<>(3);
         meshViewToOGMesh.addListener((MapChangeListener<MeshView, TriangleMesh>) change -> {
             if (change.wasRemoved() && !meshViewToOGMesh.containsKey(change.getKey())) {
                 availableMeshViews.remove(change.getKey());
@@ -72,15 +85,6 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
             meshView.setMesh(null);
         }
         this.group.getChildren().addAll(newOnes);
-    }
-
-    public void addOBJ(String fileName) {
-        if (getMeshViewWithID(fileName) != null) return;
-        MeshView meshView = (MeshView) hasFXGroupContentsContainer.createMeshView(fileName);
-        TriangleMesh triangleMesh = (TriangleMesh) meshView.getMesh();
-        meshViewToOGMesh.put(meshView, triangleMesh);
-        meshView.setMesh(null);
-        this.group.getChildren().add(meshView);
     }
 
     public void removeOBJ(String id) {
@@ -179,6 +183,302 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
     @Override
     public ObservableList<MeshView> getAllItems() {
         return availableMeshViews;
+    }
+
+
+    /**
+     * Has a mapping of FileIDs (that come in as groupItems here) to anatomical group (String[]).
+     * -> one fileID may be mapped to multiple anatomical groups.
+     * Is set on Construction by loading resource .json.
+     */
+    private FileGroupingScheme fileGroupingScheme;
+// You will still need this when you implement diff selection visualization modes, specifically color visualization
+// (e.g. intense Red for selected) because you will need to be able to go back to default.
+// Also, this schema may be needed for loading/saving sessions IF you still allow user to change colors.
+
+    {
+        try {
+            this.fileGroupingScheme = new ObjectMapper().readValue(this.getClass().getResourceAsStream("/Project/3DSupport/fileGroupingScheme_manual_V6.json"), FileGroupingScheme.class);
+            this.anatomicalGroupLevel = 0;
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Failed to load fileGroupingScheme, e");
+        }
+    }
+
+    /**
+     * The index to use when accessing anatomical group array returned by fileGroupingScheme.
+     */
+    private int anatomicalGroupLevel;
+    public int getAnatomicalGroupLevel() {return anatomicalGroupLevel;}
+
+    public static final String DEFAULT_COLOR_VAL = "#789B73";
+    public static final Color DEFAULT_COLOR = Color.web(DEFAULT_COLOR_VAL);
+
+    public Color getColorForGroup(String group) {
+        return Color.web(this.fileGroupingScheme.groupToColor.getOrDefault(group, DEFAULT_COLOR_VAL));
+    }
+
+    public String[] findAnatomyGroupsForID(String id) {
+        return this.fileGroupingScheme.fileIDstoGroups.getOrDefault(id, new String[anatomicalGroupLevel]);
+    }
+
+    public String findAnatomyGroupForID(String id) {
+        String[] anatomicalGroups = findAnatomyGroupsForID(id);
+        if (anatomicalGroups.length > anatomicalGroupLevel) {
+            return anatomicalGroups[anatomicalGroupLevel];
+        } else {
+            logger.log(Level.FINER, "could not find a color-group for " + id + ", returning empty.");
+            return "";
+        }
+    }
+
+    /**
+     * @param id ID of a MeshView
+     * @return The default color for this id at the default anatomical group level
+     */
+    public Color getDefaultColorForID(String id) {
+        return getColorForGroup(findAnatomyGroupForID(id));
+    }
+
+    /**
+     * @param id ID of a MeshView
+     * @param anatomicalGroupLevel anatomical group level
+     * @return The default color for this id at that anatomical group level
+     */
+    public Color getDefaultColorForID(String id, int anatomicalGroupLevel) {
+        return getColorForGroup(findAnatomyGroupsForID(id)[anatomicalGroupLevel]);
+    }
+
+
+    private final SimpleBooleanProperty isLoadingOBJs = new SimpleBooleanProperty(false);
+
+    /**
+     * @return Are there OBJs being loaded on a different thread right now?
+     */
+    public SimpleBooleanProperty getIsLoadingOBJs() {return isLoadingOBJs;}
+
+    private Function<Task<List<MeshView>>, Object> handleLoadingTask = null;
+
+    /**
+     * Set a function to handle the Task of loading OBJ files. For example to put it on a new Thread or to bind UI to the task.<P>
+     *     If set, this class WILL NOT run() the task anymore! This must be done by the provided function.
+     * <P>
+     *     The task updates progress and has a message.
+     * @param handleLoadingTask a function that accepts the task. Set to null to make this class run tasks again itself (not on a new Thread).
+     */
+    public void setHandleLoadingTask(Function<Task<List<MeshView>>, Object> handleLoadingTask) {
+        this.handleLoadingTask = handleLoadingTask;
+    }
+
+
+    /**
+     *
+     * @param url directory in resources containing the files. Has to be usable via getClass().getResource(...)
+     * @param whiteList Set of FileIDs that can be found in the directory of the given url
+     */
+    private void loadOBJsMulti(String url, Set<String> whiteList) {
+        Task<List<MeshView>> task = new Task<>() {
+
+            @Override
+            protected List<MeshView> call() throws Exception {
+                isLoadingOBJs.set(true);
+                updateMessage("Loading OBJ files...");
+                ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+                List<Future<MeshView>> meshViewF = new ArrayList<>(whiteList.size());
+                for (String fileID : whiteList) {
+                    if (getMeshViewWithID(fileID) != null) continue;
+                    meshViewF.add(executor.submit(() -> createMeshView(getClass().getResourceAsStream(url + fileID + ".obj"), fileID)));
+                }
+                executor.shutdown();
+
+                List<MeshView> result = new ArrayList<>(meshViewF.size());
+
+                int total = meshViewF.size();
+                int done = 0;
+
+                for (Future<MeshView> f : meshViewF) {
+                    result.add(f.get());
+                    updateProgress(++done, total);
+                }
+                return result;
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            logger.log(Level.CONFIG, "loading OBJs task done");
+            addMeshViews(task.getValue());
+            logger.log(Level.CONFIG, "n triangles: " + HasFXGroupContents.printNrFaces(task.getValue()));
+            isLoadingOBJs.set(false);
+        });
+
+        if (handleLoadingTask != null) handleLoadingTask.apply(task);
+        else task.run();
+    }
+
+
+    private void loadOBJsMulti(File dir, Set<String> whiteList) {
+        Task<List<MeshView>> task = new Task<>() {
+
+            @Override
+            protected List<MeshView> call() throws Exception {
+                File[] files = dir.listFiles();
+
+                isLoadingOBJs.set(true);
+                updateMessage("Loading OBJ files...");
+                ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+                List<Future<MeshView>> meshViewF = new ArrayList<>(whiteList.size());
+                for (File file : files) {
+                    if (!file.isFile()) continue;
+                    if (!file.getName().endsWith(".obj")) continue;
+                    String name = file.getName().substring(0, file.getName().lastIndexOf("."));
+                    if (!whiteList.contains(name)) continue;
+                    if (getMeshViewWithID(name) != null) continue;
+                    meshViewF.add(executor.submit(() -> createMeshView(file.toURI().toURL().openStream(), name)));
+                }
+                executor.shutdown();
+
+                List<MeshView> result = new ArrayList<>(meshViewF.size());
+
+                int total = meshViewF.size();
+                int done = 0;
+
+                for (Future<MeshView> f : meshViewF) {
+                    result.add(f.get());
+                    updateProgress(++done, total);
+                }
+                return result;
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            logger.log(Level.CONFIG, "loading OBJs task done");
+            addMeshViews(task.getValue());
+            logger.log(Level.CONFIG, "n triangles: " + HasFXGroupContents.printNrFaces(task.getValue()));
+            isLoadingOBJs.set(false);
+        });
+
+        if (handleLoadingTask != null) handleLoadingTask.apply(task);
+        else task.run();
+    }
+
+
+
+//    private void loadOBJsMulti(URL url, Set<String> whiteList) {
+//        File[] files = url.listFiles();
+//        if (files == null) return;
+//        Task<List<MeshView>> task = new Task<>() {
+//
+//            @Override
+//            protected List<MeshView> call() throws Exception {
+//                isLoadingOBJs.set(true);
+//                updateMessage("Loading OBJ files...");
+//                ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+//                List<Future<MeshView>> meshViewF = new ArrayList<>(files.length);
+//                for (File file1 : files) {
+//                    if (!file1.isFile()) continue;
+//                    if (!file1.getName().endsWith(".obj")) continue;
+//                    String name = file1.getName().substring(0, file1.getName().lastIndexOf("."));
+//                    if (!whiteList.contains(name)) continue;
+//                    if (hasFXGroupContents.getMeshViewWithID(name) != null) continue;
+//                    meshViewF.add(executor.submit(() -> createMeshView(name)));
+//                }
+//                executor.shutdown();
+//
+//                List<MeshView> result = new ArrayList<>(meshViewF.size());
+//
+//                int total = meshViewF.size();
+//                int done = 0;
+//
+//                for (Future<MeshView> f : meshViewF) {
+//                    result.add(f.get());
+//                    updateProgress(++done, total);
+//                }
+//                return result;
+//            }
+//        };
+//
+//        task.setOnSucceeded(e -> {
+//            logger.log(Level.CONFIG, "loading OBJs task done");
+//            hasFXGroupContents.addMeshViews(task.getValue());
+//            isLoadingOBJs.set(false);
+//        });
+//
+//        if (handleLoadingTask != null) handleLoadingTask.apply(task);
+//        else task.run();
+//    }
+
+    private void loadOBJs(File file, Set<String> whiteList) {
+        loadOBJsMulti(file, whiteList);
+    }
+
+    private void loadOBJs(String url, Set<String> whiteList) {
+        loadOBJsMulti(url, whiteList);
+    }
+
+
+    public ArrayList<File> getFileDirs() {
+        return fileDirs;
+    }
+
+    public void addFileDir(File dir, Set<String> whiteList) {
+        if (!dir.exists() || dir.isDirectory()) throw new IllegalArgumentException("Provided path is not a directory: " + dir.toString());
+        fileDirs.add(dir);
+        loadOBJs(dir, whiteList);
+    }
+    public void removeFileDir(File dir) {
+        fileDirs.remove(dir);
+    }
+
+    // THEORETICALLY the location lists could also be sets. BUT if 2 models share the same resource location, then removing one of them
+    // would remove the location for both, possibly breaking resource loading (not actually since OBJs are now created only once at
+    // startup but still, it would be wrong). leaving it as a list has the advantage that locations will occur as often as the number of models
+    // that use them, circumventing this error.
+    // Problem now:
+    private final ArrayList<File> fileDirs;
+    private final ArrayList<String> resourceLocations;
+
+    public ArrayList<String> getResourceLocationsLocations() {return resourceLocations;}
+
+    /**
+     * Add a directory from the resources. Will be used via getClass().getResource()
+     * @param resourceDir the path to the directory, like '/path/to/dir/'. slash at the front important.
+     * @param whiteList files to be loaded from this directory
+     */
+    public void addResourceLocation(String resourceDir, Set<String> whiteList) {
+        logger.log(Level.CONFIG, "adding resource location " + resourceDir);
+        resourceLocations.add(resourceDir);
+        loadOBJs(resourceDir, whiteList);
+    }
+
+    public void removeResourceLocation(String location) {resourceLocations.remove(location); //removeOBJs(url);
+    }
+
+
+    public static String printNrFaces(List<MeshView> meshViews) {
+        int counter = 0;
+        for (MeshView meshView : meshViews) {
+            if (meshView.getMesh() instanceof TriangleMesh triangleMesh) counter += triangleMesh.getFaces().size();
+        }
+        return (counter + " faces");
+    }
+
+    /**
+     *
+     * @param inputStream InputStram from which the MeshView will be created.
+     * @param id ID that will be given to the MeshView. Will also be treated as FileName to search for corresponding
+     *           .png files to apply to the MeshView. If no such image file exists, the meshview will receive a color.
+     * @return The MeshView or null if the inputstream is null or if an error occurred when parsing the file.
+     */
+    public MeshView createMeshView(InputStream inputStream, String id) {
+
+        long startTime = System.nanoTime();
+        String anatomicalGroup = findAnatomyGroupForID(id);
+        //fileGroupingScheme.groupToColor returns hex values of the color (String) which must be converted to Color using Color.web(string)
+        MeshView result = OpenOBJ.objInputStreamToMeshViews(inputStream, id, getColorForGroup(anatomicalGroup));
+        long endTime = System.nanoTime();
+        long durationMillis = (endTime - startTime) / 1000000;
+        logger.log(Level.FINEST, "creating meshview took " + durationMillis);
+        return result;
     }
 
 }

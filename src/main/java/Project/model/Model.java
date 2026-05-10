@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Objects;
 
 /**
  * Loads the Tree from the files and stores the root.
@@ -21,9 +20,9 @@ public class Model {
     private final String name;
     public String getName() {return name;}
 
-    private URL filesDirURL = null;
-    public URL getFilesDirURL() {return filesDirURL;}
-    public void setFilesDir(URL filesDirURL) {this.filesDirURL = filesDirURL;}
+    private String resourceFilesDir = null;
+    public String getResourceFilesDir() {return resourceFilesDir;}
+    public void setFilesDir(String resourceFilesDir) {this.resourceFilesDir = resourceFilesDir;}
     // the location of this model's Files can be specified as either URL (as is the case for the included anatomy trees)
     // or File (as is the case when the model is created at runtime by the user (to be implemented)).
 
@@ -45,12 +44,12 @@ public class Model {
      * For every tree to be constructed, pass 1 relations file and 1 fileID file. Their positions in their arrays must be the same.
      * @param relations Edge list of format: concept id (parent)\tname (parent)\tconcept id (child)\tname (child)
      * @param fileIDs List of format: concept id\tname\tfilename, where filename corresponds to the name of an .obj file excluding the .obj extension.
-     * @param filesDirURL Directory that holds the Files.
+     * @param resourceFilesDir Directory within resources that contains the OBJ Files. Usable via getClass().getResource()
      */
-    public Model(InputStream relations, InputStream fileIDs, String name, URL filesDirURL) throws IllegalArgumentException {
+    public Model(InputStream relations, InputStream fileIDs, String name, String resourceFilesDir) throws IllegalArgumentException {
         this.root = TreeLoader.load(fileIDs, relations);
         this.name = name;
-        this.filesDirURL = filesDirURL;
+        this.resourceFilesDir = resourceFilesDir;
     }
 
     /**
@@ -64,8 +63,6 @@ public class Model {
         this.root = TreeLoader.load(fileIDs, relations);
         this.name = name;
         this.filesDir = filesDir;
-        try {this.filesDirURL = filesDir.toURI().toURL();}
-        catch (MalformedURLException ignored) {}    //TODO: can this even happen if filesDir is confirmed to be a directory?
     }
 
     public Model(InputStream relations, String name) {

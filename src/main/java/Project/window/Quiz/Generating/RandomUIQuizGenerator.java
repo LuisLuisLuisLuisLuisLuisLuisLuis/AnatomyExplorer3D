@@ -10,7 +10,6 @@ import Project.window.SupportingUI.ReusableUIComponent;
 import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
 import Project.window.TreeView.TreeViewEditing.TreeViewSetup;
-import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
@@ -26,8 +25,6 @@ import javafx.util.StringConverter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -181,14 +178,17 @@ public class RandomUIQuizGenerator {
                 return;
             }
             List<TreeItem<ANode>> roots = selectTreeItemResults.stream().map(LittlePopUp.SelectTreeItemResult::result).toList();
-            List<URI> resourceLocations = new ArrayList<>(roots.size());
+//            List<URI> resourceLocations = new ArrayList<>(roots.size());
+            Map<TreeItem<ANode>, Model> topicToModel = new HashMap<>();
+
             for (LittlePopUp.SelectTreeItemResult selectTreeItemResult : selectTreeItemResults) {
                 Model model = fromModels.stream().filter(m -> m.getName().equals(selectTreeItemResult.treeName())).toList().getFirst(); //get the model with the matching name
-                if (model.getFilesDirURL() != null) {
-                    try {resourceLocations.add(model.getFilesDirURL().toURI());} catch (URISyntaxException urie) {logger.log(Level.SEVERE, "failed to parse model.filesURL.toURI", e);}
-                } else if (model.getFilesDir() != null && model.getFilesDir().exists()) {
-                    resourceLocations.add(model.getFilesDir().toURI());
-                }
+                topicToModel.put(selectTreeItemResult.result(), model);
+//                if (model.getResourceFilesDir() != null) {
+//                    try {resourceLocations.add(model.getResourceFilesDir().toURI());} catch (URISyntaxException urie) {logger.log(Level.SEVERE, "failed to parse model.filesURL.toURI", e);}
+//                } else if (model.getFilesDir() != null && model.getFilesDir().exists()) {
+//                    resourceLocations.add(model.getFilesDir().toURI());
+//                }
             }
 
 //            Difficulty difficulty =
@@ -209,7 +209,7 @@ public class RandomUIQuizGenerator {
                 case "Seconds" -> TimeUnit.SECONDS;
                 default -> TimeUnit.MINUTES;
             };
-            this.integerUIQuiz = simpleIntQuizFromTree(roots, resourceLocations, Integer.parseInt(controller.getNquestionsTextfield().getText()), null, time,timeUnit, controller.getShowCorrectAnswerCheckbox().isSelected());
+            this.integerUIQuiz = simpleIntQuizFromTree(topicToModel, Integer.parseInt(controller.getNquestionsTextfield().getText()), null, time,timeUnit, controller.getShowCorrectAnswerCheckbox().isSelected());
             onCreate();
         });
 
@@ -329,14 +329,13 @@ public class RandomUIQuizGenerator {
 
     private int HOW_MUCH_TO_DRAW = 12;
 
-
     private int difficultyToN(Difficulty difficulty) {
         return 12 - difficulty.getDifficultyLevel() / 100;
     }
 
     /**
-     * @param roots
-     * @param resourceLocations
+     * @param topicToModel maps target TreeItems to their Model of origin. Needed to provide each question with the appropriate
+     *                      resource location.
      * @param nquestions
      * @param difficulty
      * @param time
@@ -344,18 +343,20 @@ public class RandomUIQuizGenerator {
      * @param timeUnit
      * @return the UIQuiz
      */
-    public UIQuiz<Integer> simpleIntQuizFromTree(List<TreeItem<ANode>> roots, List<URI> resourceLocations, int nquestions, Difficulty difficulty, int time, TimeUnit timeUnit, boolean showCorrectAnswerOnWrong) {
-        List<UIQuestion<?, Integer>> questions = new ArrayList<>(roots.size());
-        for (TreeItem<ANode> root : new LinkedList<>(roots)) if (root.getChildren().isEmpty() && forbiddenIDs.contains(root.getValue().conceptId())) roots.remove(root);
+    public UIQuiz<Integer> simpleIntQuizFromTree(Map<TreeItem<ANode>, Model> topicToModel, int nquestions, Difficulty difficulty, int time, TimeUnit timeUnit, boolean showCorrectAnswerOnWrong) {
+        List<UIQuestion<?, Integer>> questions = new ArrayList<>(topicToModel.size());
+        for (TreeItem<ANode> root : new LinkedList<>(topicToModel.keySet())) if (root.getChildren().isEmpty() && forbiddenIDs.contains(root.getValue().conceptId())) topicToModel.remove(root);
         int topicInd = 0;
         int sliceAxisInd = 0;
 
-        HashMap<AllQuestionTypes, Integer> countQuestTypes = new HashMap<>(AllQuestionTypes.values().length);
+        HashMap<AllQuestionTypes, Integer> countQuestTypes = new HashMap<>(AllQuestionTypes.values().length);   // keep track of how often each available question type occurs
         for (AllQuestionTypes qType : AllQuestionTypes.values()) countQuestTypes.put(qType, 0);
+
+        List<TreeItem<ANode>> topics = new ArrayList<>(topicToModel.keySet());
 
         for (int i = 0; i < nquestions; i++) {
             String questionName = "Question " + (i+1);
-            TreeItem<ANode> topic = roots.get(topicInd);
+            TreeItem<ANode> topic = topics.get(topicInd);
             TreeItem<ANode> target = randomTreeItemWFileIDsBelow(topic);
 
             List<AllQuestionTypes> possibleQuestTypes = new ArrayList<>(getQuestTypesForTarget(target));
@@ -371,17 +372,17 @@ public class RandomUIQuizGenerator {
                 case ARTERY_SOURCE -> questions.add(makeArterySourceQuestion(target, questionName, difficulty, 0,1));
                 case VEIN_SOURCE -> questions.add(makeVeinSourceQuestion(target, questionName, difficulty, 0,1));
                 case ARTERY_BRANCH -> questions.add(makeArteryBranchQuestion(target, questionName, difficulty, 0,1));
-                case IDENTIFY_IN_3D -> questions.add(makeSimpleMultipleChoice3DQuestion(questionName, "Which item is highlighted?", difficulty, target, resourceLocations));
-                case SELECT_IN_3D -> questions.add(makeSimpleSelectIn3DUIQuestion(questionName, "Select the " + target.getValue().name(), difficulty, 0, 1, target, resourceLocations, showCorrectAnswerOnWrong));
+                case IDENTIFY_IN_3D -> questions.add(makeSimpleMultipleChoice3DQuestion(questionName, "Which item is highlighted?", difficulty, target, topicToModel.get(topic)));
+                case SELECT_IN_3D -> questions.add(makeSimpleSelectIn3DUIQuestion(questionName, "Select the " + target.getValue().name(), difficulty, 0, 1, target, showCorrectAnswerOnWrong, topicToModel.get(topic)));
                 case IDENTIFY_IN_SLICE -> {
                     Plane.BodyAxis bodyAxis = switch (sliceAxisInd){case 0 -> Plane.BodyAxis.AXIAL; case 1 -> Plane.BodyAxis.SAGGITAL; default -> Plane.BodyAxis.CORONAL;};
                     if (sliceAxisInd == 2) sliceAxisInd = 0; else sliceAxisInd++;
-                    questions.add(makeSimpleSliceQuestion(questionName, "Which item is highlighted?", difficulty, target, resourceLocations, bodyAxis, random.nextBoolean()));
+                    questions.add(makeSimpleSliceQuestion(questionName, "Which item is highlighted?", difficulty, target, bodyAxis, random.nextBoolean(), topicToModel.get(topic)));
                 }
             }
             countQuestTypes.put(qType, countQuestTypes.get(qType) + 1);
 
-            if (topicInd == roots.size()-1) topicInd = 0; else topicInd++;
+            if (topicInd == topicToModel.size()-1) topicInd = 0; else topicInd++;
 
         }
 
@@ -390,7 +391,7 @@ public class RandomUIQuizGenerator {
     }
 
 
-    public SimpleMultipleChoice3DQuestion<String, Integer> makeSimpleMultipleChoice3DQuestion(String name, String instructions, Difficulty difficulty, TreeItem<ANode> target, List<URI> resourceLocations) {
+    public SimpleMultipleChoice3DQuestion<String, Integer> makeSimpleMultipleChoice3DQuestion(String name, String instructions, Difficulty difficulty, TreeItem<ANode> target, Model model) {
 
         Set<TreeItem<ANode>> relativesIncludingTarget = findRelatives2(target, difficulty !=  null ? difficultyToN(difficulty) : HOW_MUCH_TO_DRAW);
         List<String> toDraw = new LinkedList<>();
@@ -413,14 +414,16 @@ public class RandomUIQuizGenerator {
                 possibleOptions, //                relativesIncludingTarget.stream().map(t -> t.getValue().name()).toList(),
                 toDraw,
                 target.getValue().fileIds().stream().toList(),
-                true,
-                resourceLocations);
+                true
+        );
+        if (model.getResourceFilesDir() != null) question.setResourceLocations(List.of(model.getResourceFilesDir()));
+        else if (model.getFilesDir() != null) question.setFileDirs(List.of(model.getFilesDir()));
         question.setName(name);
         question.setInstructions(instructions);
         return question;
     }
 
-    public SimpleSelectIn3DUIQuestion<Integer> makeSimpleSelectIn3DUIQuestion(String name, String instructions, Difficulty difficulty, Integer minScore, Integer maxScore, TreeItem<ANode> target, List<URI> resourceLocations, boolean showHintOnWrongAnswer) {
+    public SimpleSelectIn3DUIQuestion<Integer> makeSimpleSelectIn3DUIQuestion(String name, String instructions, Difficulty difficulty, Integer minScore, Integer maxScore, TreeItem<ANode> target, boolean showHintOnWrongAnswer, Model model) {
 
         Set<TreeItem<ANode>> relativesIncludingTarget = findRelatives2(target, difficulty != null ? difficultyToN(difficulty) : HOW_MUCH_TO_DRAW);
         List<String> toDraw = new LinkedList<>();
@@ -432,15 +435,16 @@ public class RandomUIQuizGenerator {
                 difficulty, minScore, maxScore,
                 target.getValue().fileIds().stream().toList(),
                 toDraw,
-                resourceLocations,
                 showHintOnWrongAnswer
         );
+        if (model.getResourceFilesDir() != null) question.setResourceLocations(List.of(model.getResourceFilesDir()));
+        else if (model.getFilesDir() != null) question.setFileDirs(List.of(model.getFilesDir()));
         question.setName(name);
         question.setInstructions(instructions);
         return question;
     }
 
-    public SimpleSliceMCQuestion<String, Integer> makeSimpleSliceQuestion(String name, String instructions, Difficulty difficulty, TreeItem<ANode> target, List<URI> resourceLocations, Plane.BodyAxis sliceAxis, boolean positiveDir) {
+    public SimpleSliceMCQuestion<String, Integer> makeSimpleSliceQuestion(String name, String instructions, Difficulty difficulty, TreeItem<ANode> target, Plane.BodyAxis sliceAxis, boolean positiveDir, Model model) {
 
         //get the names of the target and some other nodes for multiple choice
         List<String> namesForMCOptions = findRelatives2(target, DEFAULT_NO_MC_OPTIONS).stream().map(t -> t.getValue().getName()).toList();
@@ -462,8 +466,10 @@ public class RandomUIQuizGenerator {
                 namesForMCOptions,
                 toDraw.stream().toList(),
                 target.getValue().fileIds().stream().toList(),
-                true,
-                resourceLocations);
+                true
+        );
+        if (model.getResourceFilesDir() != null) question.setResourceLocations(List.of(model.getResourceFilesDir()));
+        else if (model.getFilesDir() != null) question.setFileDirs(List.of(model.getFilesDir()));
 
         question.setName(name);
         question.setInstructions(instructions);

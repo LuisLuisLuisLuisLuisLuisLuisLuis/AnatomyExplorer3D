@@ -175,7 +175,7 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
 
         if (has3DQuestions()) {
             this.threeDGroupHandler = new ThreeDGroupHandler(this.threeDPane, new PerspectiveCamera(true), ThreeDGroupHandler.DEFAULT_INITIAL_CAMERA_POSITION, "quiz3DHandler");
-            this.threeDGroupHandler.getHasFXGroupContentsContainer().setHandleLoadingTask(task -> {runBlockingTask(task, true); return null;});
+            this.threeDGroupHandler.getHasFXGroupContents().setHandleLoadingTask(task -> {runBlockingTask(task, true); return null;});
             this.threeDGroupHandler.setHandleLoadingTask((task -> {runBlockingTask(task, true);return null;}));
 
             VBox.setVgrow(threeDPane, Priority.ALWAYS);
@@ -353,7 +353,7 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
             popupStage.show();
             popupStage.setOnCloseRequest(e -> {
                 e.consume();
-                stop();
+                if (LittlePopUp.showMsg("Quit", "Do you really want to quit?", "Yes", "No")) stop();
             });
             if (timeline != null) timeline.play();
         } catch (IOException e) {

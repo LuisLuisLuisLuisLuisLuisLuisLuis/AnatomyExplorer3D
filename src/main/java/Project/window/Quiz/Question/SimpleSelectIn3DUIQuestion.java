@@ -15,7 +15,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.MeshView;
 
-import java.net.URI;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -98,10 +97,9 @@ public class SimpleSelectIn3DUIQuestion<S extends Comparable<S>> extends SimpleS
      * @param maxScore          max score
      * @param correctAnswer     a list of one or more IDs of MeshViews that represent the correct answer
      * @param idsToDraw Meshview IDs that will be drawn upon asking the question. In the format of filenames of OBJ files.
-     * @param resourceLocations where to find the OBJ files specified by idsToDraw and idsToSelec
      */
-    public SimpleSelectIn3DUIQuestion(Difficulty difficulty, S minScore, S maxScore, List<String> correctAnswer, List<String> idsToDraw, List<URI> resourceLocations, boolean showHintOnWrongAnswer) {
-        super(difficulty, minScore, maxScore, correctAnswer, idsToDraw, resourceLocations);
+    public SimpleSelectIn3DUIQuestion(Difficulty difficulty, S minScore, S maxScore, List<String> correctAnswer, List<String> idsToDraw, boolean showHintOnWrongAnswer) {
+        super(difficulty, minScore, maxScore, correctAnswer, idsToDraw);
         this.showHintOnWrongAnswer = showHintOnWrongAnswer;
     }
 

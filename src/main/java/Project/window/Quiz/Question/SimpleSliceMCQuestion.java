@@ -11,7 +11,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
 import javafx.scene.paint.Color;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
@@ -63,10 +62,9 @@ public class SimpleSliceMCQuestion<T,S extends Comparable<S>> extends SimpleMult
      * @param possibleAnswers   choices this question. it is only possible to answer with one of the choices
      * @param idsToDraw         Meshview IDs that will be drawn upon asking the question. In the format of filenames of OBJ files.
      * @param idsToSelect       Meshviews that will be selected upon asking the question. In the format of filenames of OBJ files.
-     * @param resourceLocations where to find the OBJ files specified by idsToDraw and idsToSelect
      */
-    public SimpleSliceMCQuestion(Difficulty difficulty, S minScore, S maxScore, T correctAnswer, List<T> possibleAnswers, List<String> idsToDraw, List<String> idsToSelect, boolean forceOnlyOneAnswer, List<URI> resourceLocations) {
-        super(difficulty, minScore, maxScore, correctAnswer, possibleAnswers, idsToDraw, idsToSelect, forceOnlyOneAnswer, resourceLocations);
+    public SimpleSliceMCQuestion(Difficulty difficulty, S minScore, S maxScore, T correctAnswer, List<T> possibleAnswers, List<String> idsToDraw, List<String> idsToSelect, boolean forceOnlyOneAnswer) {
+        super(difficulty, minScore, maxScore, correctAnswer, possibleAnswers, idsToDraw, idsToSelect, forceOnlyOneAnswer);
     }
 
     /** between 0 and 5 incl.*/

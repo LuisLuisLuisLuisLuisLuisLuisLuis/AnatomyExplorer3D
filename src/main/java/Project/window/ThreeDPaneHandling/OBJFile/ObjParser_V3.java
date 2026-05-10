@@ -11,7 +11,7 @@ Adapted from Huson (2025) to include deduplication.
  */
 public class ObjParser_V3 {
 
-    public static TriangleMesh load(InputStream inputStream, boolean useNormals) throws IOException{
+    public static TriangleMesh load(InputStream inputStream, boolean useNormals) throws IOException {
 
         // OBJ raw data
         var objVertices = new ArrayList<Float>();

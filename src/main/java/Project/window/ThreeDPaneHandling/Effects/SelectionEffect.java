@@ -1,10 +1,14 @@
 package Project.window.ThreeDPaneHandling.Effects;
 
+import Project.SelectionModel.FXGroupDraw.HasFXGroupContents;
 import Project.SelectionModel.FXGroupDraw.HasFXGroupContentsContainer;
+import Project.window.Quiz.UIQuiz;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.DrawMode;
 import javafx.scene.shape.MeshView;
+
+import java.util.logging.Logger;
 
 
 public class SelectionEffect {
@@ -61,7 +65,7 @@ public class SelectionEffect {
      * Sets meshView.setMaterial(new PhongMaterial(Color.valueOf(HasFXGroupContentsContainer.DEFAULT_COLOR)) if MeshView.getMaterial() not instance of Phongmaterial
      */
     public static void viaSaturation(MeshView meshView, boolean selected) {
-        if (!(meshView.getMaterial() instanceof PhongMaterial)) meshView.setMaterial(new PhongMaterial(Color.web(HasFXGroupContentsContainer.DEFAULT_COLOR_VAL)));
+        if (!(meshView.getMaterial() instanceof PhongMaterial)) meshView.setMaterial(new PhongMaterial(Color.web(HasFXGroupContents.DEFAULT_COLOR_VAL)));
 
         PhongMaterial currentMaterial = (PhongMaterial) meshView.getMaterial();
         //things ive tried:

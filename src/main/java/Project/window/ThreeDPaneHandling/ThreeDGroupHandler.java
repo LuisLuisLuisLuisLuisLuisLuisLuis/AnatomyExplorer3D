@@ -378,7 +378,7 @@ public class ThreeDGroupHandler {
      */
     public void resetColors() {
         for (MeshView meshView : getHasFXGroupContents().getAllItems()) {
-            new ColorMeshviewsCommand(hasFXGroupContentsContainer.getDefaultColorForID(meshView.getId()), Set.of(meshView.getId()), hasFXGroupContents, hasFXGroupSelection).execute();
+            new ColorMeshviewsCommand(hasFXGroupContents.getDefaultColorForID(meshView.getId()), Set.of(meshView.getId()), hasFXGroupContents, hasFXGroupSelection).execute();
         }
     }
 

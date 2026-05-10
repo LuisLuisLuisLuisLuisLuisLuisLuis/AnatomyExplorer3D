@@ -1,6 +1,6 @@
 package Project.window.ThreeDPaneHandling.OBJFile;
 
-import Project.SelectionModel.FXGroupDraw.HasFXGroupContentsContainer;
+import Project.SelectionModel.FXGroupDraw.HasFXGroupContents;
 import Project.window.WindowPresenter;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -13,12 +13,14 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class OpenOBJ {
 
+    private static final Logger logger = Logger.getLogger(OpenOBJ.class.getName());
 
     /**
      * Creates a meshView from a TriangleMesh and an image file.
@@ -36,7 +38,7 @@ public class OpenOBJ {
             //meshView.setCullFace(CullFace.FRONT); strangely caused the cube to deform when rotating.
             material.setDiffuseMap(new Image(image.toURI().toString()));
         } else {
-            if (color == null) color = HasFXGroupContentsContainer.DEFAULT_COLOR;
+            if (color == null) color = HasFXGroupContents.DEFAULT_COLOR;
             material.setDiffuseColor(color);
         }
         meshView.setMaterial(material);
@@ -85,6 +87,7 @@ public class OpenOBJ {
 
     public static MeshView objInputStreamToMeshViews(InputStream inputStream, String nameWithoutExtension, Color color) {
         if (inputStream != null) {
+            logger.log(Level.CONFIG, inputStream + ", name="+nameWithoutExtension);
             File imgFile = new File(nameWithoutExtension + ".png");
             try {
                 //generate mesh from OBJ inputstream. For now I ignore normals to save RAM.
@@ -93,16 +96,14 @@ public class OpenOBJ {
                 meshView.setId(nameWithoutExtension);
 
                 return meshView;
-            } catch (Exception e) {
-                System.err.println(Arrays.toString(e.getStackTrace()));
-                System.err.println(e.getMessage());
-                System.err.println("Failed to parse Inputstream of .obj resource " + nameWithoutExtension + ".obj");
+            } catch (IOException e) {
+                logger.log(Level.WARNING,"Failed to parse Inputstream of .obj resource " + nameWithoutExtension + ".obj", e);
+                return null;
             }
-        } return null;
-    }
-    //default case of no color
-    public static MeshView objInputStreamToMeshViews(InputStream inputStream, String nameWithoutExtension) {
-        return objInputStreamToMeshViews(inputStream, nameWithoutExtension, null);
+        } else {
+            logger.log(Level.WARNING, "InputStream is null");
+            return null;
+        }
     }
 
 

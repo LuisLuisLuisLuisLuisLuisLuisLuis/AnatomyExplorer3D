@@ -15,9 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.MeshView;
 import org.jetbrains.annotations.NotNull;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.util.Collections;
+import java.io.File;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,7 +31,19 @@ public class SimpleMultipleChoice3DQuestion<T,S extends Comparable<S>> extends S
 
     protected List<String> nonExist;    // ids which the ThreeDGroupHandler doesn't know about (either draw or select).
 
-    private final List<URI> resourceLocations;
+    /** List of directories in resources. Will be accessed via getClass().getResource(...) */
+    private List<String> resourceLocations = List.of();
+
+    private List<File> fileDirs = List.of();
+
+    /** Provide a list of directories in resources. Will be accessed via getClass().getResource(...) */
+    public void setResourceLocations(List<String> resourceDirs) {
+        this.resourceLocations = resourceDirs;
+    }
+
+    public void setFileDirs(List<File> dirs) {
+        this.fileDirs = dirs;
+    }
 
     /**
      * A simple multiple choice question model with only one correct answer. Draws some stuff in 3D and asks via multiple choice.
@@ -44,16 +54,14 @@ public class SimpleMultipleChoice3DQuestion<T,S extends Comparable<S>> extends S
      * @param maxScore        max score
      * @param correctAnswer   correct answer
      * @param possibleAnswers choices this question. it is only possible to answer with one of the choices
-     * @param idsToDraw Meshview IDs that will be drawn upon asking the question. In the format of filenames of OBJ files.
-     * @param idsToSelect Meshviews that will be selected upon asking the question. In the format of filenames of OBJ files.
-     * @param resourceLocations where to find the OBJ files specified by idsToDraw and idsToSelect
+     * @param idsToDraw MeshView IDs that will be drawn upon asking the question. In the format of filenames of OBJ files.
+     * @param idsToSelect MeshViews that will be selected upon asking the question. In the format of filenames of OBJ files.
      */
-    public SimpleMultipleChoice3DQuestion(Difficulty difficulty, S minScore, S maxScore, T correctAnswer, List<T> possibleAnswers, List<String> idsToDraw, List<String> idsToSelect, List<URI> resourceLocations) {
+    public SimpleMultipleChoice3DQuestion(Difficulty difficulty, S minScore, S maxScore, T correctAnswer, List<T> possibleAnswers, List<String> idsToDraw, List<String> idsToSelect) {
         super(difficulty, minScore, maxScore, correctAnswer, possibleAnswers, false);
 
         this.idsToDraw = idsToDraw;
         this.idsToSelect = idsToSelect;
-        this.resourceLocations = resourceLocations;
     }
 
     /**
@@ -67,14 +75,12 @@ public class SimpleMultipleChoice3DQuestion<T,S extends Comparable<S>> extends S
      * @param possibleAnswers choices this question. it is only possible to answer with one of the choices
      * @param idsToDraw Meshview IDs that will be drawn upon asking the question. In the format of filenames of OBJ files.
      * @param idsToSelect Meshviews that will be selected upon asking the question. In the format of filenames of OBJ files.
-     * @param resourceLocations where to find the OBJ files specified by idsToDraw and idsToSelect
      */
-    public SimpleMultipleChoice3DQuestion(Difficulty difficulty, S minScore, S maxScore, T correctAnswer, List<T> possibleAnswers, List<String> idsToDraw, List<String> idsToSelect, boolean forceOnlyOneAnsewr, List<URI> resourceLocations) {
+    public SimpleMultipleChoice3DQuestion(Difficulty difficulty, S minScore, S maxScore, T correctAnswer, List<T> possibleAnswers, List<String> idsToDraw, List<String> idsToSelect, boolean forceOnlyOneAnsewr) {
         super(difficulty, minScore, maxScore, correctAnswer, possibleAnswers, forceOnlyOneAnsewr);
 
         this.idsToDraw = idsToDraw;
         this.idsToSelect = idsToSelect;
-        this.resourceLocations = resourceLocations;
     }
 
     protected void checkIDs() {
@@ -130,9 +136,7 @@ public class SimpleMultipleChoice3DQuestion<T,S extends Comparable<S>> extends S
             showArrowButton.setText("Show Arrow");
             hideArrowButton.setDisable(true);
         });
-        changeSelEffectButton.setOnAction(e -> {
-            threeDGroupHandler.changeSelectionEffect(threeDGroupHandler.getSelectionEffect() == SelectionEffect.Effect.VIA_DRAWMODE ? SelectionEffect.Effect.VIA_SATURATION : SelectionEffect.Effect.VIA_DRAWMODE);
-        });
+        changeSelEffectButton.setOnAction(e -> threeDGroupHandler.changeSelectionEffect(threeDGroupHandler.getSelectionEffect() == SelectionEffect.Effect.VIA_DRAWMODE ? SelectionEffect.Effect.VIA_SATURATION : SelectionEffect.Effect.VIA_DRAWMODE));
 
         formattedQuestionUI.setBottom(new ToolBar(resetViewButton, showArrowButton, hideArrowButton, changeSelEffectButton));
 
@@ -172,14 +176,12 @@ public class SimpleMultipleChoice3DQuestion<T,S extends Comparable<S>> extends S
         HashSet<String> allFileIDs = new HashSet<>((int) ((idsToSelect.size() + idsToDraw.size()) /0.75));
         allFileIDs.addAll(idsToSelect);
         allFileIDs.addAll(idsToDraw);
-//        for (String id : idsToDraw) if (this.threeDGroupHandler.getHasFXGroupContents().getMeshViewWithID(id) == null) allFileIDs.add(id); not necessary anymore. hasfxcontentcontainer checks for this.
-//        for (String id : idsToSelect) if (this.threeDGroupHandler.getHasFXGroupContents().getMeshViewWithID(id) == null) allFileIDs.add(id);
-        for (URI uri : this.resourceLocations) {
-            try {
-                this.threeDGroupHandler.getHasFXGroupContentsContainer().addResourceLocation(uri.toURL(), allFileIDs);
-            } catch (MalformedURLException e) {
-                throw new RuntimeException("Failed to load resource location " + uri.toString());  //TODO: must be caught by Quiz
-            }
+
+        for (String dir : this.resourceLocations) {
+            this.threeDGroupHandler.getHasFXGroupContents().addResourceLocation(dir, allFileIDs);
+        }
+        for (File dir : this.fileDirs) {
+            this.threeDGroupHandler.getHasFXGroupContents().addFileDir(dir, allFileIDs); //TODO
         }
     }
 

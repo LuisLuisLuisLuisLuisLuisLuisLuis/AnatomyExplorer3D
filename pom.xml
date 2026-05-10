@@ -139,6 +139,7 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>3.1.0</version>
+
         <executions>
           <execution>
             <id>jpackage</id>
@@ -146,11 +147,13 @@
             <goals>
               <goal>exec</goal>
             </goals>
+
             <configuration>
               <executable>${java.home}/bin/jpackage</executable>
+
               <arguments>
                 <!-- Input is the jlink image -->
-                <argument>--input</argument>
+                <argument>--runtime-image</argument> <!-- was input b4-->
                 <argument>${project.build.directory}/image</argument>
 
                 <!-- Where to put the exe -->
@@ -158,10 +161,13 @@
                 <argument>${project.build.directory}</argument>
 
                 <!-- Main class & module -->
-                <argument>--main-class</argument>
-                <argument>Project.Main</argument>
-                <argument>--main-jar</argument>
-                <argument>HelloWorldModule.jar</argument>
+<!--                <argument>&#45;&#45;main-class</argument>-->
+<!--                <argument>Project.Main</argument>-->
+<!--                <argument>&#45;&#45;main-jar</argument>-->
+<!--                <argument>HelloWorldModule.jar</argument>-->
+                <argument>--module</argument>
+<!--                <argument>Project.AnatomyExplorer</argument>-->
+                <argument>com.anatomyExplorer/Project.AnatomyExplorer</argument>
 
                 <!-- Application name -->
                 <argument>--name</argument>
@@ -169,7 +175,7 @@
 
                 <!-- Type: exe (instead of msi installer) -->
                 <argument>--type</argument>
-                <argument>exe</argument>
+                <argument>msi</argument>
               </arguments>
             </configuration>
           </execution>
