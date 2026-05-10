@@ -4,6 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <!--
+  How to use via command line:
+  run app                                                     -> mvn javafx:run@anatomyExplorer
+  build runtime image (executable via anatomyExploer.bat)     -> mvn clean javafx:jlink@anatomyExplorer
+  build installer from runtime image                          -> mvn exec:exec@jpackage
+  -->
   <groupId>com.example</groupId>
   <artifactId>HelloWorldModule</artifactId>
   <version>1</version>
