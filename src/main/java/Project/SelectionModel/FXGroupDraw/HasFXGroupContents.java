@@ -307,7 +307,6 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
         task.setOnSucceeded(e -> {
             logger.log(Level.CONFIG, "loading OBJs task done");
             addMeshViews(task.getValue());
-            logger.log(Level.CONFIG, "n triangles: " + HasFXGroupContents.printNrFaces(task.getValue()));
             isLoadingOBJs.set(false);
         });
 
@@ -353,7 +352,6 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
         task.setOnSucceeded(e -> {
             logger.log(Level.CONFIG, "loading OBJs task done");
             addMeshViews(task.getValue());
-            logger.log(Level.CONFIG, "n triangles: " + HasFXGroupContents.printNrFaces(task.getValue()));
             isLoadingOBJs.set(false);
         });
 
@@ -421,7 +419,7 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
     }
 
     public void addFileDir(File dir, Set<String> whiteList) {
-        if (!dir.exists() || dir.isDirectory()) throw new IllegalArgumentException("Provided path is not a directory: " + dir.toString());
+        if (!dir.exists() || !dir.isDirectory()) throw new IllegalArgumentException("Provided path is not a directory: " + dir.toString());
         fileDirs.add(dir);
         loadOBJs(dir, whiteList);
     }
@@ -453,7 +451,7 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
     public void removeResourceLocation(String location) {resourceLocations.remove(location); //removeOBJs(url);
     }
 
-
+    /** maybe doesnt work reliably*/
     public static String printNrFaces(List<MeshView> meshViews) {
         int counter = 0;
         for (MeshView meshView : meshViews) {

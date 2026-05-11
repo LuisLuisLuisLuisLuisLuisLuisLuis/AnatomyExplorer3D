@@ -453,7 +453,7 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
             boolean alt = event.isAltDown();
             boolean shift = event.isShiftDown();
             KeyCode keyCode = event.getCode();
-            if (event.isControlDown() || alt) {
+            if (event.isShortcutDown() || alt) {
                 if (List.of(KeyCode.LEFT, KeyCode.RIGHT, KeyCode.UP, KeyCode.DOWN, KeyCode.PLUS, KeyCode.MINUS).contains(keyCode)) threeDGroupHandler.rotationControl(keyCode, alt, shift);
             }
         });

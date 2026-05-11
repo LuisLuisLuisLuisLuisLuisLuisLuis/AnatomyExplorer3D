@@ -173,13 +173,13 @@ public class WindowPresenter {
     private Model partof_v3 = null;
     private Model isa_v3 = null;
 
-    private long sizeOfLoadedModels = 0;   // this counts the size of OBJ files associated with models loaded by the user; in MB. (excluding the anatomy models shipped with this software).
-                                        // The user is not allowed to load more than maxSizeOfUserModels MB of OBJ files.
-    private static final int maxSizeOfUserModels = 500 + 427;   // +427 is the size of the standard anatomy hierarchy
+    private long sizeOfLoadedModels = 0;    // this counts the size of OBJ files associated with models loaded by the user in MB. (excluding the anatomy models shipped with this software).
+                                            // The user is not allowed to load more than maxSizeOfUserModels MB of OBJ files.
+    private static final int maxSizeOfUserModels = 500 + 427;   // +427 is the size of the standard unmodified anatomy hierarchy
 
     private static final double freeRamFractionThreshold = 0.1; // when freeMemory / totalMemory < threshold manageRAM() will try to free up RAM
 
-    private final Set<String> supportedFileExtensions = Set.of(".obj");   //may be expanded in the future
+    private static final Set<String> supportedFileExtensions = Set.of(".obj");   //may be expanded in the future
     public Set<String> getSupportedFileExtensions() {return supportedFileExtensions;}
 
 
@@ -624,7 +624,7 @@ public class WindowPresenter {
         controller.getRemoveFrom3DButton().setOnAction(e -> {
             TreeViewSelectionContainer treeViewSelectionContainer = null;
             for (TreeViewSelectionContainer treeViewSelectionContainer1 : this.treeViewSelectionContainers) if (treeViewSelectionContainer1.getId().equals(getSelectedTreeView().getId())) treeViewSelectionContainer = treeViewSelectionContainer1;
-            if (treeViewSelectionContainer == null) {System.out.println("drawin3dButton: treeViewSelectionContainer is null!"); return;}
+
             HashSet<String> toRemove = new HashSet<>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()));
             for (String item : new HashSet<>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()))) {  //need to create this again to not concurrently modify toRemove
                 if (!threeDContentGroup.getSelection().contains(item)) {
@@ -689,7 +689,7 @@ public class WindowPresenter {
                             } else continue;
                         }
 
-                        estOBJsSize = estimateSizeOfOBJsInDir(filesDir, FileUtil.extractFileIDsFromFileList(makeStream(filesListFile)));
+                        estOBJsSize = estimateSizeOfOBJsInDir(filesDir, FileUtil.extractFileIDsFromFileList(makeStream(filesListFile)), supportedFileExtensions);
                         if (sizeOfLoadedModels + estOBJsSize > maxSizeOfUserModels) {
                             String wrnmsg1 = "The provided OBJ files (" + estOBJsSize + " MB) exceed the maximum capacity of " + maxSizeOfUserModels + " MB.";
                             String actmsg1 = "Choose a different directory?";
@@ -721,7 +721,7 @@ public class WindowPresenter {
             try {
                 Model model;
                 try {
-                    model = filesListFile == null ? new Model(relationsStream, name) : new Model(relationsStream, makeStream(filesListFile), name, filesDir);
+                    model = filesListFile == null ? new Model(relationsStream, name) : new Model(relationsStream,  makeStream(filesListFile), name, filesDir);
                 } catch (IllegalArgumentException illegalArgumentException) {
                     LittlePopUp.showMsg("Error", "Failed to load " + name + ".\nError: " + illegalArgumentException.getMessage(), "OK");
                     return;
@@ -934,7 +934,7 @@ public class WindowPresenter {
             };
 
             cell.setOnMouseClicked(event -> {
-                if (!cell.isEmpty() && event.isControlDown()) {
+                if (!cell.isEmpty() && event.isShortcutDown()) {
                     String content = cell.getItem();
                     Clipboard clipboard = Clipboard.getSystemClipboard();
                     ClipboardContent clipboardContent = new ClipboardContent();
@@ -1285,7 +1285,7 @@ public class WindowPresenter {
             boolean alt = event.isAltDown();
             boolean shift = event.isShiftDown();
             KeyCode keyCode = event.getCode();
-            if (event.isControlDown() || alt) {
+            if (event.isShortcutDown() || alt) {
                 if (List.of(KeyCode.LEFT, KeyCode.RIGHT, KeyCode.UP, KeyCode.DOWN, KeyCode.PLUS, KeyCode.MINUS).contains(keyCode)) rotationControl(keyCode, alt, shift);
                 switch (keyCode) {
                     case KeyCode.F: controller.getTreeSearchField().requestFocus(); //ctrl+F -> search
@@ -1516,11 +1516,20 @@ public class WindowPresenter {
             } else logger.log(Level.CONFIG, "filesDirURL and filesDir of model are null");
         }
         controller.getTreeTabPane().getTabs().add(tab);
-        try {
-            sizeOfLoadedModels += model.getFilesDir() != null ? estimateSizeOfOBJsInDir(model.getFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot())) : (model.getResourceFilesDir() != null ? estimateSizeOfOBJsInDir(new File(getClass().getResource(model.getResourceFilesDir()).getFile()), collectFileIDsBelowToSet(model.getRoot())) : 0);
-        } catch (NullPointerException n) {
-            logger.log(Level.WARNING, "Model=" + model.getName() + ": new File(getClass().getResource(model.getResourceFilesDir())) produced null", n);
+
+        if (model.getFilesDir() != null) {  //it is only possible to determine directory size via File. but in the compiled shipped product, resources aren't accessible as File anymore,
+                                            //thus i hardcode the size of the shipped models. this may lead to incorrect calculations since the user has the ability to modify them.
+                                            //an improvement for this would be to count the number of fileIDs in the tree and multiply that with the average OBJ file size.
+                                            //a further improvement to this could be to discard those fileIDs for which no inputstream can be created to avoid fileIDs that were added to the tree even when no corresponding file exists.
+            sizeOfLoadedModels += FileUtil.estimateSizeOfOBJsInDir(model.getFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot()), supportedFileExtensions);
+        } else {
+            if (model.equals(mainModel)) {
+                sizeOfLoadedModels += FileUtil.estimateSizeOfTreeFiles(treeView.getRoot(), 214) / 1024;
+            } else if (model.equals(partof_v3) || model.equals(isa_v3)) {   // like this i prevent the size from being added twice.
+                if (models.stream().filter(m -> m.equals(partof_v3) || m.equals(isa_v3)).toList().size() == 1) sizeOfLoadedModels += FileUtil.estimateSizeOfTreeFiles(treeView.getRoot(), 477) / 1024;
+            }
         }
+        logger.log(Level.CONFIG, "size of loaded models: " + sizeOfLoadedModels);
 
         this.isModelUnsaved.put(model.getName(), new SimpleBooleanProperty(false));
         Circle circle = new Circle(3,Color.GRAY);
@@ -1528,6 +1537,7 @@ public class WindowPresenter {
             if (newValue) tab.setGraphic(circle);
             else tab.setGraphic(null);
         });
+
     }
 
     /**
@@ -1572,11 +1582,20 @@ public class WindowPresenter {
         this.tabs.removeIf(tab -> tab.getText().equals(model.getName()));
         controller.getTreeTabPane().getTabs().removeIf(tab -> tab.getText().equals(model.getName()));
         this.models.remove(model);
-        try {
-            sizeOfLoadedModels -= model.getFilesDir() != null ? estimateSizeOfOBJsInDir(model.getFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot())) : (model.getResourceFilesDir() != null ? estimateSizeOfOBJsInDir(new File(getClass().getResource(model.getResourceFilesDir()).getFile()), collectFileIDsBelowToSet(model.getRoot())) : 0);
-        } catch (NullPointerException n) {
-            logger.log(Level.WARNING, "Model=" + model.getName() + ": new File(getClass().getResource(model.getResourceFilesDir())) produced null", n);
+        if (model.getFilesDir() != null) {  //it is only possible to determine directory size via File. but in the compiled shipped product, resources aren't accessible as File anymore,
+            //thus i hardcode the size of the shipped models. this may lead to incorrect calculations since the user has the ability to modify them.
+            //an improvement for this would be to count the number of fileIDs in the tree and multiply that with the average OBJ file size.
+            //a further improvement to this could be to discard those fileIDs for which no inputstream can be created to avoid fileIDs that were added to the tree even when no corresponding file exists.
+            sizeOfLoadedModels -= FileUtil.estimateSizeOfOBJsInDir(model.getFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot()), supportedFileExtensions);
+        } else {
+            if (model.equals(mainModel)) {
+                sizeOfLoadedModels -= FileUtil.estimateSizeOfTreeFiles(modelTreeView.getRoot(), 214) / 1024;
+            } else if (model.equals(partof_v3) || model.equals(isa_v3)) {   // like this i prevent the size from being added twice.
+                if (models.stream().filter(m -> m.equals(partof_v3) || m.equals(isa_v3)).toList().size() == 1) sizeOfLoadedModels -= FileUtil.estimateSizeOfTreeFiles(modelTreeView.getRoot(), 477) / 1024;
+            }
         }
+        logger.log(Level.CONFIG, "size of loaded models: " + sizeOfLoadedModels);
+
         this.isModelUnsaved.remove(model.getName());
     }
 
@@ -1884,39 +1903,6 @@ public class WindowPresenter {
         boolean result = (double) freeMemory() / totalMemory() < freeRamFractionThreshold;
         logger.log(Level.CONFIG, "free memory=" + freeMemory() + ". total memory=" + totalMemory() + " -> " + result);
         return result;
-    }
-
-
-    /**
-     * Estimates the sum of sizes of all OBJ files in the directory.
-     * @param dir A directory.
-     * @param whiteList WhiteList of file names without file extension (like '.obj')
-     * @return Size in MB. 0 if dir does not specify a directory or an exception is thrown.
-     */
-    public long estimateSizeOfOBJsInDir(File dir, Set<String> whiteList) {
-        System.out.println(Arrays.toString(whiteList.toArray()));
-        try {System.out.println("directory size: " + Files.size(dir.toPath()));}
-        catch (IOException i) {return 0;}
-
-        if (dir.isDirectory() && dir.listFiles() != null) {
-            File[] files = dir.listFiles();
-            long sumFileSizes = 0;
-            for (File file : files) {
-                try {
-                    if (!file.isFile()) continue;
-                    if (!file.getName().contains(".")) continue; //so that the next statement can safely run
-                    String extension = file.getName().substring(file.getName().lastIndexOf("."));
-                    if (!supportedFileExtensions.contains(extension)) continue;
-                    if (!whiteList.contains(file.getName().substring(0, file.getName().lastIndexOf(".")))) continue;
-                    sumFileSizes += Files.size(file.toPath());
-                }
-                catch (IOException ignored) {System.out.println("skipping file");}
-            }
-            sumFileSizes /= (1024 * 1024);
-            System.out.println("file sizes: " + sumFileSizes );
-            return sumFileSizes;
-        }
-        return 0;
     }
 
     /**

@@ -26,6 +26,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.text.Font?>
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="419.0" prefWidth="583.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Project.window.MainWindowController">
    <children>
       <StackPane prefHeight="419.0" prefWidth="583.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -170,6 +171,14 @@
                                  <top>
                                     <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                                        <items>
+                                           <Label text="🛈">
+                                               <tooltip>
+                                                   <Tooltip text="Try scrolling, Ctrl/Alt + Scroll, Ctrl/Alt + Arrow/+/- keys. Hold Shift to modify slice plane." showDuration="10s"/>
+                                               </tooltip>
+                                               <font>
+                                                   <Font size="14.0" />
+                                               </font>
+                                           </Label>
                                         <Button fx:id="zoomInButton" mnemonicParsing="false" text="+" />
                                           <Button fx:id="zoomOutButton" mnemonicParsing="false" text="-" />
                                           <Separator orientation="VERTICAL" />
@@ -178,13 +187,13 @@
                                           <Button fx:id="moveLeftButton" mnemonicParsing="false" text="←" />
                                           <Button fx:id="moveRightButton" mnemonicParsing="false" text="→" />
                                           <Separator orientation="VERTICAL" />
-                                          <Button fx:id="tiltAntiClButton" mnemonicParsing="false" text="↶" />
-                                          <Button fx:id="tiltClockwButton" mnemonicParsing="false" text="↷" />
+                                          <Button fx:id="tiltAntiClButton" mnemonicParsing="false" text="⤻" />
+                                          <Button fx:id="tiltClockwButton" mnemonicParsing="false" text="⤺" />
                                           <Separator orientation="VERTICAL" />
                                           <Button fx:id="rotLeftButton" mnemonicParsing="false" text="↩" />
                                           <Button fx:id="rotRightButton" mnemonicParsing="false" text="↪" />
-                                          <Button fx:id="rotUpButton" mnemonicParsing="false" text="⤻" />
-                                          <Button fx:id="rotDownButton" mnemonicParsing="false" text="⤺" />
+                                          <Button fx:id="rotUpButton" mnemonicParsing="false" text="↶" />
+                                          <Button fx:id="rotDownButton" mnemonicParsing="false" text="↷" />
                                           <Separator orientation="VERTICAL" />
                                           <Button fx:id="resetViewButton" mnemonicParsing="false" text="Reset" />
                                           <Button fx:id="clearViewButton" mnemonicParsing="false" text="Clear View" />

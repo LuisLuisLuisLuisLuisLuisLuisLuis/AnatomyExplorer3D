@@ -87,7 +87,7 @@ public class OpenOBJ {
 
     public static MeshView objInputStreamToMeshViews(InputStream inputStream, String nameWithoutExtension, Color color) {
         if (inputStream != null) {
-            logger.log(Level.CONFIG, inputStream + ", name="+nameWithoutExtension);
+            logger.log(Level.FINE, inputStream + ", name="+nameWithoutExtension);
             File imgFile = new File(nameWithoutExtension + ".png");
             try {
                 //generate mesh from OBJ inputstream. For now I ignore normals to save RAM.

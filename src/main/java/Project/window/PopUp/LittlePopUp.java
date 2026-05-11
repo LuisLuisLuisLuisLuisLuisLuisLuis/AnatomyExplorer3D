@@ -386,7 +386,7 @@ public class LittlePopUp {
                 searchTree.find(treeSearchField.getText(), false, regexCheck.isSelected());
             }
         });
-        dialog.getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {if (event.isControlDown() && event.getCode() == KeyCode.F) treeSearchField.requestFocus();});
+        dialog.getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {if (event.isShortcutDown() && event.getCode() == KeyCode.F) treeSearchField.requestFocus();});
 
         Button treeSearchNextButton = new Button(">");
         Button treeSearchPrevButton = new Button("<");
@@ -538,7 +538,7 @@ public class LittlePopUp {
         });
 
         dialog.getDialogPane().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.isControlDown() && event.getCode() == KeyCode.F) {
+            if (event.isShortcutDown() && event.getCode() == KeyCode.F) {
                 treeSearchField.requestFocus();
             }
         });

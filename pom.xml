@@ -10,6 +10,117 @@
   build runtime image (executable via anatomyExploer.bat)     -> mvn clean javafx:jlink@anatomyExplorer
   build installer from runtime image                          -> mvn exec:exec@jpackage
   -->
+
+  <!-- use these to configure which installer to build -->
+  <!-- use by appending -Pxxx at the end of the mvn command, where xxx is the name of the profile-->
+
+  <profiles>
+
+    <profile>
+      <id>windows</id>
+
+      <properties>
+        <javafx.platform>win</javafx.platform>
+        <jpackage.type>msi</jpackage.type>
+      </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+
+            <executions>
+              <execution>
+                <id>jpackage</id>
+
+                <configuration>
+                  <arguments combine.children="append">
+
+                    <argument>--win-dir-chooser</argument>
+                    <argument>--win-shortcut</argument>
+                    <argument>--icon</argument>
+                    <argument>${project.build.outputDirectory}/Project/icons/skull.ico</argument>
+
+                  </arguments>
+                </configuration>
+
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>linux</id>
+      <properties>
+        <javafx.platform>linux</javafx.platform>
+        <jpackage.type>deb</jpackage.type>
+      </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+
+            <executions>
+              <execution>
+                <id>jpackage</id>
+
+                <configuration>
+                  <arguments combine.children="append">
+
+                    <argument>--linux-shortcut</argument>
+                    <argument>--icon</argument>
+                    <argument>${project.build.outputDirectory}/Project/icons/skull.png</argument>
+
+                  </arguments>
+                </configuration>
+
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>mac</id>
+      <properties>
+        <javafx.platform>mac</javafx.platform>
+        <jpackage.type>dmg</jpackage.type>
+      </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+
+            <executions>
+              <execution>
+                <id>jpackage</id>
+
+                <configuration>
+                  <arguments combine.children="append">
+
+                    <argument>--icon</argument>
+                    <argument>${project.build.outputDirectory}/Project/icons/skull.icns</argument>
+
+                  </arguments>
+                </configuration>
+
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+  </profiles>
+
   <groupId>com.example</groupId>
   <artifactId>HelloWorldModule</artifactId>
   <version>1</version>
@@ -20,6 +131,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>5.9.2</junit.version>
     <javafx.version>24</javafx.version>
+    <javafx.platform>linux</javafx.platform>
   </properties>
 
   <dependencies>
@@ -27,25 +139,25 @@
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
       <version>${javafx.version}</version>
-      <classifier>win</classifier> <!--only platform specific jars-->
+      <classifier>${javafx.platform}</classifier> <!--only platform specific jars-->
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-fxml</artifactId>
       <version>${javafx.version}</version>
-      <classifier>win</classifier>
+      <classifier>${javafx.platform}</classifier>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-media</artifactId>
       <version>24</version>
-      <classifier>win</classifier>
+      <classifier>${javafx.platform}</classifier>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-web</artifactId>
       <version>${javafx.version}</version>
-      <classifier>win</classifier>
+      <classifier>${javafx.platform}</classifier>
     </dependency>
     <dependency>
       <groupId>org.controlsfx</groupId>
@@ -99,6 +211,7 @@
 
   <build>
     <plugins>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -107,6 +220,7 @@
           <release>21</release>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-maven-plugin</artifactId>
@@ -120,7 +234,7 @@
             </goals>
             <configuration>
              <options>
-               <option>-Xmx4g</option>
+               <option>-Xmx4g</option>  <!-- use up to 4G RAM-->
              </options>
               <mainClass>Project.AnatomyExplorer</mainClass>
               <launcher>anatomyExplorer</launcher>
@@ -132,6 +246,7 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <artifactId>maven-jlink-plugin</artifactId>
         <version>3.2.0</version>
@@ -140,7 +255,7 @@
           <goal>jlink:jlink</goal>
         </configuration>
       </plugin>
-      <!-- Use exec plugin to call jpackage -->
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -158,30 +273,24 @@
               <executable>${java.home}/bin/jpackage</executable>
 
               <arguments>
-                <!-- Input is the jlink image -->
-                <argument>--runtime-image</argument> <!-- was input b4-->
+                <!-- input is the jlink image -->
+                <argument>--runtime-image</argument>
                 <argument>${project.build.directory}/image</argument>
 
-                <!-- Where to put the exe -->
+                <!-- Where to put the installer / result -->
                 <argument>--dest</argument>
                 <argument>${project.build.directory}</argument>
 
-                <!-- Main class & module -->
-<!--                <argument>&#45;&#45;main-class</argument>-->
-<!--                <argument>Project.Main</argument>-->
-<!--                <argument>&#45;&#45;main-jar</argument>-->
-<!--                <argument>HelloWorldModule.jar</argument>-->
                 <argument>--module</argument>
-<!--                <argument>Project.AnatomyExplorer</argument>-->
                 <argument>com.anatomyExplorer/Project.AnatomyExplorer</argument>
 
                 <!-- Application name -->
                 <argument>--name</argument>
                 <argument>AnatomyExplorer</argument>
 
-                <!-- Type: exe (instead of msi installer) -->
                 <argument>--type</argument>
-                <argument>msi</argument>
+                <argument>${jpackage.type}</argument>
+
               </arguments>
             </configuration>
           </execution>
