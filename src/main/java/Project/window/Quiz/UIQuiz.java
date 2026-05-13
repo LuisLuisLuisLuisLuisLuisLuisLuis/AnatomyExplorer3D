@@ -1,11 +1,10 @@
 package Project.window.Quiz;
 
-import Project.window.PopUp.LittlePopUp;
+import Project.window.SupportingUI.PopUp.LittlePopUp;
 import Project.window.Quiz.Question.Needs3DAccess;
 import Project.window.Quiz.Question.Question;
 import Project.window.Quiz.Question.SimpleMultipleChoice3DQuestion;
 import Project.window.Quiz.Question.UIQuestion;
-import Project.window.ThreeDPaneHandling.Movement.Group3DRotation;
 import Project.window.ThreeDPaneHandling.ThreeDGroupHandler;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -18,9 +17,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
-import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Point3D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.PerspectiveCamera;
@@ -33,14 +30,11 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import javax.xml.stream.EventFilter;
-import javax.xml.stream.events.XMLEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

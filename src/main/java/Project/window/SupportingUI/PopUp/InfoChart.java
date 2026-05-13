@@ -1,4 +1,4 @@
-package Project.window.PopUp;
+package Project.window.SupportingUI.PopUp;
 
 import Project.model.ANode;
 import javafx.geometry.Insets;

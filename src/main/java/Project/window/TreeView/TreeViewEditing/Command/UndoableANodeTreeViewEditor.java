@@ -3,10 +3,9 @@ package Project.window.TreeView.TreeViewEditing.Command;
 
 import Project.command.Command;
 import Project.model.ANode;
-import Project.window.PopUp.LittlePopUp;
+import Project.window.SupportingUI.PopUp.LittlePopUp;
 import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import Project.window.TreeView.TreeRestructuring.TreeRestructuring;
-import com.sun.source.tree.Tree;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;

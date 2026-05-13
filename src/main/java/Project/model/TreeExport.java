@@ -1,6 +1,6 @@
 package Project.model;
 
-import Project.window.PopUp.LittlePopUp;
+import Project.window.SupportingUI.PopUp.LittlePopUp;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.FileChooser;

@@ -47,7 +47,7 @@
                                           <Button fx:id="treeSelectNoneButton" mnemonicParsing="false" text="Select None" />
                                           <Separator orientation="VERTICAL" />
                                           <Button fx:id="quizButton" mnemonicParsing="false" text="Quiz" />
-                                          <Button fx:id="infoButton" mnemonicParsing="false" text="Leaf Info" />
+                                          <Button fx:id="infoButton" mnemonicParsing="false" text="Leaf Info" disable="true" visible="false"/>    <!-- disabled for now because I don't see the use of it -->
                                       </items>
                                     </ToolBar>
                                  </top>
@@ -77,8 +77,8 @@
                                                       <Button fx:id="treeSearchNextButton" mnemonicParsing="false" text="&gt;" />
                                                       <Button fx:id="treeSearchAllButton" mnemonicParsing="false" text="All" />
                                                       <CheckBox fx:id="regexCheck" mnemonicParsing="false" text="Regex" />
-                                                      <Separator orientation="VERTICAL" />
-                                                      <CheckBox fx:id="showAICheck" mnemonicParsing="false" text="Show AI" />
+                                                      <Separator orientation="VERTICAL" visible="false"/> <!-- disabled for now-->
+                                                      <CheckBox fx:id="showAICheck" mnemonicParsing="false" text="Show AI" disable="true" visible="false"/>
                                                   </items>
                                                 </ToolBar>
                                              </top>

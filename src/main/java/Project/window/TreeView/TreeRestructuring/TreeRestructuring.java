@@ -3,8 +3,8 @@ package Project.window.TreeView.TreeRestructuring;
 import Project.command.Command;
 import Project.command.TreeCommands.TreeEditorMockCommand;
 import Project.model.ANode;
-import Project.window.PopUp.LegendItem;
-import Project.window.PopUp.LittlePopUp;
+import Project.window.SupportingUI.PopUp.LegendItem;
+import Project.window.SupportingUI.PopUp.LittlePopUp;
 import Project.window.SupportingUI.TextSearch.SearchTree;
 import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
@@ -13,17 +13,12 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.HBox;
 
 import java.io.IOException;
 import java.util.*;
-
-import static Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils.replaceANodeByCopy;
 
 
 public class TreeRestructuring {
@@ -53,7 +48,7 @@ public class TreeRestructuring {
     private void setResult(TreeItem<ANode> result) {this.result = result;}
     public TreeItem<ANode> getResultNow() {return result;}
 
-    private final Project.window.PopUp.LittlePopUp.ShowPopup showPopup;
+    private final LittlePopUp.ShowPopup showPopup;
 
     private final ObservableList<Command> undoList = FXCollections.observableList(new LinkedList<>());
     private final ObservableList<Command> redoList = FXCollections.observableList(new LinkedList<>());

@@ -1,4 +1,4 @@
-package Project.window.PopUp;
+package Project.window.SupportingUI.PopUp;
 
 
 import Project.AnatomyExplorer;
@@ -187,7 +187,10 @@ public class LittlePopUp {
         Label edgeText = new Label("Edge list with the following constraints:");
         paragraphs.add(edgeText);
 
+        Label headerLineEdge = new Label("- First line is header and will be skipped");
+        Label headerLineFiles = new Label("- First line is header and will be skipped");
         Label edgeForm = new Label("- Format: ");
+        bullets.add(headerLineEdge);
         bullets.add(edgeForm);
 
         TextFlow edgeFlow = new TextFlow();
@@ -198,7 +201,7 @@ public class LittlePopUp {
             tabTxt.getStyleClass().add("text-normal");
             edgeFlow.getChildren().add(tabTxt);
         } edgeFlow.getChildren().removeLast();
-        HBox edgeFormatHBox = new HBox(edgeForm, edgeFlow);
+        HBox edgeFormatHBox = new HBox(headerLineEdge, edgeForm, edgeFlow);
 
         Label edgeText2 = new Label(
                 """
@@ -210,7 +213,7 @@ public class LittlePopUp {
         Label fileText = new Label("\nList of file associations (optional) with the following constraints:");
         paragraphs.add(fileText);
 
-        Label fileIDtext = new Label("- format: ");
+        Label fileIDtext = new Label("- Format: ");
         bullets.add(fileIDtext);
         TextFlow fileIDTextFlow = new TextFlow();
         for (String txt : new String[]{"node id", "node name", "name of the .obj file"}) {
@@ -243,7 +246,7 @@ public class LittlePopUp {
         }
         Separator separator = new Separator(Orientation.HORIZONTAL);
         separator.setPadding(new Insets(12,0,12,0));
-        listVBox.getChildren().addAll(edgeText, edgeFormatHBox, edgeText2, fileText, fileIDformatbox, dirText, separator, askText);
+        listVBox.getChildren().addAll(edgeText, headerLineEdge, edgeFormatHBox, edgeText2, fileText, headerLineFiles, fileIDformatbox, dirText, separator, askText);
         dialog.getDialogPane().setContent(listVBox);
         separator.autosize();
         ButtonType okType = new ButtonType("Continue", ButtonBar.ButtonData.NEXT_FORWARD);

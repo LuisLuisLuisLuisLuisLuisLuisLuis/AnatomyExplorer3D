@@ -2,7 +2,7 @@ package Project.window.Quiz.Generating;
 
 import Project.model.ANode;
 import Project.model.Model;
-import Project.window.PopUp.LittlePopUp;
+import Project.window.SupportingUI.PopUp.LittlePopUp;
 import Project.window.Quiz.*;
 import Project.window.Quiz.Question.*;
 import Project.window.Slicing.Plane;

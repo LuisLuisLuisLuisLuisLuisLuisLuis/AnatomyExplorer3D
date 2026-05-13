@@ -273,10 +273,10 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
 
     /**
      *
-     * @param url directory in resources containing the files. Has to be usable via getClass().getResource(...)
-     * @param whiteList Set of FileIDs that can be found in the directory of the given url
+     * @param resourceDir directory in resources containing the files. Has to be usable via getClass().getResource(...)
+     * @param whiteList Set of FileIDs that can be found in the directory of the given resourceDir
      */
-    private void loadOBJsMulti(String url, Set<String> whiteList) {
+    private void loadOBJsMulti(String resourceDir, Set<String> whiteList) {
         Task<List<MeshView>> task = new Task<>() {
 
             @Override
@@ -287,7 +287,7 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
                 List<Future<MeshView>> meshViewF = new ArrayList<>(whiteList.size());
                 for (String fileID : whiteList) {
                     if (getMeshViewWithID(fileID) != null) continue;
-                    meshViewF.add(executor.submit(() -> createMeshView(getClass().getResourceAsStream(url + fileID + ".obj"), fileID)));
+                    meshViewF.add(executor.submit(() -> createMeshView(getClass().getResourceAsStream(resourceDir + (fileID.endsWith(".obj") ? fileID : fileID + ".obj")), fileID)));
                 }
                 executor.shutdown();
 
@@ -329,7 +329,8 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
                 for (File file : files) {
                     if (!file.isFile()) continue;
                     if (!file.getName().endsWith(".obj")) continue;
-                    String name = file.getName().substring(0, file.getName().lastIndexOf("."));
+                    String name = file.getName();//.substring(0, file.getName().lastIndexOf("."));
+                    logger.log(Level.CONFIG, name + "!!");
                     if (!whiteList.contains(name)) continue;
                     if (getMeshViewWithID(name) != null) continue;
                     meshViewF.add(executor.submit(() -> createMeshView(file.toURI().toURL().openStream(), name)));
@@ -419,7 +420,7 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
     }
 
     public void addFileDir(File dir, Set<String> whiteList) {
-        if (!dir.exists() || !dir.isDirectory()) throw new IllegalArgumentException("Provided path is not a directory: " + dir.toString());
+        if (!dir.isDirectory()) throw new IllegalArgumentException("Provided path is not a directory: " + dir.toString());
         fileDirs.add(dir);
         loadOBJs(dir, whiteList);
     }

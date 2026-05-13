@@ -131,7 +131,7 @@ public class TreeLoader {
             if (lineArr.length != 3) throw new IllegalArgumentException("Required format for file list: ID\\tName\\tFileName\nFailed to parse line: " + line);
             String conceptID = lineArr[0].trim();
             HashSet<String> fileList = IDtoFilelist.containsKey(conceptID) ? IDtoFilelist.get(conceptID) : new HashSet<>();
-            fileList.add(lineArr[2].trim().replace(".obj", ""));
+            fileList.add(lineArr[2].trim());
             IDtoFilelist.put(conceptID, fileList);
         }
         return IDtoFilelist;

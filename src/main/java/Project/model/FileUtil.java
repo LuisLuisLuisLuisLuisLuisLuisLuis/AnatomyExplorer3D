@@ -1,13 +1,12 @@
 package Project.model;
 
-import Project.window.PopUp.LittlePopUp;
+import Project.window.SupportingUI.PopUp.LittlePopUp;
 import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import javafx.scene.control.TreeItem;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class FileUtil {
 

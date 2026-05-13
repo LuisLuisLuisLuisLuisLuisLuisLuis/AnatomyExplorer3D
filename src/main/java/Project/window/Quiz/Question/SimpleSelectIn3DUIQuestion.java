@@ -1,7 +1,7 @@
 package Project.window.Quiz.Question;
 
 import Project.command.DrawCommands.ColorMeshviewsCommand;
-import Project.window.PopUp.LegendItem;
+import Project.window.SupportingUI.PopUp.LegendItem;
 import Project.window.Quiz.Difficulty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;

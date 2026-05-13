@@ -2,19 +2,16 @@ package Project.window.TreeView.TreeViewEditing;
 
 import Project.model.ANode;
 import Project.model.TreeExport;
-import Project.window.PopUp.LegendItem;
-import Project.window.PopUp.LittlePopUp;
+import Project.window.SupportingUI.PopUp.LegendItem;
+import Project.window.SupportingUI.PopUp.LittlePopUp;
 import Project.window.TreeView.TreeAnalysis.MVPPattern.FileIDView;
 import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import Project.window.TreeView.TreeRestructuring.TreeRestructuring;
 import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEditor;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.*;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTreeCell;
-import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.StringConverter;
 

@@ -24,10 +24,10 @@ import Project.command.TreeCommands.ExpandTreeViewCommand;
 import Project.command.TreeCommands.SelectAllTreeViewCommand;
 import Project.command.TreeCommands.SelectNoneTreeViewCommand;
 import Project.model.*;
-import Project.window.PopUp.About;
-import Project.window.PopUp.Help;
-import Project.window.PopUp.InfoChart;
-import Project.window.PopUp.LittlePopUp;
+import Project.window.SupportingUI.PopUp.About;
+import Project.window.SupportingUI.PopUp.Help;
+import Project.window.SupportingUI.PopUp.InfoChart;
+import Project.window.SupportingUI.PopUp.LittlePopUp;
 import Project.window.Quiz.Generating.RandomUIQuizGenerator;
 import Project.window.Slicing.Plane;
 import Project.window.SupportingUI.FileExplorerInteraction;
@@ -81,10 +81,7 @@ import javafx.util.Duration;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.List;
 import java.util.function.Function;
@@ -474,6 +471,7 @@ public class WindowPresenter {
             selectionMediatorTree3D = selectionMediatorTree3D != null ? selectionMediatorTree3D : selectionMediatorTree3D_Selection;
 //            treeViewSelectionContainer.changeSelection(selectionMediatorTree3D.transformBSelectionToASelection(threeDSelectionGroup.getSelection()), true, false);
 //            treeViewSelectionContainer.updateGroup(); //TODO:
+            getSelectedTreeView().getSelectionModel().clearSelection();
             Set<ANode> anodesToSelect = selectionMediatorTree3D.transformBSelectionToASelection(threeDSelectionGroup.getSelection());
             for (ANode aNode : anodesToSelect) getSelectedTreeView().getSelectionModel().select(TreeAnalysisUtils.getTreeItemWANodeId(aNode.getConceptId(), getSelectedTreeView().getRoot()));
             if (!getSelectedTreeView().getSelectionModel().getSelectedIndices().isEmpty()) getSelectedTreeView().scrollTo(getSelectedTreeView().getSelectionModel().getSelectedIndices().getFirst());   //scroll to selection
@@ -599,7 +597,7 @@ public class WindowPresenter {
 //            for (String item : new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionGroup.getSelection()))) {  //need to create this again to not concurrently modify doDraw
             HashSet<String> toDraw = new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()));
             if (toDraw.isEmpty()) {
-                controller.getTreeInfoLabel().setText("No 3D Files in selection");
+                controller.getTreeInfoLabel().setText(" No 3D Files in selection");
                 treeInfoTimeline.playFromStart();
                 return;
             }
@@ -662,7 +660,6 @@ public class WindowPresenter {
         controller.getLoadHierarchyMenu().setOnAction(e -> {
 
             if (!LittlePopUp.showLoadHierInfo()) return;
-
 
             InputStream relationsStream = makeStream(FileExplorerInteraction.findTxt("Edge list"));
             if (relationsStream == null) return;
@@ -976,7 +973,7 @@ public class WindowPresenter {
 
         //--------setup correct UI behaviour (visibility, width)
 //        if (apiKey == null) controller.getShowAICheck().disableProperty().set(true);
-        controller.getShowAICheck().disableProperty().set(true);    //disabled for now
+
         controller.getAiButtonBox().visibleProperty().bind(controller.getShowAICheck().selectedProperty());
         controller.getAiButtonBox().managedProperty().bind(controller.getShowAICheck().selectedProperty());
         controller.getAiPromptTextArea().visibleProperty().bind(controller.getShowAICheck().selectedProperty());
