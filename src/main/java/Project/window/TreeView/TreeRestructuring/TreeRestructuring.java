@@ -236,10 +236,14 @@ public class TreeRestructuring {
                 }
             });
             ObservableList<ExistingVsDup> existingVsDups = FXCollections.observableList(new LinkedList<>());
-
+            HashSet<TreeItem<ANode>> added = new HashSet<>();
             for (TreeItem<ANode> dupTreeItem : duplicateItemsMap.keySet()) {
+                if (added.contains(dupTreeItem)) continue;
                 for (TreeItem<ANode> otherItem : duplicateItemsMap.get(dupTreeItem)) {
+                    if (added.contains(otherItem)) continue;
                     existingVsDups.add(new ExistingVsDup(otherItem.getValue(), dupTreeItem.getValue()));
+                    added.add(otherItem);   //prevent items to be listed twice when checking for duplicate IDs in the same tree.
+                    added.add(dupTreeItem);
                 }
             }
 
@@ -310,7 +314,7 @@ public class TreeRestructuring {
             TreeItem<ANode> parentTwin = makeTwin(parent, parentID, parentName, twins, newTwins, false);   //create the twins (i.e. corresponding TreeItem
             TreeItem<ANode> childTwin = makeTwin(child, childID, childName, twins, newTwins, false);       //in this TreeView
 
-            if (childTwin.getParent() != null) { // if the childTwin already has a parent, don't set it as child of another different parent (that would break the tree).
+            if (childTwin.getParent() != null) {// if the childTwin already has a parent, don't set it as child of another different parent (that would break the tree).
                                                 // instead, make a copy of it (new TreeItem instance) and proceed.
                 nonUniqueIDTreeItems.add(childTwin); // add old and new childTwin to the list of TreeItems with non-unique conceptID
                 childTwin = makeTwin(child, childID, childName, twins, newTwins, true);

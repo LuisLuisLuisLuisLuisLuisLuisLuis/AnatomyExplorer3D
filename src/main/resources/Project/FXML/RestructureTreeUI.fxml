@@ -46,7 +46,7 @@
                                  <bottom>
                                     <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                                       <items>
-                                        <Button fx:id="addMissingToTreeButton" mnemonicParsing="false" text="Add Missing to Tree" />
+                                        <Button fx:id="addMissingToTreeButton" mnemonicParsing="false" text="Add Missing items to tree" />
                                       </items>
                                     </ToolBar>
                                  </bottom>
