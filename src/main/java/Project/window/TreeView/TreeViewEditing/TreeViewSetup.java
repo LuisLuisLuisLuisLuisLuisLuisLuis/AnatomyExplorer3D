@@ -218,7 +218,7 @@ public class TreeViewSetup {
 //                    HashMap<TreeItem<ANode>, Collection<TreeItem<ANode>>> duplicateItemsMap = TreeAnalysisUtils.lookForDuplicateIDsInTree(itemsToPaste, root, false);
 
 //                    if (!duplicateItemsMap.isEmpty()) {
-                    if (TreeRestructuring.searchForDupIDs(root, "Cannot paste in this tree. The following node IDs would be duplicated:", null, itemsToPaste)) {
+                    if (TreeRestructuring.searchForDupIDs(root, "Cannot paste in this tree. The following node IDs would be duplicated:", null, itemsToPaste, "Existing item", "Item to paste")) {
 //                        StringBuilder stringBuilder = new StringBuilder();
 //                        for (TreeItem<ANode> dupTreeItem : duplicateItemsMap.keySet()) {
 //                            for (TreeItem<ANode> aNode : duplicateItemsMap.get(dupTreeItem)) stringBuilder.append("ID: " + dupTreeItem.getValue().conceptId() + " Name: " + dupTreeItem.getValue().name() + " | ID: " + aNode.getValue().conceptId() + " Name: " + aNode.getValue().name() + "\n");

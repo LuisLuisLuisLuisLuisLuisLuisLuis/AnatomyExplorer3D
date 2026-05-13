@@ -16,6 +16,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.*;
@@ -33,10 +35,10 @@ public class TreeRestructuring {
     private final HashMap<TreeItem<ANode>, String> treeCellColorMap = new HashMap<>();  //maps some TreeItems of the restructured tree to css colors
     private LinkedList<TreeItem<ANode>> missingTreeItems = new LinkedList<>();        //holds TreeItems of the original Tree that are not part of the restructured
     private LinkedList<TreeItem<ANode>> nonUniqueIDTreeItems = new LinkedList<>();
-    private final String missingNodeColor = "lightSalmon";
-    private final String newTwinCellColor = "peachPuff";        //css colors found in treeCellColorMap
-    private final String newEdgeCellColor = "lightBlue";
-    private final String newNameCellColor = "paleGoldenRod";
+    private final String missingNodeColor = "lightgrey";  //lightSalmon
+    private final String newTwinCellColor = "lightgreen";        //peachPuff css colors found in treeCellColorMap
+    private final String newEdgeCellColor = "lightskyblue";
+    private final String newNameCellColor = "khaki";    //paleGoldenRod
     private final String noUniqueCellColor = "darkSalmon";
 
     private final LinkedList<Runnable> onAcceptedRunnables = new LinkedList<>();
@@ -141,7 +143,7 @@ public class TreeRestructuring {
         controller.getTreeSearchPrevButton().setOnAction(e -> searchTree.previous());
         controller.getTreeSearchPrevButton().disableProperty().bind(searchTree.getHasPreviousObservable());
 
-        controller.getSearchForDupIDsButton().setOnAction(e -> searchForDupIDs(restrucTreeView.getRoot(), "There are duplicate IDs in the tree.", "No duplicate IDs in the tree.", TreeAnalysisUtils.accumulateAllTreeItemsBelow(restrucTreeView.getRoot())));    // wanna check if any IDs within aiTree are duplicate
+        controller.getSearchForDupIDsButton().setOnAction(e -> searchForDupIDs(restrucTreeView.getRoot(), "There are duplicate IDs in the tree.", "No duplicate IDs in the tree.", TreeAnalysisUtils.accumulateAllTreeItemsBelow(restrucTreeView.getRoot()), "Item 1", "Item 2"));    // wanna check if any IDs within aiTree are duplicate
 
         controller.getAddMissingToTreeButton().setOnAction(e -> {
             TreeItem<ANode> restructRoot = restrucTreeView.getRoot();
@@ -172,59 +174,112 @@ public class TreeRestructuring {
 
     /**
      * Search if any of the given TreeItems IDs already occur in the given tree, ignoring the subTreeToAvoid.
-     * Shows a PopupWindow displaying the results of the search.
+     * Shows a PopupWindow displaying a table with the results of the search. Column 1 will contain TreeItems from the treeToSearch
+     * while Column 2 will contain items from itemsToCheck that have the same conceptID.
      * @param treeToSearch The tree to search.
      * @param errmsg A general message to show if duplicate items are found (next to a list of duplicate items)
      * @param goodmsg A general message to show if no duplicates were found. Set to null to show no Popup window if no duplicates were found.
      * @param itemsToCheck List of items to check. The method checks if treeToSearch contains any IDs of itemsToCheck.
+     * @param col1Head Title of column 1
+     * @param col2Head Title of column 2
      * @return if any duplicates were found.
      */
-    public static boolean searchForDupIDs(TreeItem<ANode> treeToSearch, String errmsg, String goodmsg, Collection<TreeItem<ANode>> itemsToCheck) {
-        return searchForDupIDs(treeToSearch, new TreeItem<ANode>() , errmsg, goodmsg, itemsToCheck);
+    public static boolean searchForDupIDs(TreeItem<ANode> treeToSearch, String errmsg, String goodmsg, Collection<TreeItem<ANode>> itemsToCheck, String col1Head, String col2Head) {
+        return searchForDupIDs(treeToSearch, new TreeItem<ANode>() , errmsg, goodmsg, itemsToCheck, col1Head, col2Head);
     }
 
     /**
      * Search if any of the given TreeItems IDs already occur in the given tree, ignoring the subTreeToAvoid.
-     * Shows a PopupWindow displaying the results of the search.
+     * Shows a PopupWindow displaying a table with the results of the search. Column 1 will contain TreeItems from the treeToSearch
+     * while Column 2 will contain items from itemsToCheck that have the same conceptID.
      * @param treeToSearch The tree to search.
      * @param subtreeToAvoid this subtree of treeToSearch will be ignored / skipped in the search.
      * @param errmsg A general message to show if duplicate items are found (next to a list of duplicate items)
      * @param goodmsg A general message to show if no duplicates were found. Set to null to show no Popup window if no duplicates were found.
      * @param itemsToCheck List of items to check. The method checks if treeToSearch contains any IDs of itemsToCheck.
+     * @param col1Head Title of column 1
+     * @param col2Head Title of column 2
      * @return if any duplicates were found.
      */
-    public static boolean searchForDupIDs(TreeItem<ANode> treeToSearch, TreeItem<ANode> subtreeToAvoid, String errmsg, String goodmsg, Collection<TreeItem<ANode>> itemsToCheck) {
+    public static boolean searchForDupIDs(TreeItem<ANode> treeToSearch, TreeItem<ANode> subtreeToAvoid, String errmsg, String goodmsg, Collection<TreeItem<ANode>> itemsToCheck, String col1Head, String col2Head) {
         HashMap<TreeItem<ANode>, Collection<TreeItem<ANode>>> duplicateItemsMap = TreeAnalysisUtils.lookForDuplicateIDsInTree(itemsToCheck, treeToSearch, false, subtreeToAvoid);
 
         if (!duplicateItemsMap.isEmpty()) {
+            record ExistingVsDup(ANode existingItem, ANode dupItem) {}
 
-            StringBuilder stringBuilder = new StringBuilder();
+            TableView<ExistingVsDup> tableView = new TableView<>();
+            TableColumn<ExistingVsDup, String> existingItemCol = new TableColumn<>(col1Head);
+            TableColumn<ExistingVsDup, String> dupItemCol = new TableColumn<>(col2Head);
+            tableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+            existingItemCol.setCellFactory(col -> new TableCell<>() {
+                @Override
+                protected void updateItem(String value, boolean empty) {
+                    super.updateItem(value, empty);
+                    if (empty || getTableRow().getItem() == null) {
+                        setText(null);
+                        setStyle("");
+                    } else {
+                        setText(getTableRow().getItem().existingItem.getName() + "(id=" + getTableRow().getItem().existingItem.conceptId() + ")");
+                    }
+                }
+            });
+            dupItemCol.setCellFactory(col -> new TableCell<>() {
+                @Override
+                protected void updateItem(String value, boolean empty) {
+                    super.updateItem(value, empty);
+                    if (empty || getTableRow().getItem() == null) {
+                        setText(null);
+                        setStyle("");
+                    } else {
+                        setText(getTableRow().getItem().dupItem.getName() + "(id=" + getTableRow().getItem().dupItem.conceptId() + ")");
+                    }
+                }
+            });
+            ObservableList<ExistingVsDup> existingVsDups = FXCollections.observableList(new LinkedList<>());
+
             for (TreeItem<ANode> dupTreeItem : duplicateItemsMap.keySet()) {
                 for (TreeItem<ANode> otherItem : duplicateItemsMap.get(dupTreeItem)) {
-//                    stringBuilder.append("ID: " + dupTreeItem.getValue().conceptId() + " Name: " + dupTreeItem.getValue().name() + "  |  ID: " + otherItem.getValue().conceptId() + " Name: " + otherItem.getValue().name() + "\n");
-                    stringBuilder.append(dupTreeItem.getValue().name() + "(id=" + dupTreeItem.getValue().conceptId() + ")   |   " + otherItem.getValue() + "(id=" + otherItem.getValue().conceptId() + ")\n");
+                    existingVsDups.add(new ExistingVsDup(otherItem.getValue(), dupTreeItem.getValue()));
                 }
             }
 
-            String popupText = errmsg + """
-                
-                
-                Item to paste | already present item with same ID
-                """;
-            LittlePopUp.showScrollableTextPopup("Error", popupText, stringBuilder.toString(), false);    // i dont want to implement this as undoable..
+            tableView.setItems(existingVsDups);
+
+
+
+            tableView.getColumns().addAll(existingItemCol, dupItemCol);
+
+            VBox contentBox = new VBox(new Label(errmsg), tableView);
+
+            LittlePopUp.showPopup(contentBox, "Error", 350,350);
+
+//            StringBuilder stringBuilder = new StringBuilder();
+//            for (TreeItem<ANode> dupTreeItem : duplicateItemsMap.keySet()) {
+//                for (TreeItem<ANode> otherItem : duplicateItemsMap.get(dupTreeItem)) {
+//                    stringBuilder.append(dupTreeItem.getValue().name() + "(id=" + dupTreeItem.getValue().conceptId() + ")   |   " + otherItem.getValue() + "(id=" + otherItem.getValue().conceptId() + ")\n");
+//                }
+//            }
+//
+//            String popupText = errmsg + """
+//
+//
+//                Item to paste | already present item with same ID
+//                """;
+//            LittlePopUp.showScrollableTextPopup("Error", popupText, stringBuilder.toString(), false);    // i dont want to implement this as undoable..
+
             return true;
 //            if (LittlePopUp.showScrollableTextPopup("Warning", popupText)) {
 //                for (TreeItem<ANode> itemWDuplicateANode : duplicateItemsMap.keySet()) replaceANodeByCopy(itemWDuplicateANode, treeToSearch);
 //                return true;
 //            } else return false;
         } else {
-            if (goodmsg != null) LittlePopUp.showScrollableTextPopup("Info", goodmsg ,"", false);
+            if (goodmsg != null) LittlePopUp.showMsg("Info", goodmsg ,"OK");
             return false;
         }
     }
 
     private void acceptTree() {
-        if (searchForDupIDs(restrucTreeView.getRoot(), "Cannot accept. There are duplicate IDs in the tree.", null, TreeAnalysisUtils.accumulateAllTreeItemsBelow(restrucTreeView.getRoot())) || searchForDupIDs(realTreeMasterRoot, realTreeRoot, "Cannot accept. Some IDs already exist in the real tree.", null, TreeAnalysisUtils.accumulateAllTreeItemsBelow(restrucTreeView.getRoot()))) return;   //want to check if any of the IDs of aiTree already occur anywhere in the full real tree
+        if (searchForDupIDs(restrucTreeView.getRoot(), "Cannot accept. There are duplicate IDs in the tree.", null, TreeAnalysisUtils.accumulateAllTreeItemsBelow(restrucTreeView.getRoot()), "Item 1", "Item 2") || searchForDupIDs(realTreeMasterRoot, realTreeRoot, "Cannot accept. Some IDs already exist in the real tree.", null, TreeAnalysisUtils.accumulateAllTreeItemsBelow(restrucTreeView.getRoot()), "Existing item", "Item to paste")) return;   //want to check if any of the IDs of aiTree already occur anywhere in the full real tree
         setResult(restrucTreeView.getRoot());
         restrucTreeView.setRoot(null);
         runOnAccepted();
@@ -255,7 +310,7 @@ public class TreeRestructuring {
             TreeItem<ANode> parentTwin = makeTwin(parent, parentID, parentName, twins, newTwins, false);   //create the twins (i.e. corresponding TreeItem
             TreeItem<ANode> childTwin = makeTwin(child, childID, childName, twins, newTwins, false);       //in this TreeView
 
-            if (childTwin.getParent() != null){ // if the childTwin already has a parent, don't set it as child of another different parent (that would break the tree).
+            if (childTwin.getParent() != null) { // if the childTwin already has a parent, don't set it as child of another different parent (that would break the tree).
                                                 // instead, make a copy of it (new TreeItem instance) and proceed.
                 nonUniqueIDTreeItems.add(childTwin); // add old and new childTwin to the list of TreeItems with non-unique conceptID
                 childTwin = makeTwin(child, childID, childName, twins, newTwins, true);
@@ -291,6 +346,7 @@ public class TreeRestructuring {
                 restructRoot.getValue().children().add(possibleRoot.getValue());
             }
             restrucTreeView.setRoot(restructRoot);
+            treeCellColorMap.put(restructRoot, newTwinCellColor);
         }
         // all the new 'twins' who don't have corresponding treeItems in the real tree get a color
         for (TreeItem<ANode> newTwin : newTwins) treeCellColorMap.put(newTwin, newTwinCellColor);
