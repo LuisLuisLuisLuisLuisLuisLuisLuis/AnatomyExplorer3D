@@ -19,7 +19,7 @@ public class QuizPropertyChooserController {
     @FXML
     private Slider howMuchDrawSlider;
     @FXML
-    private Button acceptButton;
+    private Button generateButton;
     @FXML
     private HBox treeItemDisplayHBox;
     @FXML
@@ -63,8 +63,8 @@ public class QuizPropertyChooserController {
         return nquestionsTextfield;
     }
 
-    public Button getAcceptButton() {
-        return acceptButton;
+    public Button getGenerateButton() {
+        return generateButton;
     }
 
     public Slider getDifficultySlider() {

@@ -57,7 +57,7 @@ public class RandomUIQuizGenerator {
     private final Random random;
 
     /**
-     * @param fromModels Models from which the Quiz is to be generated.
+     * @param fromModels Models from which the Quiz may be generated.
      */
     public RandomUIQuizGenerator(List<Model> fromModels) {
 
@@ -172,7 +172,7 @@ public class RandomUIQuizGenerator {
         controller.getTreeItemDisplayScrollpane().maxWidthProperty().bind(controller.getTreeItemChoosingToolbar().widthProperty().multiply(0.7));   // otherwise it will grow so large it will be clipped
 
 
-        controller.getAcceptButton().setOnAction(e -> {
+        controller.getGenerateButton().setOnAction(e -> {
             if (selectTreeItemResults.isEmpty()) {
                 controller.getNoTreeSelectedLabel().visibleProperty().bind(Bindings.isEmpty(selectTreeItemResults));
                 return;
@@ -212,6 +212,9 @@ public class RandomUIQuizGenerator {
             this.integerUIQuiz = simpleIntQuizFromTree(topicToModel, Integer.parseInt(controller.getNquestionsTextfield().getText()), null, time,timeUnit, controller.getShowCorrectAnswerCheckbox().isSelected());
             onCreate();
         });
+
+        controller.getGenerateButton().disableProperty().bind(Bindings.isEmpty(selectTreeItemResults));
+
 
         // find treeItems of aorta, vena cava
         for (Model model : fromModels) {
@@ -282,7 +285,7 @@ public class RandomUIQuizGenerator {
                 }
             }
         }
-        if (target.getValue().fileIds().size() == 1) result.add(AllQuestionTypes.IDENTIFY_IN_SLICE);
+        if (target.getValue().fileIds().size() == 1) result.add(AllQuestionTypes.IDENTIFY_IN_SLICE);    //otherwise, which one do you choose as the target?
         return result;
     }
 
@@ -499,12 +502,14 @@ public class RandomUIQuizGenerator {
 
     public SimpleMultipleChoiceUIQuestion<String, Integer> makeArterySourceQuestion(TreeItem<ANode> target, String name, Difficulty difficulty, Integer minScore, Integer maxScore) {
 
-        List<String> possibleAnswers = new ArrayList<>(findRelatives2(target, DEFAULT_NO_MC_OPTIONS - 1).stream().map(t -> t.getValue().name()).toList());
+        List<String> possibleAnswers = new ArrayList<>(findRelatives2(target, DEFAULT_NO_MC_OPTIONS+1).stream().map(t -> t.getValue().name()).toList());
         String correctAnswer = target.getParent().getValue().name();
         if (!possibleAnswers.contains(correctAnswer)) {
             possibleAnswers.removeLast();
             possibleAnswers.add(correctAnswer);
         }
+        possibleAnswers.remove(target.getValue().name());
+
         SimpleMultipleChoiceUIQuestion<String, Integer> question = new SimpleMultipleChoiceUIQuestion<>(
                 difficulty, minScore, maxScore, correctAnswer, possibleAnswers, true
         );
@@ -514,7 +519,8 @@ public class RandomUIQuizGenerator {
     }
 
     public SimpleMultipleChoiceUIQuestion<String, Integer> makeArteryBranchQuestion(TreeItem<ANode> target, String name, Difficulty difficulty, Integer minScore, Integer maxScore) {
-        List<String> possibleAnswers = findRelatives2(target, DEFAULT_NO_MC_OPTIONS).stream().map(t -> t.getValue().name()).toList();
+        List<String> possibleAnswers = new ArrayList<>(findRelatives2(target, DEFAULT_NO_MC_OPTIONS + 1).stream().map(t -> t.getValue().name()).toList());
+        possibleAnswers.remove(target.getValue().name());   //makes no sense for target artery to branch into itself
         List<String> correctAnswers = new LinkedList<>();
         for (TreeItem<ANode> child : target.getChildren()) if (possibleAnswers.contains(child.getValue().name())) correctAnswers.add(child.getValue().name());
 
@@ -522,12 +528,13 @@ public class RandomUIQuizGenerator {
                 difficulty, minScore, maxScore, correctAnswers, possibleAnswers, false
         );
         question.setName(name);
-        question.setInstructions("What does the " + target.getValue().name() + " branch into?");
+        question.setInstructions("Which arteries are direct children or branches of " + target.getValue().name() + "?");
         return question;
     }
 
     public SimpleMultipleChoiceUIQuestion<String, Integer> makeVeinSourceQuestion(TreeItem<ANode> target, String name, Difficulty difficulty, Integer minScore, Integer maxScore) {
-        List<String> possibleAnswers = findRelatives2(target, DEFAULT_NO_MC_OPTIONS).stream().map(t -> t.getValue().name()).toList();
+        List<String> possibleAnswers = new ArrayList<>(findRelatives2(target, DEFAULT_NO_MC_OPTIONS+1).stream().map(t -> t.getValue().name()).toList());
+        possibleAnswers.remove(target.getValue().name());
         List<String> correctAnswers = new LinkedList<>();
         for (TreeItem<ANode> child : target.getChildren()) if (possibleAnswers.contains(child.getValue().name())) correctAnswers.add(child.getValue().name());
 
@@ -535,7 +542,7 @@ public class RandomUIQuizGenerator {
                 difficulty, minScore, maxScore, correctAnswers, possibleAnswers, false
         );
         question.setName(name);
-        question.setInstructions("Which veins drain into the " + target.getValue().name() + "?");
+        question.setInstructions("Which veins are direct children or branches of " + target.getValue().name() + "?");
         return question;
     }
 

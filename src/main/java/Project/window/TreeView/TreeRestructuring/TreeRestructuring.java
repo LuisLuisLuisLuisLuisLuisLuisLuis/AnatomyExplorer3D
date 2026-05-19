@@ -156,6 +156,7 @@ public class TreeRestructuring {
                 restructRoot.getChildren().add(twin);
                 restructRoot.getValue().children().add(twin.getValue());
             }
+            missingTreeItems.clear();
         });
 
         controller.getLegend().getChildren().addAll(
