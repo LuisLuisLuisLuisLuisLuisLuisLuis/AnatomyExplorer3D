@@ -444,6 +444,7 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
      * @param whiteList files to be loaded from this directory
      */
     public void addResourceLocation(String resourceDir, Set<String> whiteList) {
+        if (!resourceDir.endsWith("/")) resourceDir += "/";
         logger.log(Level.CONFIG, "adding resource location " + resourceDir);
         resourceLocations.add(resourceDir);
         loadOBJs(resourceDir, whiteList);

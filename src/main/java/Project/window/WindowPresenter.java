@@ -236,7 +236,7 @@ public class WindowPresenter {
                     getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_conventional_partof.txt"),
                     getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_parts_v4_format_cleaned.txt"),
                     "BP3D 3.0 part-of",
-                    "/Project/anatomy/BodyParts3D_3.0_obj_99"
+                    "/Project/anatomy/BodyParts3D_3.0_obj_99/"
             );
         } catch (IllegalArgumentException e) {LittlePopUp.showMsg("Error", "Failed to load BP3D part-of. Perhaps the files were modified or moved.\nError: " + e.getMessage(), "OK");}
 
@@ -245,7 +245,7 @@ public class WindowPresenter {
                     getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_composite_isa.txt"),
                     getClass().getResourceAsStream("/Project/anatomy/bp3d_v3_parts_v4_format_cleaned.txt"),
                     "BP3D 3.0 is-a",
-                    "/Project/anatomy/BodyParts3D_3.0_obj_99"
+                    "/Project/anatomy/BodyParts3D_3.0_obj_99/"
             );
         } catch (IllegalArgumentException e) {LittlePopUp.showMsg("Error", "Failed to load BP3D is-a. Perhaps the files were modified or moved.\nError: " + e.getMessage(), "OK");}
 
@@ -311,12 +311,12 @@ public class WindowPresenter {
                     }
                     if (!LittlePopUp.showMsg("Disclaimer", """
                             The BodyParts3D database comes in different versions. 
-                            The versions share most anatomy parts, but there are some anatomy parts that are can only be found in one version.
+                            The versions share most anatomy parts, but there are some anatomy parts that can only be found in one version.
                             
-                            By default, this program uses version 4.0. By enabling version 3.0, the items labeled with '(available in BP3D 3.0)' will become drawable. Further, you will be able to browse the full tree of version 3.0.
+                            By default, this program uses version 4.0. By enabling version 3.0, items labeled with '(available in BP3D 3.0)' will become drawable. Further, you will be able to browse the full tree of version 3.0.
                             
-                            Note that version 4.0 and 3.0 do not share the same coordinates and sizes! This means that even identical anatomy parts from different versions will be offset from each other. Drawing an item from version 3.0 next to an item from version 4.0 means it will have a slightly wrong location. The severity of this offset is different from part to part.
-                            You can see this for example by drawing the tibia from version 4.0 and 3.0 next to each other.
+                            Note that versions 4.0 and 3.0 do not share the same coordinates and sizes! This means that even identical anatomy parts from different versions will be offset from each other. Items from version 3.0 will have a slightly wrong location when drawn next to items from version 4.0. The severity of this offset is different from part to part.
+                            You can see this, for example, by drawing the tibia of versions 4.0 and 3.0 next to each other.
                             Version 3.0 will always be drawn in default green to always make them distinguishable.
                             
                             If you wish to continue, press 'Ok'.
@@ -1018,7 +1018,8 @@ public class WindowPresenter {
         //--------------------
 
         //------------Menu: Help----------
-        controller.getMenuGuide().setOnAction(e -> LittlePopUp.showPopup(Help.getHelp(), "Help", 1000, 500));
+//        controller.getMenuGuide().setOnAction(e -> LittlePopUp.showPopup(Help.getHelp(), "Help", 1000, 500));
+        controller.getMenuGuide().setOnAction(e -> LittlePopUp.showPopup(Help.getGuide(), "Help", 1000, 500));
         controller.getMenuAbout().setOnAction(e -> LittlePopUp.showPaddedPopup(About.getAbout(), "About", 400, 100));
 
 
