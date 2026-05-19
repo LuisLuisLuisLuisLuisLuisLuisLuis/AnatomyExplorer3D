@@ -58,8 +58,6 @@
                                           <ToolBar prefHeight="0.0" prefWidth="288.0" BorderPane.alignment="CENTER">
                                             <items>
                                                 <Button fx:id="selectIn3DButton" mnemonicParsing="false" text="Select in 3D" />
-                                                <CheckBox fx:id="selectionSynchCheck" mnemonicParsing="false" text="Sync selection" />
-                                                <Separator orientation="VERTICAL" />
                                                 <Button fx:id="drawIn3DButton" mnemonicParsing="false" text="Draw in 3D" />
                                                 <Button fx:id="removeFrom3DButton" mnemonicParsing="false" text="Remove from 3D" />
                                             </items>
@@ -124,6 +122,8 @@
                                        <bottom>
                                           <ToolBar prefHeight="0.0" prefWidth="288.0" BorderPane.alignment="CENTER">
                                             <items>
+                                                <CheckBox fx:id="selectionSynchCheck" mnemonicParsing="false" text="Sync selection" />
+                                                <Separator orientation="VERTICAL" />
                                                 <Button fx:id="showInTreeButton" mnemonicParsing="false" text="Show in Tree" />
                                                 <Button fx:id="selectAll3DButton" mnemonicParsing="false" text="Select All" />
                                                 <Button fx:id="unselectAll3DButton" mnemonicParsing="false" text="Unselect All" />
