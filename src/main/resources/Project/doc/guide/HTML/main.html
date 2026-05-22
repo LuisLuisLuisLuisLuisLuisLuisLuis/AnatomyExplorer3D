@@ -1,0 +1,859 @@
+<!DOCTYPE html><html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Thesis</title>
+<!--Generated on Tue May 19 14:16:27 2026 by LaTeXML (version 0.8.6) http://dlmf.nist.gov/LaTeXML/.-->
+
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<body>
+<div class="ltx_page_main">
+<div class="ltx_page_content">
+<article class="ltx_document ltx_authors_1line">
+<h1 class="ltx_title ltx_title_document">Thesis</h1>
+<div class="ltx_authors">
+<span class="ltx_creator ltx_role_author">
+<span class="ltx_personname">Me, Myself, I
+</span></span>
+</div>
+<span class="ltx_ERROR undefined">\addbibresource</span>
+<div id="p1" class="ltx_para">
+<p class="ltx_p">reference.bib
+
+
+
+<span class="ltx_text" lang="en"></span></p>
+</div>
+<section id="S1" class="ltx_section" lang="en">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">1 </span>Overview</h2>
+
+<div id="S1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">This software allows you to explore human anatomy in 3D. Find anatomy parts in the tree hierarchy and draw them. Create arbitrary cross sections and challenge your knowledge with automatically generated quizzes.</p>
+</div>
+<div id="S1.p2" class="ltx_para ltx_noindent">
+<p class="ltx_p">The program is split into two parts: a tree hierarchy on the left and a view for 3D visualization on the right. The tree hierarchy organizes human anatomy by easy to follow concepts and allows you to find what you are looking for quickly. Advanced users may also modify the hierarchy or use the program to visualize their own custom hierarchy and files.</p>
+</div>
+<div id="S1.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p">The 3D view on the right can be used to visualize items from the tree and create arbitrary cross sections.</p>
+</div>
+<div id="S1.p4" class="ltx_para ltx_noindent">
+<p class="ltx_p">Finally, the quiz mode provides an opportunity to challenge yourself.
+</p>
+</div>
+</section>
+<section id="S2" class="ltx_section" lang="en">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">2 </span>Working with the Tree</h2>
+
+<section id="S2.SS1" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">2.1 </span>Selection</h3>
+
+<div id="S2.SS1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">Select items via mouse click, or hold down <span class="ltx_text ltx_font_bold">Shift</span> or <span class="ltx_text ltx_font_bold">Ctrl</span> and click to select multiple items.
+<br class="ltx_break">The toolbar above the tree provides useful utility functions that apply to all items you have selected:</p>
+<ul id="S2.I1" class="ltx_itemize">
+<li id="S2.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S2.I1.i1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Expand</span> Expands all items below</p>
+</div>
+</li>
+<li id="S2.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S2.I1.i2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Collapse</span> Collapses all items below</p>
+</div>
+</li>
+<li id="S2.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S2.I1.i3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Select All of</span> Selects all items below</p>
+</div>
+</li>
+<li id="S2.I1.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S2.I1.i4.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Select None</span> Clears the tree selection</p>
+</div>
+</li>
+<li id="S2.I1.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S2.I1.i5.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Expand</span> Expands all items below</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">Use the search field (<span class="ltx_text ltx_font_bold">Ctrl + F</span>) to search for items.</p>
+</div>
+<figure id="S2.F1" class="ltx_figure"><img src="x1.png" id="S2.F1.g1" class="ltx_graphics ltx_centering" width="405" height="216" alt="">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 1</span>: </span><span class="ltx_text" style="font-size:90%;">Buttons to modify the selection of the tree</span></figcaption>
+</figure>
+</section>
+<section id="S2.SS2" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">2.2 </span>Drawing stuff</h3>
+
+<div id="S2.SS2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">The toolbar below the tree allows you to add and remove items from the 3D view.</p>
+<ul id="S2.I2" class="ltx_itemize">
+<li id="S2.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S2.I2.i1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Draw in 3D</span> draws the items you’ve selected if they are associated with any 3D files. Fig.<a href="#S2.F2" title="Figure 2 ‣ 2.2 Drawing stuff ‣ 2 Working with the Tree ‣ Thesis" class="ltx_ref"><span class="ltx_text ltx_ref_tag">2</span></a> shows an example of how to draw the skull.</p>
+</div>
+</li>
+<li id="S2.I2.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S2.I2.i2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Remove from 3D</span> removes the selected items from the 3D view.</p>
+</div>
+</li>
+</ul>
+</div>
+<figure id="S2.F2" class="ltx_figure">
+<table style="width:100%;">
+<tr>
+<td class="ltx_subfigure">
+<figure id="S2.F1.sf1" class="ltx_figure ltx_align_center"><img src="x2.png" id="S2.F1.sf1.g1" class="ltx_graphics ltx_centering" width="541" height="378" alt="">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(a)</span> </span><span class="ltx_text" style="font-size:90%;">Find the skull</span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S2.F1.sf2" class="ltx_figure ltx_align_center"><img src="x3.png" id="S2.F1.sf2.g1" class="ltx_graphics ltx_centering" width="541" height="378" alt="">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(b)</span> </span><span class="ltx_text" style="font-size:90%;">Select all children of the skull</span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S2.F1.sf3" class="ltx_figure ltx_align_center"><img src="x4.png" id="S2.F1.sf3.g1" class="ltx_graphics ltx_centering" width="541" height="378" alt="">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(c)</span> </span><span class="ltx_text" style="font-size:90%;">Draw selected items</span></figcaption>
+</figure>
+</td>
+</tr>
+</table>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 2</span>: </span><span class="ltx_text" style="font-size:90%;">Example of how to draw something from the tree</span></figcaption>
+</figure>
+</section>
+<section id="S2.SS3" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">2.3 </span>Interacting with the 3D view</h3>
+
+<div id="S2.SS3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">Move or rotate the 3D view via the buttons above the 3D view or by using mouse and keyboard:</p>
+</div>
+<div id="S2.SS3.p2" class="ltx_para ltx_noindent">
+<ul id="S2.I3" class="ltx_itemize">
+<li id="S2.I3.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S2.I3.i1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Click</span> to select items</p>
+</div>
+</li>
+<li id="S2.I3.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S2.I3.i2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Drag</span> to rotate</p>
+<ul id="S2.I3.i2.I1" class="ltx_itemize">
+<li id="S2.I3.i2.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item"><span class="ltx_text ltx_font_bold">–</span></span> 
+<div id="S2.I3.i2.I1.i1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Ctrl+Shift+Drag</span> to trigger continuous rotation</p>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li id="S2.I3.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S2.I3.i3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Scroll</span> to zoom</p>
+<ul id="S2.I3.i3.I1" class="ltx_itemize">
+<li id="S2.I3.i3.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item"><span class="ltx_text ltx_font_bold">–</span></span> 
+<div id="S2.I3.i3.I1.i1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Ctrl+Scroll</span> to move vertically</p>
+</div>
+</li>
+<li id="S2.I3.i3.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item"><span class="ltx_text ltx_font_bold">–</span></span> 
+<div id="S2.I3.i3.I1.i2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Alt+Scroll</span> to move horizontally</p>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li id="S2.I3.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S2.I3.i4.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Ctrl+Arrow keys / +- keys</span> to move</p>
+</div>
+</li>
+<li id="S2.I3.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S2.I3.i5.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Alt+Arrow keys / +- keys</span> to rotate</p>
+</div>
+</li>
+</ul>
+</div>
+<div id="S2.SS3.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p">If a slice plane is drawn, hold down shift while performing any of these actions to instead move the slice plane.<a href="#S2.SS5" title="2.5 Cross sections / Slicing ‣ 2 Working with the Tree ‣ Thesis" class="ltx_ref"><span class="ltx_text ltx_ref_tag">2.5</span></a></p>
+</div>
+<section id="S2.SS3.SSS1" class="ltx_subsubsection">
+<h4 class="ltx_title ltx_title_subsubsection">
+<span class="ltx_tag ltx_tag_subsubsection">2.3.1 </span>Resetting the 3D view</h4>
+
+<div id="S2.SS3.SSS1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">To return to the default point of view, press <span class="ltx_text ltx_font_bold">Reset View</span>. To also clear the 3D view of all drawn items, press <span class="ltx_text ltx_font_bold">Clear view</span>.</p>
+</div>
+<figure id="S2.F3" class="ltx_figure"><img src="x5.png" id="S2.F3.g1" class="ltx_graphics ltx_centering" width="405" height="216" alt="">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 3</span>: </span><span class="ltx_text" style="font-size:90%;">Button controls for the 3D view</span></figcaption>
+</figure>
+</section>
+</section>
+<section id="S2.SS4" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">2.4 </span>Selecting 3D objects</h3>
+
+<div id="S2.SS4.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">Much like the nodes in the tree, 3D objects can also be selected. Do so by clicking on them. This will cause the selected selection style to be applied to them. By default, selected items will be colored more intensely (’Saturation’ style). In ’Fill mode’, selected items will be drawn normally as solid objects while for unselected items only the outline of their meshes will be drawn. The selection style can be changed via the dropdown menu above the 3D view (Fig.<a href="#S2.F4" title="Figure 4 ‣ 2.4 Selecting 3D objects ‣ 2 Working with the Tree ‣ Thesis" class="ltx_ref"><span class="ltx_text ltx_ref_tag">4</span></a>).</p>
+</div>
+<figure id="S2.F4" class="ltx_figure">
+<table style="width:100%;">
+<tr>
+<td class="ltx_subfigure">
+<figure id="S2.F3.sf1" class="ltx_figure ltx_align_center"><img src="x6.png" id="S2.F3.sf1.g1" class="ltx_graphics" width="541" height="378" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(a)</span> </span><span class="ltx_text" style="font-size:90%;">Change the selection style. Currently the style is ’Saturation’.
+<br class="ltx_break"></span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S2.F3.sf2" class="ltx_figure ltx_align_center"><img src="x7.png" id="S2.F3.sf2.g1" class="ltx_graphics" width="541" height="378" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(b)</span> </span><span class="ltx_text" style="font-size:90%;">Fill mode: Selected items are drawn as solid objects while unselected ones are drawn as lines.</span></figcaption>
+</figure>
+</td>
+</tr>
+</table>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 4</span>: </span><span class="ltx_text" style="font-size:90%;">Changing the selection style. It determines how objects are drawn and how selection is visualized.</span></figcaption>
+</figure>
+<div id="S2.SS4.p2" class="ltx_para ltx_noindent">
+<p class="ltx_p">Click <span class="ltx_text ltx_font_bold">Remove</span> to undraw all selected items.
+<br class="ltx_break">Click <span class="ltx_text ltx_font_bold">Select All</span> or <span class="ltx_text ltx_font_bold">Unselect All</span> select or unselect all items. To highlight the items you’ve selected in 3D in the tree, click <span class="ltx_text ltx_font_bold">Show in tree</span>.
+<br class="ltx_break">The inverse is also possible. To highlight a specific node from the tree in the 3D view, click <span class="ltx_text ltx_font_bold">Select in 3D</span> below the tree.</p>
+</div>
+<section id="S2.SS4.SSS1" class="ltx_subsubsection">
+<h4 class="ltx_title ltx_title_subsubsection">
+<span class="ltx_tag ltx_tag_subsubsection">2.4.1 </span>Synchronizing selection between Tree and 3D view</h4>
+
+<div id="S2.SS4.SSS1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">By default, selecting a node in the tree will not also select it in the 3D view. By checking <span class="ltx_text ltx_font_bold">Sync selection</span> below the 3D view, items that are selected in 3D will also be selected in the tree and vice versa.</p>
+</div>
+</section>
+</section>
+<section id="S2.SS5" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">2.5 </span>Cross sections / Slicing</h3>
+
+<div id="S2.SS5.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">Pressing <span class="ltx_text ltx_font_bold">Slice</span> above the 3D view causes a red and green plane to appear (only if something is drawn). Next to the button is a dropdown button with default set to ’All’. Pressing <span class="ltx_text ltx_font_bold">All</span> will slice through all 3D objects along that plane. What lies on the red side will be cut off while what lies on the green side will be kept.</p>
+</div>
+<div id="S2.SS5.p2" class="ltx_para ltx_noindent">
+<p class="ltx_p">By choosing <span class="ltx_text ltx_font_bold">Selected</span> instead of <span class="ltx_text ltx_font_bold">All</span>, only selected objects will be sliced.</p>
+</div>
+<div id="S2.SS5.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p">To change the orientation of the slice plane, use the same mouse and keyboard controls as for moving the 3D objects (see <a href="#S2.SS3" title="2.3 Interacting with the 3D view ‣ 2 Working with the Tree ‣ Thesis" class="ltx_ref"><span class="ltx_text ltx_ref_tag">2.3</span></a>), but hold down <span class="ltx_text ltx_font_bold">Shift</span> while doing so.</p>
+</div>
+<figure id="S2.F5" class="ltx_figure">
+<table style="width:100%;">
+<tr>
+<td class="ltx_subfigure">
+<figure id="S2.F4.sf1" class="ltx_figure ltx_align_center"><img src="x8.png" id="S2.F4.sf1.g1" class="ltx_graphics ltx_centering" width="541" height="378" alt="">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(a)</span> </span><span class="ltx_text" style="font-size:90%;">Slice all drawn objects</span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S2.F4.sf2" class="ltx_figure ltx_align_center"><img src="x9.png" id="S2.F4.sf2.g1" class="ltx_graphics ltx_centering" width="541" height="378" alt="">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(b)</span> </span><span class="ltx_text" style="font-size:90%;">The skull has been sliced</span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S2.F4.sf3" class="ltx_figure ltx_align_center"><img src="x10.png" id="S2.F4.sf3.g1" class="ltx_graphics ltx_centering" width="541" height="378" alt="">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(c)</span> </span><span class="ltx_text" style="font-size:90%;">Rotate to reveal the cut surface</span></figcaption>
+</figure>
+</td>
+</tr>
+</table>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 5</span>: </span><span class="ltx_text" style="font-size:90%;">Slicing example</span></figcaption>
+</figure>
+<figure id="S2.F6" class="ltx_figure">
+<table style="width:100%;">
+<tr>
+<td class="ltx_subfigure">
+<figure id="S2.F5.sf1" class="ltx_figure ltx_align_center"><img src="x11.png" id="S2.F5.sf1.g1" class="ltx_graphics ltx_centering" width="541" height="378" alt="">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(a)</span> </span><span class="ltx_text" style="font-size:90%;">Move the slice plane
+<br class="ltx_break"></span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S2.F5.sf2" class="ltx_figure ltx_align_center"><img src="x12.png" id="S2.F5.sf2.g1" class="ltx_graphics ltx_centering" width="541" height="378" alt="">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(b)</span> </span><span class="ltx_text" style="font-size:90%;">Select the frontal and right parietal bone</span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S2.F5.sf3" class="ltx_figure ltx_align_center"><img src="x13.png" id="S2.F5.sf3.g1" class="ltx_graphics ltx_centering" width="541" height="378" alt="">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(c)</span> </span><span class="ltx_text" style="font-size:90%;">Slice only the selected items
+<br class="ltx_break"></span></figcaption>
+</figure>
+</td>
+</tr>
+</table>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 6</span>: </span><span class="ltx_text" style="font-size:90%;">Slicing example 2. This time also the brain has been drawn. Only the frontal and right parietal bone are selected and cut.</span></figcaption>
+</figure>
+</section>
+</section>
+<section id="S3" class="ltx_section" lang="en">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">3 </span>Data model</h2>
+
+<div id="S3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">The underlying data model is a tree in which each node has:</p>
+<ul id="S3.I1" class="ltx_itemize">
+<li id="S3.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I1.i1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">a unique ID ("conceptID")</p>
+</div>
+</li>
+<li id="S3.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I1.i2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">a possibly redundant name</p>
+</div>
+</li>
+<li id="S3.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I1.i3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">a possibly empty list of file IDs</p>
+</div>
+</li>
+</ul>
+</div>
+<section id="S3.SS1" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">3.1 </span>Loading custom models</h3>
+
+<div id="S3.SS1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">File &gt; Load hierarchy</span> allows you to load a custom model. To do so, you must provide at least an edge list representing the tree. Optionally, you may provide a mapping of nodes to files and a directory containing .obj files.
+
+<br class="ltx_break">In the edge list, there must be one entry per line and each entry must be tab separated and adhere to the following format:
+<span class="ltx_ERROR undefined">{minted}</span>text
+parent id parent name child id child name
+
+Note that:</p>
+<ul id="S3.I2" class="ltx_itemize">
+<li id="S3.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I2.i1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_typewriter">child id</span> and <span class="ltx_text ltx_font_typewriter">child name</span> may be omitted to create a single node without edges</p>
+</div>
+</li>
+<li id="S3.I2.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I2.i2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">if the provided edge list has more than one possible root, all roots will be made children of a new root</p>
+</div>
+</li>
+<li id="S3.I2.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I2.i3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">any node may only have up to one parent</p>
+</div>
+</li>
+<li id="S3.I2.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I2.i4.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">cycles are broken up</p>
+</div>
+</li>
+<li id="S3.I2.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I2.i5.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">the first line of the list is treated as header and will be ignored</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">In the mapping of nodes to files, there must be one entry per line and each entry must be tab separated and adhere to the following format:
+<span class="ltx_ERROR undefined">{minted}</span>text
+node id node name file id
+
+Note that:</p>
+<ul id="S3.I3" class="ltx_itemize">
+<li id="S3.I3.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I3.i1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">file id is the name of an .obj file</p>
+</div>
+</li>
+<li id="S3.I3.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I3.i2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">the first line of the list is treated as header and will be ignored</p>
+</div>
+</li>
+</ul>
+</div>
+<div id="S3.SS1.p2" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Note:</span> Adding custom models is undoable via the <span class="ltx_text ltx_font_bold">Undo</span> button. It is also possible to remove custom trees by right-clicking their tab and choosing <span class="ltx_text ltx_font_bold">Remove</span>.</p>
+</div>
+<section id="S3.SS1.SSS1" class="ltx_subsubsection">
+<h4 class="ltx_title ltx_title_subsubsection">
+<span class="ltx_tag ltx_tag_subsubsection">3.1.1 </span>Generating the edge list and file list for the tree</h4>
+
+<div id="S3.SS1.SSS1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">To generate the edge list for any subtree, right click on a node and press <span class="ltx_text ltx_font_bold">Print subtree</span>. This will generate the edge list for the subtree below that node. Click <span class="ltx_text ltx_font_bold">Print FileIDs of subtree</span> to generate the mapping of nodes to File IDs for the subtree below that node.</p>
+</div>
+</section>
+</section>
+<section id="S3.SS2" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">3.2 </span>FileID Info</h3>
+
+<div id="S3.SS2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">To inspect which 3D files are associated with any node in the tree, <span class="ltx_text ltx_font_bold">right-click &gt; FileID Info</span>. This brings up a two-column table.
+<br class="ltx_break">Cells in the left column contain a file ID. For every file ID, the right column lists all the nodes that have that file ID. In total, the table lists all file IDs of the subtree below the node that you are inspecting.
+<br class="ltx_break">The right column is color coded to the type of items it references. If a cell references the item you are inspecting, it is colored light green. For other items, it is colored beige if it is a leaf node (i.e. does not have any children) and dark green if it is an internal node (i.e. has children).
+<br class="ltx_break">Click the column headers to sort the table alphabetically.
+<br class="ltx_break">Enter a File ID in the bottom text field and hit search to scroll to it in the table.
+<br class="ltx_break">If tree editing (see <a href="#S3.SS3" title="3.3 Tree Editing ‣ 3 Data model ‣ Thesis" class="ltx_ref"><span class="ltx_text ltx_ref_tag">3.3</span></a>) is enabled, you may add or remove File IDs from this node by entering them in the text field and pressing <span class="ltx_text ltx_font_bold">Add FileID</span> / <span class="ltx_text ltx_font_bold">Remove FileID</span>.
+<br class="ltx_break">The text field in the bottom right corner contains the name and concept ID of this node.</p>
+</div>
+</section>
+<section id="S3.SS3" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">3.3 </span>Tree Editing</h3>
+
+<div id="S3.SS3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">The program allows you to edit the tree. Enable <span class="ltx_text ltx_font_bold">File &gt; Enable Tree Editing</span>.
+<br class="ltx_break">This will enable the <span class="ltx_text ltx_font_bold">Add FileID</span> and <span class="ltx_text ltx_font_bold">Remove FileID</span> options in <a href="#S3.SS2" title="3.2 FileID Info ‣ 3 Data model ‣ Thesis" class="ltx_ref"><span class="ltx_text ltx_ref_tag">3.2</span></a>.
+<br class="ltx_break">Also, the context menu for tree items will be expanded by the following options:</p>
+<ul id="S3.I4" class="ltx_itemize">
+<li id="S3.I4.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I4.i1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Cut</span>: cut the item. Not available for the root</p>
+</div>
+</li>
+<li id="S3.I4.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I4.i2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Paste</span>: paste the item</p>
+</div>
+</li>
+<li id="S3.I4.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I4.i3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Delete</span>: delete the item. Not available for the root</p>
+</div>
+</li>
+<li id="S3.I4.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I4.i4.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Rename</span>: rename the item</p>
+</div>
+</li>
+<li id="S3.I4.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I4.i5.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Create</span>: create a new child below that item</p>
+</div>
+</li>
+<li id="S3.I4.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I4.i6.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Extract children</span>: makes all the children of that node siblings of it. Not available for the root
+</p>
+</div>
+</li>
+<li id="S3.I4.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I4.i7.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Restructure subtree</span>: allows you to replace the node and its subtree with a new tree by providing a new edge list. See <a href="#S3.SS3.SSS2" title="3.3.2 Restructure subtree ‣ 3.3 Tree Editing ‣ 3 Data model ‣ Thesis" class="ltx_ref"><span class="ltx_text ltx_ref_tag">3.3.2</span></a> for more details.</p>
+</div>
+</li>
+</ul>
+</div>
+<section id="S3.SS3.SSS1" class="ltx_subsubsection">
+<h4 class="ltx_title ltx_title_subsubsection">
+<span class="ltx_tag ltx_tag_subsubsection">3.3.1 </span>Saving changes</h4>
+
+<div id="S3.SS3.SSS1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">To save changes to a tree, right click on the tab of that tree and choose <span class="ltx_text ltx_font_bold">Save</span>. The program will ask you to choose a directory where the two files (edge list and node to File ID mapping) will be generated.</p>
+</div>
+<div id="S3.SS3.SSS1.p2" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_bold">Note:</span> This means that changes to the main model (’anatomy’) can only be saved by saving them as a new model. They will <span class="ltx_text ltx_font_bold">NOT</span> be loaded again upon startup of the program. You must load the modified model via <span class="ltx_text ltx_font_bold">File &gt; Load hierarchy</span>.
+<br class="ltx_break">To save all trees, regardless of whether they contain unsaved changes, use <span class="ltx_text ltx_font_bold">File &gt; Save trees</span>.</p>
+</div>
+<div id="S3.SS3.SSS1.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p">If there are unsaved changes in any tree, the program will ask you to save them before exiting or before removing the tree.</p>
+</div>
+</section>
+<section id="S3.SS3.SSS2" class="ltx_subsubsection">
+<h4 class="ltx_title ltx_title_subsubsection">
+<span class="ltx_tag ltx_tag_subsubsection">3.3.2 </span>Restructure subtree</h4>
+
+<figure id="S3.F7" class="ltx_figure"><img src="x14.png" id="S3.F7.g1" class="ltx_graphics ltx_centering" width="271" height="189" alt="">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 7</span>: </span><span class="ltx_text" style="font-size:90%;">The <span class="ltx_text ltx_font_bold">Restructure subtree</span> menu</span></figcaption>
+</figure>
+<div id="S3.SS3.SSS2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">Opening the <span class="ltx_text ltx_font_bold">Restructure subtree</span> function on a node allows you to replace the node and the subtree below it by a new tree.</p>
+</div>
+<div id="S3.SS3.SSS2.p2" class="ltx_para ltx_noindent">
+<p class="ltx_p">In the top text field, paste an edge list (format described in <a href="#S3" title="3 Data model ‣ Thesis" class="ltx_ref"><span class="ltx_text ltx_ref_tag">3</span></a>, NO HEADER LINE) and click <span class="ltx_text ltx_font_bold">Parse</span>. This will create a new tree from the provided edge list. Nodes that already existed in the tree will be reused (meaning they will also keep their fileIDs). The tree will appear in the bottom right window. The tree can be edited.
+<br class="ltx_break">In the bottom left window, there is a table giving an overview over the changes this new tree has compared to the old one. Each row is an edge (parent left, child right). The table is color-coded according to the legend at the bottom.</p>
+</div>
+<div id="S3.SS3.SSS2.p3" class="ltx_para ltx_noindent">
+<p class="ltx_p">If the new tree does not contain all items of the old subtree, this will be indicated in the table. By clicking <span class="ltx_text ltx_font_bold">Add missing items to tree</span>, these items will be added to the tree as children of the root.
+</p>
+</div>
+<div id="S3.SS3.SSS2.p4" class="ltx_para ltx_noindent">
+<p class="ltx_p">Click <span class="ltx_text ltx_font_bold">Accept</span> in the bottom left corner to replace the node with which you opened <span class="ltx_text ltx_font_bold">Restructure subtree</span> by the new tree.</p>
+</div>
+<div id="S3.SS3.SSS2.p5" class="ltx_para ltx_noindent">
+<p class="ltx_p">Since each node must have a unique conceptID (see <a href="#S3" title="3 Data model ‣ Thesis" class="ltx_ref"><span class="ltx_text ltx_ref_tag">3</span></a>), no two nodes in the new tree must share the same conceptID. Further, nodes of the new tree must not have conceptIDs that already occur somewhere else in the tree outside of the subtree you are restructuring. The program will check both upon clicking <span class="ltx_text ltx_font_bold">Accept</span>. The former can also be checked via <span class="ltx_text ltx_font_bold">Search For Duplicate IDs</span>. If duplicate conceptIDs are found, a table is shown showing which new item shares a conceptID with which other or already existing item.</p>
+</div>
+<figure id="S3.F8" class="ltx_figure"><img src="x15.png" id="S3.F8.g1" class="ltx_graphics ltx_centering" width="271" height="206" alt="">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 8</span>: </span><span class="ltx_text" style="font-size:90%;">Using the <span class="ltx_text ltx_font_bold">Restructure subtree</span> function to restructure the subtree of ’urinary system’<a href="#S3.F7" title="Figure 7 ‣ 3.3.2 Restructure subtree ‣ 3.3 Tree Editing ‣ 3 Data model ‣ Thesis" class="ltx_ref"><span class="ltx_text ltx_ref_tag">7</span></a>.</span></figcaption>
+</figure>
+<div id="S3.SS3.SSS2.p6" class="ltx_para ltx_noindent">
+<p class="ltx_p">Fig.<a href="#S3.F8" title="Figure 8 ‣ 3.3.2 Restructure subtree ‣ 3.3 Tree Editing ‣ 3 Data model ‣ Thesis" class="ltx_ref"><span class="ltx_text ltx_ref_tag">8</span></a> shows how the <span class="ltx_text ltx_font_bold">Restructure subtree</span> function can be used. As an example, a new tree with a few nonsensical modifications has been parsed:</p>
+<ul id="S3.I5" class="ltx_itemize">
+<li id="S3.I5.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I5.i1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">’urinary system’ has been renamed to ’urinary systemm’</p>
+</div>
+</li>
+<li id="S3.I5.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I5.i2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">a new node ’new node’ has been created below ’left upper urinary tract’</p>
+</div>
+</li>
+<li id="S3.I5.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I5.i3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">the ’tongue’ node has been copied from elsewhere in the tree to below ’lower urinary tract’</p>
+</div>
+</li>
+<li id="S3.I5.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I5.i4.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">’right kidney’ has been renamed to ’right kidneyyy’</p>
+</div>
+</li>
+<li id="S3.I5.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I5.i5.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">a new node ’right ureter 2’ has been created under ’right upper urinary tract’. It has the same conceptID as ’right ureter’</p>
+</div>
+</li>
+<li id="S3.I5.i6" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I5.i6.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">the ’left ureter’ has been moved to below ’right upper urinary tract’</p>
+</div>
+</li>
+<li id="S3.I5.i7" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I5.i7.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">’urethra’ has been removed</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">Trying to <span class="ltx_text ltx_font_bold">Accept</span> this tree will not work because:</p>
+<ul id="S3.I6" class="ltx_itemize">
+<li id="S3.I6.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I6.i1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">there are two nodes in it that share the same conceptID, namely ’right ureter’ and ’right ureter 2’
+</p>
+</div>
+</li>
+<li id="S3.I6.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S3.I6.i2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">there is a node in it that shares a conceptID with another node elsewhere in the tree, namely the ’tongue’. This is only checked after all duplicate IDs within the new tree have been resolved.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">The program notifies the user of these problems (Fig.<a href="#S3.F9" title="Figure 9 ‣ 3.3.2 Restructure subtree ‣ 3.3 Tree Editing ‣ 3 Data model ‣ Thesis" class="ltx_ref"><span class="ltx_text ltx_ref_tag">9</span></a>).</p>
+</div>
+<figure id="S3.F9" class="ltx_figure">
+<table style="width:100%;">
+<tr>
+<td class="ltx_subfigure">
+<figure id="S3.F8.sf1" class="ltx_figure ltx_align_center"><img src="x16.png" id="S3.F8.sf1.g1" class="ltx_graphics" width="541" height="586" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(a)</span> </span><span class="ltx_text" style="font-size:90%;">Two nodes share the same fileID. This is not allowed.</span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S3.F8.sf2" class="ltx_figure ltx_align_center"><img src="x17.png" id="S3.F8.sf2.g1" class="ltx_graphics" width="541" height="586" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(b)</span> </span><span class="ltx_text" style="font-size:90%;">The ’tongue’s fileID already exists elsewhere in the tree. This is not allowed.</span></figcaption>
+</figure>
+</td>
+</tr>
+</table>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 9</span>: </span><span class="ltx_text" style="font-size:90%;">Problems with the restructured tree of ’urinary system’.</span></figcaption>
+</figure>
+</section>
+</section>
+</section>
+<section id="S4" class="ltx_section" lang="en">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">4 </span>BodyParts 3D 3.0</h2>
+
+<div id="S4.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">The BodyParts3D database comes in different versions.
+The versions share most anatomy parts, but there are some anatomy parts that can only be found in one version.
+
+<br class="ltx_break">By default, this program uses version 4.0. By enabling version 3.0 (<span class="ltx_text ltx_font_bold">File &gt; Enable BP3D 3.0</span>), items labeled with ’(available in BP3D 3.0)’ will become drawable. Further, you will be able to browse the full tree of version 3.0.
+
+<br class="ltx_break">Note that versions 4.0 and 3.0 do not share the same coordinates and sizes! This means that even identical anatomy parts from different versions will be offset from each other. Items from version 3.0 will have a slightly wrong location when drawn next to items from version 4.0. The severity of this offset is different from part to part.
+You can see this, for example, by drawing the tibia of versions 4.0 and 3.0 next to each other.
+<br class="ltx_break">Version 3.0 will always be drawn in default green to always make them distinguishable.</p>
+</div>
+</section>
+<section id="S5" class="ltx_section" lang="en">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">5 </span>Quiz</h2>
+
+<div id="S5.p1" class="ltx_para">
+<p class="ltx_p">Press the <span class="ltx_text ltx_font_bold">Quiz</span> button to start the quiz setup. There you can choose parameters based on which the program will create a quiz. You can choose:</p>
+<ul id="S5.I1" class="ltx_itemize">
+<li id="S5.I1.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S5.I1.i1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">the topic(s). A topic is represented by a node from a tree. The quiz will ask about items in the subtree of the chosen node(s)</p>
+</div>
+</li>
+<li id="S5.I1.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S5.I1.i2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">the time limit for the quiz</p>
+</div>
+</li>
+<li id="S5.I1.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S5.I1.i3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">whether the quiz will show you the correct answer if you submit a wrong answer</p>
+</div>
+</li>
+<li id="S5.I1.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S5.I1.i4.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">how many items will the quiz draw in 3D questions</p>
+</div>
+</li>
+<li id="S5.I1.i5" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S5.I1.i5.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">the number of questions in the quiz (max. 30)</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">After choosing at least one topic, click <span class="ltx_text ltx_font_bold">Generate</span> to start the quiz.</p>
+</div>
+<figure id="S5.F10" class="ltx_figure"><img src="x18.png" id="S5.F10.g1" class="ltx_graphics ltx_centering" width="271" height="204" alt="">
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 10</span>: </span><span class="ltx_text" style="font-size:90%;">Setting up a quiz</span></figcaption>
+</figure>
+<section id="S5.SS1" class="ltx_subsection">
+<h3 class="ltx_title ltx_title_subsection">
+<span class="ltx_tag ltx_tag_subsection">5.1 </span>Question types</h3>
+
+<div id="S5.SS1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">There are four general types of questions:</p>
+<ul id="S5.I2" class="ltx_itemize">
+<li id="S5.I2.i1" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S5.I2.i1.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_italic">Select in 3D question</span> (Fig.<a href="#S5.F11" title="Figure 11 ‣ 5.1 Question types ‣ 5 Quiz ‣ Thesis" class="ltx_ref"><span class="ltx_text ltx_ref_tag">11</span></a>): a few things are drawn in 3D and you are asked to select one of them</p>
+</div>
+</li>
+<li id="S5.I2.i2" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S5.I2.i2.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_italic">Multiple choice 3D question</span> (see Fig.<a href="#S5.F12" title="Figure 12 ‣ 5.1 Question types ‣ 5 Quiz ‣ Thesis" class="ltx_ref"><span class="ltx_text ltx_ref_tag">12</span></a>, <a href="#S5.F13" title="Figure 13 ‣ 5.1 Question types ‣ 5 Quiz ‣ Thesis" class="ltx_ref"><span class="ltx_text ltx_ref_tag">13</span></a>): a few things are draw in 3D and one of them is selected/highlighted. A multiple choice questions asks the name of the selected item
+</p>
+</div>
+</li>
+<li id="S5.I2.i3" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S5.I2.i3.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_italic">Multiple choice Cross section question </span>(see Fig.<a href="#S5.F14" title="Figure 14 ‣ 5.1 Question types ‣ 5 Quiz ‣ Thesis" class="ltx_ref"><span class="ltx_text ltx_ref_tag">14</span></a>): a cross section of the full human body is shown. One item is highlighted and a multiple choice question asks the name of the highlighted item.</p>
+</div>
+</li>
+<li id="S5.I2.i4" class="ltx_item" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span> 
+<div id="S5.I2.i4.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p"><span class="ltx_text ltx_font_italic">Blood vessel continuity question </span>(see Fig.<a href="#S5.F15" title="Figure 15 ‣ 5.1 Question types ‣ 5 Quiz ‣ Thesis" class="ltx_ref"><span class="ltx_text ltx_ref_tag">15</span></a>): Based on the hierarchy in the tree, the question asks about the direct parent/children of a blood vessel. Note: the hierarchy of blood vessels in the tree is based on vessel continuity, i.e. which vessel feeds into / branches off of which. However, there may be errors or misleading structure that may cause faulty or misleading questions.</p>
+</div>
+</li>
+</ul>
+</div>
+<figure id="S5.F11" class="ltx_figure">
+<table style="width:100%;">
+<tr>
+<td class="ltx_subfigure">
+<figure id="S5.F10.sf1" class="ltx_figure ltx_align_center"><img src="x19.png" id="S5.F10.sf1.g1" class="ltx_graphics" width="541" height="437" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(a)</span> </span><span class="ltx_text" style="font-size:90%;">A few bones and muscles are shown. The user is asked to select the middle phalanx of left little finger.
+<br class="ltx_break"></span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S5.F10.sf2" class="ltx_figure ltx_align_center"><img src="x20.png" id="S5.F10.sf2.g1" class="ltx_graphics" width="541" height="437" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(b)</span> </span><span class="ltx_text" style="font-size:90%;">The user failed to correctly pick the middle phalanx of left littel finger. The user’s wrong choice is highlighted in red while the correct choice is highlighted in green.</span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S5.F10.sf3" class="ltx_figure ltx_align_center"><img src="x21.png" id="S5.F10.sf3.g1" class="ltx_graphics" width="541" height="437" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(c)</span> </span><span class="ltx_text" style="font-size:90%;">The user was supposed to pick the cerebral peduncles, but only picked one of two correct items. Their correct choice is highlighted in dark green while the missing item is highlighted in light green.</span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S5.F10.sf4" class="ltx_figure ltx_align_center"><img src="x22.png" id="S5.F10.sf4.g1" class="ltx_graphics" width="541" height="437" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(d)</span> </span><span class="ltx_text" style="font-size:90%;">Some muscles and bones of the shoulder are drawn and the user is asked to select the right rhomboid minor.
+<br class="ltx_break"></span></figcaption>
+</figure>
+</td>
+</tr>
+</table>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 11</span>: </span><span class="ltx_text" style="font-size:90%;">Examples for the ’select in 3D’ question type.</span></figcaption>
+</figure>
+<figure id="S5.F12" class="ltx_figure">
+<table style="width:100%;">
+<tr>
+<td class="ltx_subfigure">
+<figure id="S5.F11.sf1" class="ltx_figure ltx_align_center"><img src="x23.png" id="S5.F11.sf1.g1" class="ltx_graphics" width="541" height="437" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(a)</span> </span><span class="ltx_text" style="font-size:90%;">Multiple muscles and bones are drawn and one of them is highlighted. A multiple choice question asks the identity of the highlighted structure.</span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S5.F11.sf2" class="ltx_figure ltx_align_center"><img src="x24.png" id="S5.F11.sf2.g1" class="ltx_graphics" width="541" height="437" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(b)</span> </span><span class="ltx_text" style="font-size:90%;">Clicking <span class="ltx_text ltx_font_bold">Show Arrow</span> highlights the structure in red and points an arrow at it.
+<br class="ltx_break">
+<br class="ltx_break"></span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S5.F11.sf3" class="ltx_figure ltx_align_center"><img src="x25.png" id="S5.F11.sf3.g1" class="ltx_graphics" width="541" height="437" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(c)</span> </span><span class="ltx_text" style="font-size:90%;">The user wrongly answers ’left rhomboid major’ upon which the corret answer ’left subscapularis’ is revealed.</span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S5.F11.sf4" class="ltx_figure ltx_align_center"><img src="x26.png" id="S5.F11.sf4.g1" class="ltx_graphics" width="541" height="437" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(d)</span> </span><span class="ltx_text" style="font-size:90%;">The user chooses the correct answer.
+<br class="ltx_break">
+<br class="ltx_break"></span></figcaption>
+</figure>
+</td>
+</tr>
+</table>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 12</span>: </span><span class="ltx_text" style="font-size:90%;">An example of how a multiple choice 3D question.</span></figcaption>
+</figure>
+<figure id="S5.F13" class="ltx_figure">
+<table style="width:100%;">
+<tr>
+<td class="ltx_subfigure">
+<figure id="S5.F12.sf1" class="ltx_figure ltx_align_center"><img src="x27.png" id="S5.F12.sf1.g1" class="ltx_graphics" width="541" height="437" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(a)</span> </span><span class="ltx_text" style="font-size:90%;">Multiple teeth are drawn and one of them is selected. A multiple choice question asks the identity of the selected item.</span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S5.F12.sf2" class="ltx_figure ltx_align_center"><img src="x28.png" id="S5.F12.sf2.g1" class="ltx_graphics" width="541" height="437" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(b)</span> </span><span class="ltx_text" style="font-size:90%;">The <span class="ltx_text ltx_font_bold">Show Arrow</span> function highlights the item in red and points an arrow at it.
+<br class="ltx_break"></span></figcaption>
+</figure>
+</td>
+</tr>
+</table>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 13</span>: </span><span class="ltx_text" style="font-size:90%;">Another example for a multiple choice 3D question.</span></figcaption>
+</figure>
+<figure id="S5.F14" class="ltx_figure">
+<table style="width:100%;">
+<tr>
+<td class="ltx_subfigure">
+<figure id="S5.F13.sf1" class="ltx_figure ltx_align_center"><img src="x29.png" id="S5.F13.sf1.g1" class="ltx_graphics" width="541" height="437" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(a)</span> </span><span class="ltx_text" style="font-size:90%;">A cross section through the abdominal area is shown from above. An arrow points at an item highlighted in red. A multiple choice question asks the identity of the highlighted item.</span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S5.F13.sf2" class="ltx_figure ltx_align_center"><img src="x30.png" id="S5.F13.sf2.g1" class="ltx_graphics" width="541" height="437" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(b)</span> </span><span class="ltx_text" style="font-size:90%;">The user correctly answers ’right adrenal gland’.
+<br class="ltx_break">
+<br class="ltx_break">
+<br class="ltx_break"></span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S5.F13.sf3" class="ltx_figure ltx_align_center"><img src="x31.png" id="S5.F13.sf3.g1" class="ltx_graphics" width="541" height="287" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(c)</span> </span><span class="ltx_text" style="font-size:90%;">A cross section through the liver is shown. An arrow points at a structure highlighted in red and a multiple choice question asks the identity of the structure.</span></figcaption>
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S5.F13.sf4" class="ltx_figure ltx_align_center"><img src="x32.png" id="S5.F13.sf4.g1" class="ltx_graphics" width="541" height="287" alt="">
+<figcaption class="ltx_caption"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(d)</span> </span><span class="ltx_text" style="font-size:90%;">A slice through the upper arm is shown. An arrow points at a structure highlighted in red and a multiple choice question asks the identity of the structure.</span></figcaption>
+</figure>
+</td>
+</tr>
+</table>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 14</span>: </span><span class="ltx_text" style="font-size:90%;">Examples for cross section questions.</span></figcaption>
+</figure>
+<figure id="S5.F15" class="ltx_figure">
+<table style="width:100%;">
+<tr>
+<td class="ltx_subfigure">
+<figure id="S5.F15.fig1" class="ltx_figure ltx_align_center"><img src="x33.png" id="S5.F15.g1" class="ltx_graphics" width="541" height="437" alt="">
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S5.F15.fig2" class="ltx_figure ltx_align_center"><img src="x34.png" id="S5.F15.g2" class="ltx_graphics" width="541" height="437" alt="">
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S5.F15.fig3" class="ltx_figure ltx_align_center"><img src="x35.png" id="S5.F15.g3" class="ltx_graphics" width="541" height="437" alt="">
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S5.F15.fig4" class="ltx_figure ltx_align_center"><img src="x36.png" id="S5.F15.g4" class="ltx_graphics" width="541" height="437" alt="">
+</figure>
+</td>
+<td class="ltx_subfigure">
+<figure id="S5.F15.fig5" class="ltx_figure ltx_align_center"><img src="x37.png" id="S5.F15.g5" class="ltx_graphics" width="541" height="437" alt="">
+</figure>
+</td>
+</tr>
+</table>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 15</span>: </span><span class="ltx_text" style="font-size:90%;">Examples for questions asking about blood vessel continuity.</span></figcaption>
+</figure>
+</section>
+</section>
+<section id="S6" class="ltx_section" lang="en">
+<h2 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">6 </span>Help</h2>
+
+<div id="S6.p1" class="ltx_para ltx_noindent">
+<p class="ltx_p">Go to <span class="ltx_text ltx_font_bold">Help &gt; Guide</span> to show this guide.</p>
+</div>
+<div class="ltx_pagination ltx_role_newpage"></div>
+<span class="ltx_ERROR undefined">\printbibliography</span>
+</section>
+</article>
+</div>
+<footer class="ltx_page_footer">
+<div class="ltx_page_logo">Generated  on Tue May 19 14:16:27 2026 by <a href="http://dlmf.nist.gov/LaTeXML/">LaTeXML <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAOCAYAAAD5YeaVAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wKExQZLWTEaOUAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAdpJREFUKM9tkL+L2nAARz9fPZNCKFapUn8kyI0e4iRHSR1Kb8ng0lJw6FYHFwv2LwhOpcWxTjeUunYqOmqd6hEoRDhtDWdA8ApRYsSUCDHNt5ul13vz4w0vWCgUnnEc975arX6ORqN3VqtVZbfbTQC4uEHANM3jSqXymFI6yWazP2KxWAXAL9zCUa1Wy2tXVxheKA9YNoR8Pt+aTqe4FVVVvz05O6MBhqUIBGk8Hn8HAOVy+T+XLJfLS4ZhTiRJgqIoVBRFIoric47jPnmeB1mW/9rr9ZpSSn3Lsmir1fJZlqWlUonKsvwWwD8ymc/nXwVBeLjf7xEKhdBut9Hr9WgmkyGEkJwsy5eHG5vN5g0AKIoCAEgkEkin0wQAfN9/cXPdheu6P33fBwB4ngcAcByHJpPJl+fn54mD3Gg0NrquXxeLRQAAwzAYj8cwTZPwPH9/sVg8PXweDAauqqr2cDjEer1GJBLBZDJBs9mE4zjwfZ85lAGg2+06hmGgXq+j3+/DsixYlgVN03a9Xu8jgCNCyIegIAgx13Vfd7vdu+FweG8YRkjXdWy329+dTgeSJD3ieZ7RNO0VAXAPwDEAO5VKndi2fWrb9jWl9Esul6PZbDY9Go1OZ7PZ9z/lyuD3OozU2wAAAABJRU5ErkJggg==" alt="[LOGO]"></a>
+</div></footer>
+</div>
+</body>
+</html>

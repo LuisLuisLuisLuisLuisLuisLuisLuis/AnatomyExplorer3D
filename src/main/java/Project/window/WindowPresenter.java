@@ -1018,8 +1018,7 @@ public class WindowPresenter {
         //--------------------
 
         //------------Menu: Help----------
-//        controller.getMenuGuide().setOnAction(e -> LittlePopUp.showPopup(Help.getHelp(), "Help", 1000, 500));
-        controller.getMenuGuide().setOnAction(e -> LittlePopUp.showPopup(Help.getGuide(), "Help", 1000, 500));
+        controller.getMenuGuide().setOnAction(e -> Help.showGuide());
         controller.getMenuAbout().setOnAction(e -> LittlePopUp.showPaddedPopup(About.getAbout(), "About", 400, 100));
 
 

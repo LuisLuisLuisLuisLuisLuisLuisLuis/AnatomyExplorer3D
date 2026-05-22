@@ -6,13 +6,12 @@ import Project.window.WindowPresenter;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.Locale;
 import java.util.logging.Level;
 
 
-public class AnatomyExplorer extends Application {
+public class AnatomyExplorer extends Application{
 
     public void start(Stage primaryStage) throws Exception {
         Locale.setDefault(Locale.ENGLISH);  // all default texts are in ENG

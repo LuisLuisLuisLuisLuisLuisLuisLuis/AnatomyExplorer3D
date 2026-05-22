@@ -19,6 +19,7 @@ module com.anatomyExplorer {
     requires jdk.xml.dom;
     requires jdk.jsobject;
     requires jdk.httpserver;
+    requires com.dlsc.pdfviewfx;
 
     exports Project.AI.Format to com.fasterxml.jackson.databind;
     exports Project.window.ThreeDPaneHandling.Coloring to com.fasterxml.jackson.databind;

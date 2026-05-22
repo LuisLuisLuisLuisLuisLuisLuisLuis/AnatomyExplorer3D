@@ -1,0 +1,159 @@
+(Loading /usr/share/perl5/LaTeXML/Package/TeX.pool.ltxml...
+(Loading /usr/share/perl5/LaTeXML/Package/eTeX.pool.ltxml... 0.00 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/pdfTeX.pool.ltxml... 0.00 sec) 0.07 sec)
+latexmlc (LaTeXML version 0.8.6)
+invoked as [/usr/bin/latexmlc /mnt/c/Users/dnexu/OneDrive/msc/Msc/wrrr/AW_Guide/main.tex --dest=main.html]
+processing started Tue May 19 14:16:22 2026
+(Digesting TeX main...
+(Processing content /mnt/c/Users/dnexu/OneDrive/msc/Msc/wrrr/AW_Guide/main.tex...
+(Loading /usr/share/perl5/LaTeXML/Package/LaTeX.pool.ltxml...
+(Loading /usr/share/perl5/LaTeXML/Package/textcomp.sty.ltxml...
+(Processing definitions /usr/share/texlive/texmf-dist/tex/latex-dev/base/ts1enc.dfu... 0.01 sec) 0.13 sec) 0.23 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/article.cls.ltxml... 0.01 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/fontenc.sty.ltxml...
+(Loading /usr/share/perl5/LaTeXML/Package/t1enc.def.ltxml...
+(Processing definitions /usr/share/texlive/texmf-dist/tex/latex-dev/base/t1enc.def...
+(Processing definitions /usr/share/texlive/texmf-dist/tex/latex-dev/base/t1enc.dfu... 0.04 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/t1.fontmap.ltxml... 0.00 sec) 0.08 sec) 0.08 sec) 0.08 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/inputenc.sty.ltxml...
+(Loading /usr/share/perl5/LaTeXML/Package/utf8.def.ltxml... 0.00 sec) 0.01 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/enumitem.sty.ltxml... 0.00 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/babel.sty.ltxml...
+(Processing definitions /usr/share/texlive/texmf-dist/tex/generic/babel/babel.sty...
+(Processing definitions /usr/share/texlive/texmf-dist/tex/generic/config/language.def... 0.00 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/txtbabel.def.ltxml...
+(Processing definitions /usr/share/texlive/texmf-dist/tex/generic/babel/txtbabel.def... 0.00 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/babel_support.sty.ltxml... 0.00 sec) 0.01 sec)
+(Processing definitions /usr/share/texlive/texmf-dist/tex/generic/babel-english/english.ldf... 0.05 sec) 0.54 sec) 0.55 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/csquotes.sty.ltxml...
+(Processing definitions /usr/share/texlive/texmf-dist/tex/latex/csquotes/csquotes.sty...
+(Loading /usr/share/perl5/LaTeXML/Package/etoolbox.sty.ltxml... 0.10 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/keyval.sty.ltxml...
+(Processing definitions /usr/share/texlive/texmf-dist/tex/latex-dev/graphics/keyval.sty... 0.01 sec) 0.01 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/csquotes.def.ltxml...
+(Processing definitions /usr/share/texlive/texmf-dist/tex/latex/csquotes/csquotes.def... 0.34 sec) 0.34 sec)
+Error:expected:{} Missing argument {} for Core::Definition::Expandable[\@gobble {}]
+	at csquotes.sty; line 2478 col 0 - line 2478 col 61
+	Ended at csquotes.sty; line 2478 col 0 - line 2478 col 61
+	Input is empty
+	In Core::Definition::Expandable[\@gobble... /usr/share/perl5/LaTeXML/Package/LaTeX.pool.ltxml; line 5212
+	 <= Core::Gullet[@0x5561da90d9f0] <= Core::Definition::Primitive[\GenericI... <= Core::Stomach[@0x5561da90a658] <= ...
+Info:latex:(csquotes)  Package csquotes Info: Trying to load configuration file 'csquotes.cfg'..
+	at csquotes.sty; line 2478 col 0 - line 2478 col 61
+(Processing definitions /usr/share/texlive/texmf-dist/tex/latex/csquotes/csquotes.cfg... 0.00 sec)
+Error:expected:{} Missing argument {} for Core::Definition::Expandable[\@gobble {}]
+	at csquotes.sty; line 2481 col 0 - line 2481 col 46
+	Ended at csquotes.sty; line 2481 col 0 - line 2481 col 46
+	Input is empty
+	In Core::Definition::Expandable[\@gobble... /usr/share/perl5/LaTeXML/Package/LaTeX.pool.ltxml; line 5212
+	 <= Core::Gullet[@0x5561da90d9f0] <= Core::Definition::Primitive[\GenericI... <= Core::Stomach[@0x5561da90a658] <= ...
+Info:latex:(csquotes)  Package csquotes Info: ... configuration file loaded successfully
+	at csquotes.sty; line 2481 col 0 - line 2481 col 46
+ 0.74 sec) 0.75 sec)
+Warning:missing_file:minted Can't find binding for package minted
+	at main.tex; line 11 col 11 - line 11 col 11
+	Anticipate undefined macros or environments
+	search paths are /mnt/c/Users/dnexu/OneDrive/msc/Msc/wrrr/AW_Guide, /home/bartsimpson, /home/bartsimpson
+	In Core::Definition::Constructor[\usepac... /usr/share/perl5/LaTeXML/Package/LaTeX.pool.ltxml; line 806
+Info:dependencies:dependencies Loading dependencies for /usr/share/texlive/texmf-dist/tex/latex/minted/minted.sty: kvoptions,fvextra,ifthen,calc,shellesc,ifplatform,pdftexcmds,xstring,lineno,framed,catchfile,xcolor,newfloat,float
+	at main.tex; line 11 col 11 - line 11 col 11
+(Loading /usr/share/perl5/LaTeXML/Package/ifthen.sty.ltxml...
+(Processing definitions /usr/share/texlive/texmf-dist/tex/latex-dev/base/ifthen.sty... 0.01 sec) 0.01 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/calc.sty.ltxml... 0.00 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/ifplatform.sty.ltxml... 0.00 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/lineno.sty.ltxml... 0.00 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/framed.sty.ltxml... 0.00 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/xcolor.sty.ltxml...
+(Loading /usr/share/perl5/LaTeXML/Package/color.sty.ltxml... 0.00 sec) 0.03 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/newfloat.sty.ltxml... 0.00 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/float.sty.ltxml... 0.00 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/amsmath.sty.ltxml...
+(Loading /usr/share/perl5/LaTeXML/Package/amsbsy.sty.ltxml...
+(Loading /usr/share/perl5/LaTeXML/Package/amsgen.sty.ltxml... 0.00 sec) 0.00 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/amstext.sty.ltxml... 0.00 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/amsopn.sty.ltxml... 0.00 sec) 0.02 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/amssymb.sty.ltxml...
+(Loading /usr/share/perl5/LaTeXML/Package/amsfonts.sty.ltxml... 0.00 sec) 0.01 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/hyperref.sty.ltxml...
+(Loading /usr/share/perl5/LaTeXML/Package/nameref.sty.ltxml... 0.00 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/url.sty.ltxml... 0.00 sec) 0.02 sec)
+Warning:missing_file:biblatex Can't find binding for package biblatex
+	at main.tex; line 15 col 15 - line 15 col 15
+	Anticipate undefined macros or environments
+	In Core::Definition::Constructor[\usepac... /usr/share/perl5/LaTeXML/Package/LaTeX.pool.ltxml; line 806
+Error:undefined:\addbibresource The token T_CS[\addbibresource] is not defined.
+	at main.tex; line 15 col 15 - line 15 col 15
+	Defining it now as <ltx:ERROR/>
+	Next token is T_BEGIN[{] ( == T_BEGIN[{])
+	In Core::Gullet[@0x5561da90d9f0] /mnt/c/Users/dnexu/OneDrive/msc/Msc/wrrr/AW_Guide/main.tex; from line 15 col 16 to line 15 col 16
+	 <= Core::Stomach[@0x5561da90a658] <= ...
+(Loading /usr/share/perl5/LaTeXML/Package/graphicx.sty.ltxml...
+(Loading /usr/share/perl5/LaTeXML/Package/graphics.sty.ltxml... 0.00 sec) 0.01 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/subcaption.sty.ltxml...
+(Loading /usr/share/perl5/LaTeXML/Package/caption.sty.ltxml... 0.00 sec) 0.01 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/booktabs.sty.ltxml... 0.00 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/longtable.sty.ltxml... 0.00 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/geometry.sty.ltxml...
+(Loading /usr/share/perl5/LaTeXML/Package/ifpdf.sty.ltxml... 0.00 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/ifvtex.sty.ltxml... 0.00 sec)
+(Loading /usr/share/perl5/LaTeXML/Package/ifxetex.sty.ltxml... 0.00 sec) 0.01 sec)
+Error:expected:{} Missing argument {} for Core::Definition::Expandable[\@gobble {}]
+	at main.tex; line 37 col 0 - line 37 col 16
+	Ended at main.tex; line 37 col 0 - line 37 col 16
+	Input is empty
+	In Core::Definition::Expandable[\@gobble... /usr/share/perl5/LaTeXML/Package/LaTeX.pool.ltxml; line 5212
+	 <= Core::Gullet[@0x5561da90d9f0] <= Core::Definition::Primitive[\GenericI... <= Core::Stomach[@0x5561da90a658] <= ...
+Info:latex:(csquotes)  Package csquotes Info: Checking for multilingual support..
+	at main.tex; line 37 col 0 - line 37 col 16
+Error:expected:{} Missing argument {} for Core::Definition::Expandable[\@gobble {}]
+	at main.tex; line 37 col 0 - line 37 col 16
+	Ended at main.tex; line 37 col 0 - line 37 col 16
+	Input is empty
+	In Core::Definition::Expandable[\@gobble... /usr/share/perl5/LaTeXML/Package/LaTeX.pool.ltxml; line 5212
+	 <= Core::Gullet[@0x5561da90d9f0] <= Core::Definition::Primitive[\GenericI... <= Core::Stomach[@0x5561da90a658] <= ...
+Info:latex:(csquotes)  Package csquotes Info: ... found 'babel' package
+	at main.tex; line 37 col 0 - line 37 col 16
+Error:expected:{} Missing argument {} for Core::Definition::Expandable[\@gobble {}]
+	at main.tex; line 37 col 0 - line 37 col 16
+	Ended at main.tex; line 37 col 0 - line 37 col 16
+	Input is empty
+	In Core::Definition::Expandable[\@gobble... /usr/share/perl5/LaTeXML/Package/LaTeX.pool.ltxml; line 5212
+	 <= Core::Gullet[@0x5561da90d9f0] <= Core::Definition::Primitive[\GenericI... <= Core::Stomach[@0x5561da90a658] <= ...
+Info:latex:(csquotes)  Package csquotes Info: Adjusting default style
+	at main.tex; line 37 col 0 - line 37 col 16
+Error:expected:{} Missing argument {} for Core::Definition::Expandable[\@gobble {}]
+	at main.tex; line 37 col 0 - line 37 col 16
+	Ended at main.tex; line 37 col 0 - line 37 col 16
+	Input is empty
+	In Core::Definition::Expandable[\@gobble... /usr/share/perl5/LaTeXML/Package/LaTeX.pool.ltxml; line 5212
+	 <= Core::Gullet[@0x5561da90d9f0] <= Core::Definition::Primitive[\GenericI... <= Core::Stomach[@0x5561da90a658] <= ...
+Info:latex:(csquotes)  Package csquotes Info: Redefining alias 'default' -> 'english'
+	at main.tex; line 37 col 0 - line 37 col 16
+Error:undefined:{minted} The environment {minted} is not defined.
+	at main.tex; line 229 col 14 - line 229 col 14
+	Next token is T_BEGIN[{] ( == T_BEGIN[{])
+	In Core::Definition::Expandable[\begin {}] /usr/share/perl5/LaTeXML/Package/LaTeX.pool.ltxml; line 180
+	 <= Core::Gullet[@0x5561da90d9f0] <= Core::Stomach[@0x5561da90a658] <= ...
+Error:undefined:\printbibliography The token T_CS[\printbibliography] is not defined.
+	at main.tex; line 492 col 18 - line 492 col 18
+	Defining it now as <ltx:ERROR/>
+	Next token is T_CS[\par] ( == Core::Definition::Constructor[\par])
+	In Core::Gullet[@0x5561da90d9f0] /mnt/c/Users/dnexu/OneDrive/msc/Msc/wrrr/AW_Guide/main.tex; from line 493 col 0 to line 493 col 1
+	 <= Core::Stomach[@0x5561da90a658] <= ...
+ 3.90 sec) 3.93 sec)
+(Building...
+(Loading compiled schema /usr/share/perl5/LaTeXML/resources/RelaxNG/LaTeXML.model... 0.01 sec) 0.86 sec)
+(Rewriting... 0.00 sec)
+(Finalizing... 0.03 sec)
+Conversion complete: 2 warnings; 9 errors; 3 undefined macros[\addbibresource, {minted}, \printbibliography]; 2 missing files[biblatex.sty, minted.sty] (See /home/bartsimpson/main.latexml.log)
+(post-processing...
+(Scan main.html processing...
+Scan: DBStatus: 287/0 objects
+ 0.03 sec)
+(CrossRef main.html processing... 0.01 sec)
+(Graphics main.html 37 to process... 3.95 sec)
+(XSLT[using LaTeXML-html5.xsl] main.html processing... 0.04 sec)
+(Writer main.html processing... 0.00 sec) 4.03 sec)
+Post-processing complete: No obvious problems
+processing finished Tue May 19 14:16:31 2026
+Status:conversion:2

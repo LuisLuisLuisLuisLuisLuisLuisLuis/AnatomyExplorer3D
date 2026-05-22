@@ -4,40 +4,910 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3c65ee50-307e-41c9-811a-e44a903afa8a" name="Changes" comment="MeshSlicer_Aware now requires a BooleanProperty set to false. If any Triangle of the Mesh is modified, the property is set to true.&#10;&#10;SliceCommand is now undoable. HOWEVER other Draw-related commands break it because they re-create default MeshViews without regarding whether they've been modified. &#10;&#10;BUG fixed where another slice box was added to the sliceplane for every child of innergroup that changed while the user was in slice mode.">
-      <change afterPath="$PROJECT_DIR$/src/main/java/Project/command/Remember/RememberHasFXGroupContents.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/Project/command/Remember/RememberHasSelection.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/Project/command/Remember/RememberMeshViewMeshes.java" afterDir="false" />
+    <list default="true" id="3c65ee50-307e-41c9-811a-e44a903afa8a" name="Changes" comment="MainWindow.fxml: Sync selection button is now below the 3D view instead of below the tree. Makes more sense intuitively bcuz checking the box initially overrides the tree selection with the 3D selection and not the other way round.">
+      <change afterPath="$PROJECT_DIR$/pom2.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/Project/Launch.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/3d/3dControls.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/3d/selectionStyle.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/3d/selectionStyle_fillmode.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/3d/slicing/slice_select.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/3d/slicing/slice_select_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/3d/slicing/slice_select_2_selected.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/3d/slicing/sliced_skull.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/3d/slicing/sliced_skull_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/3d/slicing/sliced_skull_rotated.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/FileID Inf/aortic_arch_noedit.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/FileID Inf/urinary_no_editing.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/LaTeXML.cache" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/LaTeXML.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/ltx-article.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/main.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/main.latexml.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x10.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x11.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x12.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x13.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x14.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x15.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x16.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x17.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x18.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x19.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x20.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x21.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x22.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x23.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x24.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x25.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x26.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x27.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x28.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x29.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x30.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x31.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x32.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x33.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x34.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x35.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x36.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x37.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x4.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x5.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x6.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x7.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x8.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/HTML/x9.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/full.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/arterybranch_quest_1_1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/arterybranch_quest_1_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/arterysource_quest_1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/arterysource_quest_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/choose_topic_cardio.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/choose_topic_leftlimb.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/mc_3d_quest1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/mc_3d_quest1_1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/mc_3d_quest1_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/mc_3d_quest1_3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/mc_3d_quest1_4.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/mc_3d_quest_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/mc_3d_quest_2_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/mc_3d_quest_3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/select_3d_quest1_1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/select_3d_quest1_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/select_3d_quest2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/select_3d_quest_3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/select_3d_quest_4.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/setup.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/setup_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/slice_quest_1_1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/slice_quest_1_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/slice_quest_2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/slice_quest_3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/quiz/veindrain_Quest_1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/tree/howToDraw/draw_skull.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/tree/howToDraw/select_all_of_skull.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/tree/howToDraw/select_skull.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/tree/howToSelect/full_toptreetoolbar.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/tree/howToSelect/select_mandible.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/tree/howToSelect/select_mandible_in3d.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/tree/howToSelect/sync_mandible.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/tree/restructure/cannot_Accept_tongue.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/tree/restructure/cannot_accept_rightureter2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/tree/restructure/empty.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/tree/restructure/restructure_urinary.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/Project/doc/guide/tree/restructure/restructure_urinary_init.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/SelectionModel/FXGroupDraw/HasFXGroupContents.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/SelectionModel/FXGroupDraw/HasFXGroupContents.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/SelectionModel/FXGroupDraw/HasFXGroupContentsContainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/SelectionModel/FXGroupDraw/HasFXGroupContentsContainer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/SelectionModel/FXGroupSelection/FXGroupSelectionContainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/SelectionModel/FXGroupSelection/FXGroupSelectionContainer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/SelectionModel/FXGroupSelection/HasFXGroupSelection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/SelectionModel/FXGroupSelection/HasFXGroupSelection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/SelectionModel/HasGroup/HasGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/SelectionModel/HasGroup/HasGroup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/SelectionModel/HasSelection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/SelectionModel/HasSelection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/SelectionModel/Tree/HasTreeView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/SelectionModel/Tree/HasTreeView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/ClearCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/ClearCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/ColorMeshviewsCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/ColorMeshviewsCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/DrawAnatomyCommands/RemoveObjFrom3DCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/DrawAnatomyCommands/RemoveObjFrom3DCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/SliceCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/command/DrawCommands/SliceCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/command/Remember/RememberFXGroupContents.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/command/Remember/RememberFXMeshViewColors.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/command/Remember/RememberFXMeshViewColors.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/model/EnableDisableBP3DV3Parts.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/model/EnableDisableBP3DV3Parts.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/Slicing/MeshSlicer_Aware.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/Slicing/MeshSlicer_Aware.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Project/AnatomyExplorer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/AnatomyExplorer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/SupportingUI/PopUp/Help.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/SupportingUI/PopUp/Help.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Project/window/WindowPresenter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Project/window/WindowPresenter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/anatomy/BP3D_4.0_obj_99/FMA13358.obj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/anatomy/BP3D_4.0_obj_99/FMA13359.obj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/anatomy/BP3D_4.0_obj_99/FMA22781.obj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/anatomy/BP3D_4.0_obj_99/FMA22782.obj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/anatomy/BP3D_4.0_obj_99/FMA22878.obj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/anatomy/BP3D_4.0_obj_99/FMA22879.obj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/anatomy/BP3D_4.0_obj_99/FMA46759.obj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/anatomy/BP3D_4.0_obj_99/FMA46760.obj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/anatomy/BP3D_4.0_obj_99/FMA46763.obj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/anatomy/BP3D_4.0_obj_99/FMA46764.obj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/anatomy/BP3D_4.0_obj_99/newLatOBJ.obj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/Doc.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/Styles/pdfEngine.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/main.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/Project/guide.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/build/pdf.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/build/pdf.mjs.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/build/pdf.sandbox.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/build/pdf.sandbox.mjs.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/build/pdf.worker.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/build/pdf.worker.mjs.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/78-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/78-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/78-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/78-RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/78-RKSJ-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/78-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/78ms-RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/78ms-RKSJ-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/83pv-RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/90ms-RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/90ms-RKSJ-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/90msp-RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/90msp-RKSJ-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/90pv-RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/90pv-RKSJ-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Add-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Add-RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Add-RKSJ-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Add-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-CNS1-0.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-CNS1-1.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-CNS1-2.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-CNS1-3.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-CNS1-4.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-CNS1-5.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-CNS1-6.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-CNS1-UCS2.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-GB1-0.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-GB1-1.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-GB1-2.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-GB1-3.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-GB1-4.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-GB1-5.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-GB1-UCS2.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-Japan1-0.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-Japan1-1.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-Japan1-2.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-Japan1-3.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-Japan1-4.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-Japan1-5.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-Japan1-6.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-Japan1-UCS2.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-Korea1-0.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-Korea1-1.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-Korea1-2.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Adobe-Korea1-UCS2.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/B5pc-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/B5pc-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/CNS-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/CNS-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/CNS1-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/CNS1-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/CNS2-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/CNS2-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/ETHK-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/ETHK-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/ETen-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/ETen-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/ETenms-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/ETenms-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Ext-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Ext-RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Ext-RKSJ-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Ext-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GB-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GB-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GB-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GB-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GBK-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GBK-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GBK2K-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GBK2K-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GBKp-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GBKp-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GBT-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GBT-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GBT-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GBT-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GBTpc-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GBTpc-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GBpc-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/GBpc-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/HKdla-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/HKdla-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/HKdlb-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/HKdlb-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/HKgccs-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/HKgccs-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/HKm314-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/HKm314-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/HKm471-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/HKm471-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/HKscs-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/HKscs-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Hankaku.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Hiragana.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/KSC-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/KSC-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/KSC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/KSC-Johab-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/KSC-Johab-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/KSC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/KSCms-UHC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/KSCms-UHC-HW-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/KSCms-UHC-HW-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/KSCms-UHC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/KSCpc-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/KSCpc-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Katakana.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/NWP-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/NWP-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/RKSJ-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/Roman.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniCNS-UCS2-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniCNS-UCS2-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniCNS-UTF16-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniCNS-UTF16-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniCNS-UTF32-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniCNS-UTF32-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniCNS-UTF8-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniCNS-UTF8-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniGB-UCS2-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniGB-UCS2-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniGB-UTF16-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniGB-UTF16-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniGB-UTF32-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniGB-UTF32-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniGB-UTF8-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniGB-UTF8-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJIS-UCS2-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJIS-UCS2-HW-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJIS-UCS2-HW-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJIS-UCS2-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJIS-UTF16-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJIS-UTF16-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJIS-UTF32-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJIS-UTF32-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJIS-UTF8-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJIS-UTF8-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJIS2004-UTF16-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJIS2004-UTF16-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJIS2004-UTF32-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJIS2004-UTF32-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJIS2004-UTF8-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJIS2004-UTF8-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJISPro-UCS2-HW-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJISPro-UCS2-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJISPro-UTF8-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJISX0213-UTF32-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJISX0213-UTF32-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJISX02132004-UTF32-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniJISX02132004-UTF32-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniKS-UCS2-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniKS-UCS2-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniKS-UTF16-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniKS-UTF16-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniKS-UTF32-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniKS-UTF32-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniKS-UTF8-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/UniKS-UTF8-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/cmaps/WP-Symbol.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/compressed.tracemonkey-pldi-09.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/debugger.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/debugger.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/iccs/CGATS001Compat-v2-micro.icc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/iccs/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/altText_add.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/altText_disclaimer.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/altText_done.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/altText_spinner.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/altText_warning.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/annotation-check.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/annotation-comment.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/annotation-help.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/annotation-insert.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/annotation-key.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/annotation-newparagraph.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/annotation-noicon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/annotation-note.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/annotation-paperclip.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/annotation-paragraph.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/annotation-pushpin.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/comment-actionsButton.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/comment-closeButton.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/comment-editButton.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/cursor-editorFreeHighlight.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/cursor-editorFreeText.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/cursor-editorInk.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/cursor-editorTextHighlight.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/editor-toolbar-delete.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/editor-toolbar-edit.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/findbarButton-next.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/findbarButton-previous.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/gv-toolbarButton-download.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/loading-icon.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/loading.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/messageBar_closingButton.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/messageBar_info.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/messageBar_warning.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/secondaryToolbarButton-documentProperties.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/secondaryToolbarButton-firstPage.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/secondaryToolbarButton-handTool.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/secondaryToolbarButton-lastPage.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/secondaryToolbarButton-rotateCcw.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/secondaryToolbarButton-rotateCw.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/secondaryToolbarButton-scrollHorizontal.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/secondaryToolbarButton-scrollPage.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/secondaryToolbarButton-scrollVertical.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/secondaryToolbarButton-scrollWrapped.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/secondaryToolbarButton-selectTool.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/secondaryToolbarButton-spreadEven.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/secondaryToolbarButton-spreadNone.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/secondaryToolbarButton-spreadOdd.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-bookmark.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-currentOutlineItem.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-download.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-editorFreeText.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-editorHighlight.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-editorInk.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-editorSignature.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-editorStamp.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-menuArrow.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-openFile.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-pageDown.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-pageUp.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-presentationMode.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-print.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-search.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-secondaryToolbarToggle.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-sidebarToggle.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-viewAttachments.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-viewLayers.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-viewOutline.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-viewThumbnail.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-zoomIn.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/toolbarButton-zoomOut.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/treeitem-collapsed.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/images/treeitem-expanded.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ach/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/af/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/an/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ar/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ast/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/az/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/be/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/bg/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/bn/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/bo/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/br/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/brx/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/bs/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ca/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/cak/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ckb/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/cs/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/cy/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/da/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/de/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/dsb/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/el/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/en-CA/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/en-GB/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/en-US/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/eo/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/es-AR/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/es-CL/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/es-ES/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/es-MX/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/et/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/eu/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/fa/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ff/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/fi/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/fr/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/fur/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/fy-NL/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ga-IE/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/gd/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/gl/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/gn/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/gu-IN/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/he/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/hi-IN/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/hr/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/hsb/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/hu/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/hy-AM/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/hye/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ia/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/id/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/is/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/it/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ja/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ka/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/kab/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/kk/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/km/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/kn/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ko/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/lij/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/lo/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/locale.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/lt/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ltg/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/lv/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/meh/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/mk/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ml/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/mr/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ms/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/my/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/nb-NO/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ne-NP/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/nl/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/nn-NO/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/oc/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/pa-IN/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/pl/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/pt-BR/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/pt-PT/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/rm/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ro/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ru/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/sat/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/sc/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/scn/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/sco/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/si/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/sk/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/skr/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/sl/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/son/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/sq/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/sr/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/sv-SE/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/szl/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ta/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/te/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/tg/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/th/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/tl/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/tr/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/trs/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/uk/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/ur/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/uz/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/vi/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/wo/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/xh/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/zh-CN/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/locale/zh-TW/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/standard_fonts/FoxitDingbats.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/standard_fonts/FoxitFixed.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/standard_fonts/FoxitFixedBold.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/standard_fonts/FoxitFixedBoldItalic.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/standard_fonts/FoxitFixedItalic.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/standard_fonts/FoxitSerif.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/standard_fonts/FoxitSerifBold.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/standard_fonts/FoxitSerifBoldItalic.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/standard_fonts/FoxitSerifItalic.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/standard_fonts/FoxitSymbol.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/standard_fonts/LICENSE_FOXIT" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/standard_fonts/LICENSE_LIBERATION" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/standard_fonts/LiberationSans-Bold.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/standard_fonts/LiberationSans-BoldItalic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/standard_fonts/LiberationSans-Italic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/standard_fonts/LiberationSans-Regular.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/viewer.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/viewer.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/viewer.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/viewer.mjs.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/wasm/LICENSE_OPENJPEG" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/wasm/LICENSE_PDFJS_OPENJPEG" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/wasm/LICENSE_PDFJS_QCMS" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/wasm/LICENSE_QCMS" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/wasm/openjpeg.wasm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/wasm/openjpeg_nowasm_fallback.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.4.54-legacy-dist/web/wasm/qcms_bg.wasm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/build/pdf.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/build/pdf.mjs.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/build/pdf.sandbox.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/build/pdf.sandbox.mjs.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/build/pdf.worker.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/build/pdf.worker.mjs.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/78-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/78-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/78-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/78-RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/78-RKSJ-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/78-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/78ms-RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/78ms-RKSJ-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/83pv-RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/90ms-RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/90ms-RKSJ-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/90msp-RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/90msp-RKSJ-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/90pv-RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/90pv-RKSJ-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Add-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Add-RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Add-RKSJ-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Add-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-CNS1-0.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-CNS1-1.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-CNS1-2.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-CNS1-3.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-CNS1-4.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-CNS1-5.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-CNS1-6.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-CNS1-UCS2.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-GB1-0.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-GB1-1.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-GB1-2.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-GB1-3.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-GB1-4.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-GB1-5.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-GB1-UCS2.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-Japan1-0.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-Japan1-1.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-Japan1-2.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-Japan1-3.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-Japan1-4.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-Japan1-5.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-Japan1-6.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-Japan1-UCS2.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-Korea1-0.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-Korea1-1.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-Korea1-2.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Adobe-Korea1-UCS2.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/B5pc-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/B5pc-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/CNS-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/CNS-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/CNS1-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/CNS1-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/CNS2-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/CNS2-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/ETHK-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/ETHK-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/ETen-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/ETen-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/ETenms-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/ETenms-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Ext-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Ext-RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Ext-RKSJ-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Ext-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GB-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GB-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GB-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GB-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GBK-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GBK-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GBK2K-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GBK2K-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GBKp-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GBKp-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GBT-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GBT-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GBT-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GBT-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GBTpc-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GBTpc-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GBpc-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/GBpc-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/HKdla-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/HKdla-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/HKdlb-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/HKdlb-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/HKgccs-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/HKgccs-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/HKm314-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/HKm314-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/HKm471-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/HKm471-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/HKscs-B5-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/HKscs-B5-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Hankaku.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Hiragana.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/KSC-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/KSC-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/KSC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/KSC-Johab-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/KSC-Johab-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/KSC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/KSCms-UHC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/KSCms-UHC-HW-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/KSCms-UHC-HW-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/KSCms-UHC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/KSCpc-EUC-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/KSCpc-EUC-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Katakana.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/NWP-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/NWP-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/RKSJ-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/RKSJ-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/Roman.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniCNS-UCS2-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniCNS-UCS2-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniCNS-UTF16-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniCNS-UTF16-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniCNS-UTF32-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniCNS-UTF32-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniCNS-UTF8-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniCNS-UTF8-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniGB-UCS2-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniGB-UCS2-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniGB-UTF16-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniGB-UTF16-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniGB-UTF32-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniGB-UTF32-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniGB-UTF8-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniGB-UTF8-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJIS-UCS2-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJIS-UCS2-HW-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJIS-UCS2-HW-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJIS-UCS2-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJIS-UTF16-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJIS-UTF16-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJIS-UTF32-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJIS-UTF32-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJIS-UTF8-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJIS-UTF8-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJIS2004-UTF16-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJIS2004-UTF16-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJIS2004-UTF32-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJIS2004-UTF32-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJIS2004-UTF8-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJIS2004-UTF8-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJISPro-UCS2-HW-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJISPro-UCS2-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJISPro-UTF8-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJISX0213-UTF32-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJISX0213-UTF32-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJISX02132004-UTF32-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniJISX02132004-UTF32-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniKS-UCS2-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniKS-UCS2-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniKS-UTF16-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniKS-UTF16-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniKS-UTF32-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniKS-UTF32-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniKS-UTF8-H.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/UniKS-UTF8-V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/V.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/cmaps/WP-Symbol.bcmap" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/compressed.tracemonkey-pldi-09.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/debugger.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/debugger.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/iccs/CGATS001Compat-v2-micro.icc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/iccs/LICENSE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/altText_add.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/altText_disclaimer.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/altText_done.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/altText_spinner.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/altText_warning.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/annotation-check.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/annotation-comment.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/annotation-help.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/annotation-insert.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/annotation-key.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/annotation-newparagraph.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/annotation-noicon.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/annotation-note.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/annotation-paperclip.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/annotation-paragraph.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/annotation-pushpin.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/checkmark.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/comment-actionsButton.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/comment-closeButton.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/comment-editButton.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/comment-popup-editButton.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/cursor-editorFreeHighlight.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/cursor-editorFreeText.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/cursor-editorInk.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/cursor-editorTextHighlight.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/editor-toolbar-delete.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/editor-toolbar-edit.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/findbarButton-next.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/findbarButton-previous.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/gv-toolbarButton-download.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/loading-icon.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/loading.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/messageBar_closingButton.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/messageBar_info.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/messageBar_warning.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/pages_closeButton.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/pages_selected.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/pages_viewArrow.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/pages_viewButton.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/secondaryToolbarButton-documentProperties.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/secondaryToolbarButton-firstPage.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/secondaryToolbarButton-handTool.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/secondaryToolbarButton-lastPage.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/secondaryToolbarButton-rotateCcw.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/secondaryToolbarButton-rotateCw.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/secondaryToolbarButton-scrollHorizontal.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/secondaryToolbarButton-scrollPage.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/secondaryToolbarButton-scrollVertical.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/secondaryToolbarButton-scrollWrapped.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/secondaryToolbarButton-selectTool.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/secondaryToolbarButton-spreadEven.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/secondaryToolbarButton-spreadNone.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/secondaryToolbarButton-spreadOdd.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-bookmark.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-currentOutlineItem.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-download.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-editorFreeText.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-editorHighlight.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-editorInk.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-editorSignature.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-editorStamp.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-menuArrow.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-openFile.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-pageDown.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-pageUp.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-presentationMode.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-print.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-search.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-secondaryToolbarToggle.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-viewAttachments.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-viewLayers.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-viewOutline.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-viewThumbnail.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-viewsManagerToggle.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-zoomIn.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/toolbarButton-zoomOut.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/treeitem-collapsed.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/images/treeitem-expanded.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ach/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/af/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/an/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ar/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ast/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/az/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/be/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/bg/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/bn/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/bo/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/bqi/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/br/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/brx/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/bs/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ca/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/cak/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ckb/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/cs/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/cy/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/da/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/de/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/dsb/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/el/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/en-CA/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/en-GB/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/en-US/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/eo/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/es-AR/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/es-CL/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/es-ES/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/es-MX/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/et/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/eu/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/fa/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ff/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/fi/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/fr/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/fur/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/fy-NL/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ga-IE/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/gd/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/gl/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/gn/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/gu-IN/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/he/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/hi-IN/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/hr/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/hsb/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/hu/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/hy-AM/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/hye/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ia/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/id/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/is/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/it/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ja/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ka/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/kab/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/kk/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/km/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/kn/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ko/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/lij/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/lo/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/locale.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/lt/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ltg/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/lv/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/meh/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/mk/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ml/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/mr/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ms/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/my/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/nb-NO/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ne-NP/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/nl/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/nn-NO/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/oc/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/pa-IN/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/pl/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/pt-BR/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/pt-PT/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/rm/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ro/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ru/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/sat/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/sc/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/scn/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/sco/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/si/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/sk/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/skr/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/sl/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/son/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/sq/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/sr/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/sv-SE/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/szl/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ta/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/te/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/tg/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/th/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/tl/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/tr/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/trs/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/uk/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/ur/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/uz/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/vi/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/wo/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/xh/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/zh-CN/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/locale/zh-TW/viewer.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/standard_fonts/FoxitDingbats.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/standard_fonts/FoxitFixed.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/standard_fonts/FoxitFixedBold.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/standard_fonts/FoxitFixedBoldItalic.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/standard_fonts/FoxitFixedItalic.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/standard_fonts/FoxitSerif.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/standard_fonts/FoxitSerifBold.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/standard_fonts/FoxitSerifBoldItalic.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/standard_fonts/FoxitSerifItalic.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/standard_fonts/FoxitSymbol.pfb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/standard_fonts/LICENSE_FOXIT" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/standard_fonts/LICENSE_LIBERATION" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/standard_fonts/LiberationSans-Bold.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/standard_fonts/LiberationSans-BoldItalic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/standard_fonts/LiberationSans-Italic.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/standard_fonts/LiberationSans-Regular.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/viewer.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/viewer.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/viewer.mjs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/viewer.mjs.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/wasm/LICENSE_JBIG2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/wasm/LICENSE_OPENJPEG" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/wasm/LICENSE_PDFJS_JBIG2" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/wasm/LICENSE_PDFJS_OPENJPEG" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/wasm/LICENSE_PDFJS_QCMS" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/wasm/LICENSE_QCMS" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/wasm/jbig2.wasm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/wasm/jbig2_nowasm_fallback.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/wasm/openjpeg.wasm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/wasm/openjpeg_nowasm_fallback.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/wasm/qcms_bg.wasm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/wasm/quickjs-eval.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Project/pdfjs-5.7.284-dist/web/wasm/quickjs-eval.wasm" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,10 +917,11 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Record" />
         <option value="JavaFXApplication" />
-        <option value="Interface" />
+        <option value="Enum" />
+        <option value="Record" />
         <option value="FxmlFile" />
+        <option value="Interface" />
         <option value="Class" />
       </list>
     </option>
@@ -62,39 +933,86 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;LuisLuisLuisLuisLuisLuisLuisLuis&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/LuisLuisLuisLuisLuisLuisLuisLuis/AnatomyExploer3D_Private.git&quot;,
+    &quot;accountId&quot;: &quot;19c06fb0-1fce-4beb-8bed-398475cc3869&quot;
+  }
+}</component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
-        <option name="mavenHome" value="Use Maven wrapper" />
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
       </MavenGeneralSettings>
     </option>
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
   <component name="ProjectId" id="2wAeoRwID8dBHmk7oQOFTfATvAd" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.Launch.executor": "Run",
+    "JavaClassFindUsagesOptions.isImplementingClasses": "true",
+    "JavaClassFindUsagesOptions.isSearchForTextOccurrences": "false",
+    "JavaClassFindUsagesOptions.isUsages": "false",
+    "JavaMethodFindUsagesOptions.isImplementingMethods": "true",
     "JavaMethodFindUsagesOptions.isSearchForBaseMethod": "false",
+    "JavaVariableFindUsagesOptions.isSearchForAccessors": "true",
+    "Maven.AnatomyExplorer [-e,clean,package].executor": "Run",
+    "Maven.AnatomyExplorer [-e,clean...].executor": "Run",
+    "Maven.AnatomyExplorer [clean,package,--debug].executor": "Run",
+    "Maven.AnatomyExplorer [clean,package].executor": "Run",
+    "Maven.AnatomyExplorer [clean].executor": "Run",
+    "Maven.AnatomyExplorer [install].executor": "Run",
+    "Maven.AnatomyExplorer [javafx:package@anatomyExplorer].executor": "Run",
+    "Maven.HelloWorldModule [-e,clean,package].executor": "Run",
+    "Maven.HelloWorldModule [clean,package].executor": "Run",
+    "Maven.HelloWorldModule [clean...].executor": "Run",
+    "Maven.HelloWorldModule [compile].executor": "Run",
+    "Maven.HelloWorldModule [exec:exec@jpackage].executor": "Run",
+    "Maven.HelloWorldModule [javafx:jlink@anatomyExplorer...].executor": "Run",
+    "Maven.HelloWorldModule [javafx:jlink@anatomyExplorer].executor": "Run",
+    "Maven.HelloWorldModule [javafx:jpackage].executor": "Run",
+    "Maven.HelloWorldModule [javafx:run@anatomyExplorer...].executor": "Run",
+    "Maven.HelloWorldModule [package].executor": "Run",
+    "Maven.clean run win.executor": "Run",
+    "Maven.clean run.executor": "Run",
+    "Maven.exec jpackage win.executor": "Run",
+    "Maven.exec jpackage.executor": "Run",
+    "Maven.jlink win.executor": "Run",
+    "Maven.jlink.executor": "Run",
+    "Maven.run win.executor": "Run",
+    "Maven.run.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "main",
     "jdk.selected.JAVA_MODULE": "corretto-23",
-    "last_opened_file_path": "C:/Users/dnexu/Documents/GitHub/AnatomyExploer3D_Private/src/main/resources/Project/anatomy",
-    "project.structure.last.edited": "Modules",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/dnexu/Documents/GitHub/AnatomyExploer3D_Private",
+    "project.structure.last.edited": "Libraries",
     "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.43049932",
-    "settings.editor.selected.configurable": "reference.settings.project.maven.runner",
+    "project.structure.side.proportion": "0.50629234",
+    "settings.editor.selected.configurable": "reference.settings.project.maven.importing",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -103,31 +1021,32 @@
       <recent name="Project.command.Remember" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\dnexu\Documents\GitHub\AnatomyExploer3D_Private" />
+      <recent name="C:\Users\dnexu\Documents\GitHub\AnatomyExploer3D_Private\src\main\resources\Project" />
+      <recent name="C:\Users\dnexu\Documents\GitHub\AnatomyExploer3D_Private\src\main\resources\Project\doc" />
       <recent name="C:\Users\dnexu\Documents\GitHub\AnatomyExploer3D_Private\src\main\resources\Project\anatomy" />
-      <recent name="C:\Users\dnexu\Documents\GitHub\AnatomyExploer3D_Private\src\main\resources\Project\FXML" />
-      <recent name="C:\Users\dnexu\Documents\GitHub\AnatomyExploer3D_Private\src\main\java\Project\window" />
-      <recent name="C:\Users\dnexu\Documents\GitHub\TreeEditor_Kopie\src\main\resources\Project\anatomy" />
-      <recent name="C:\Users\dnexu\Documents\GitHub\TreeEditor_Kopie\src\main\resources\Project\anatomy\partof_BP3D_4.0_obj_99" />
+      <recent name="C:\Users\dnexu\Documents\GitHub\AnatomyExploer3D_Private\src\main\resources\Project\icons" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\dnexu\Documents\GitHub\AnatomyExploer3D_Private\src\main\resources\Project\doc\guide\HTML" />
+      <recent name="C:\Users\dnexu\Documents\GitHub\AnatomyExploer3D_Private\src\main\resources\Project\icons" />
       <recent name="C:\Users\dnexu\Documents\GitHub\TreeEditor_Kopie\src\main\resources\Project\FXML" />
       <recent name="C:\Users\dnexu\Documents\GitHub\advanced-java-for-bioinformatics-2025-LuisLuisLuisLuisLuisLuisLuisLuis\src\main\resources\Project\Styles" />
       <recent name="C:\Users\dnexu\Documents\GitHub\advanced-java-for-bioinformatics-2025-LuisLuisLuisLuisLuisLuisLuisLuis\src\main\java\Project\window" />
-      <recent name="C:\Users\dnexu\Documents\GitHub\advanced-java-for-bioinformatics-2025-LuisLuisLuisLuisLuisLuisLuisLuis\src" />
-      <recent name="C:\Users\dnexu\Documents\GitHub\advanced-java-for-bioinformatics-2025-LuisLuisLuisLuisLuisLuisLuisLuis" />
     </key>
     <key name="MoveMembersDialog.RECENTS_KEY">
+      <recent name="Project.window.TreeView.TreeAnalysis.TreeViewEditing.Command.UndoableANodeTreeViewEditor" />
       <recent name="Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="com.example.helloworldmodule" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="Project.window.TreeView.TreeViewEditing.Command" />
       <recent name="Project.window.Slicing" />
       <recent name="Project.window.ThreeDPaneHandling" />
       <recent name="Project.window" />
       <recent name="Project.model" />
-      <recent name="Project.window.TreeView.TreeAnalysis.TreeViewEditing.Command" />
     </key>
   </component>
   <component name="RunAnythingCache">
@@ -145,13 +1064,47 @@
       <command value="mvn dependency:tree" />
       <command value="mvn compile" />
       <command value="mvn -e clean javafx:jlink@anatomyExplorer" />
-      <command value="mvn javafx:jlink@anatomyExplorer" />
       <command value="mvn " />
       <command value="mvn -e javafx:run@anatomyExplorer" />
+      <command value="mvn javafx:jlink@anatomyExplorer" />
+      <command value="mvn javafx:jpackage" />
+      <command value="mvn exec:exec@jpackage" />
+      <command value="mvn javafx:run@anatomyExplorer -Pwindows" />
+      <command value="mvn javafx:jlink@anatomyExplorer -Pwindows" />
+      <command value="mvn clean javafx:jlink@anatomyExplorer -Pwindows" />
+      <command value="mvn -e clean package" />
+      <command value="mvn javafx:package@anatomyExplorer" />
       <command value="mvn -e clean javafx:run@anatomyExplorer" />
+      <command value="mvn install" />
+      <command value="jlink ^   --module-path &quot;%JAVA_HOME%\jmods;C:\Users\dnexu\Documents\JavaFX\openjfx-26.0.1_windows-x64_bin-sdk\javafx-sdk-26.0.1\lib&quot; ^   --add-modules java.base,java.desktop,java.logging,java.sql,javafx.controls,javafx.fxml ^   --output runtime" />
+      <command value="jlink  --module-path &quot;%JAVA_HOME%\jmods;C:\Users\dnexu\Documents\JavaFX\openjfx-26.0.1_windows-x64_bin-sdk\javafx-sdk-26.0.1\lib&quot; --add-modules java.base,java.desktop,java.logging,java.sql,javafx.controls,javafx.fxml --output runtime" />
+      <command value="jlink  --module-path &quot;%JAVA_HOME%\jmods;C:\Users\dnexu\Documents\JavaFX\openjfx-24.0.1_windows-x64_bin-sdk\javafx-sdk-26.0.1\lib&quot; --add-modules java.base,java.desktop,java.logging,java.sql,javafx.controls,javafx.fxml --output runtime" />
+      <command value="mvn clean" />
+      <command value="jlink  --module-path &quot;%JAVA_HOME%\jmods;C:\Users\dnexu\Documents\JavaFX\openjfx-24.0.1_windows-x64_bin-sdk\javafx-sdk-24.0.1\lib&quot; --add-modules java.base,java.desktop,java.logging,java.sql,javafx.controls,javafx.fxml --output runtime" />
+      <command value="javac --version" />
+      <command value="jlink --version" />
+      <command value="java --version" />
+      <command value="jlink  --module-path &quot;%JAVA_HOME%\jmods;C:\Users\dnexu\Documents\JavaFX\openjfx-24.0.1_windows-x64_bin-sdk\javafx-sdk-24.0.1\lib&quot; --add-modules java.base,java.desktop,java.logging,java.sql,javafx.controls,javafx.fxml,javafx.web,javafx.media --output rntm" />
+      <command value="jdeps --module-path &quot;%JAVA_HOME%\jmods;C:\Users\dnexu\Documents\JavaFX\openjfx-24.0.1_windows-x64_bin-sdk\javafx-sdk-24.0.1\lib&quot; --add-modules=javafx.controls --list-deps FlightRecorder.jar" />
+      <command value="jdeps --module-path &quot;C:\Users\dnexu\Documents\JavaFX\openjfx-24.0.1_windows-x64_bin-sdk\javafx-sdk-24.0.1\lib&quot; --add-modules=javafx.controls --list-deps FlightRecorder.jar" />
+      <command value="mvn clean package --debug" />
+      <command value="mvn clean package" />
     </option>
   </component>
-  <component name="RunManager" selected="Maven.run">
+  <component name="RunManager" selected="Maven.run win">
+    <configuration name="Launch" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Project.Launch" />
+      <module name="HelloWorldModule" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Project.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="JetRunConfigurationType">
       <module name="AnatomyViewer3D" />
       <method v="2">
@@ -165,7 +1118,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="clean run" type="MavenRunConfiguration" factoryName="Maven">
+    <configuration name="clean run win" type="MavenRunConfiguration" factoryName="Maven">
       <MavenSettings>
         <option name="myGeneralSettings" />
         <option name="myRunnerSettings" />
@@ -179,8 +1132,10 @@
               <list>
                 <option value="clean" />
                 <option value="javafx:run@anatomyExplorer" />
+                <option value="-Pwindows" />
               </list>
             </option>
+            <option name="multimoduleDir" />
             <option name="pomFileName" />
             <option name="profilesMap">
               <map />
@@ -195,7 +1150,71 @@
       </MavenSettings>
       <method v="2" />
     </configuration>
-    <configuration name="run" type="MavenRunConfiguration" factoryName="Maven">
+    <configuration name="exec jpackage win" type="MavenRunConfiguration" factoryName="Maven">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="cmdOptions" />
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list>
+                <option value="exec:exec@jpackage" />
+                <option value="-Pwindows" />
+              </list>
+            </option>
+            <option name="multimoduleDir" />
+            <option name="pomFileName" />
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="projectsCmdOptionValues">
+              <list />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="$PROJECT_DIR$" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <method v="2" />
+    </configuration>
+    <configuration name="jlink win" type="MavenRunConfiguration" factoryName="Maven">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="cmdOptions" />
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list>
+                <option value="clean" />
+                <option value="--debug" />
+                <option value="javafx:jlink@anatomyExplorer" />
+                <option value="-Pwindows" />
+              </list>
+            </option>
+            <option name="multimoduleDir" />
+            <option name="pomFileName" />
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="projectsCmdOptionValues">
+              <list />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="$PROJECT_DIR$" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <method v="2" />
+    </configuration>
+    <configuration name="run win" type="MavenRunConfiguration" factoryName="Maven">
       <MavenSettings>
         <option name="myGeneralSettings" />
         <option name="myRunnerSettings">
@@ -209,7 +1228,6 @@
               <map />
             </option>
             <option name="passParentEnv" value="true" />
-            <option name="runMavenInBackground" value="true" />
             <option name="skipTests" value="false" />
             <option name="vmOptions" value="-Xmx2048m" />
           </MavenRunnerSettings>
@@ -223,8 +1241,10 @@
             <option name="goals">
               <list>
                 <option value="javafx:run@anatomyExplorer" />
+                <option value="-Pwindows" />
               </list>
             </option>
+            <option name="multimoduleDir" />
             <option name="pomFileName" />
             <option name="profilesMap">
               <map />
@@ -241,6 +1261,7 @@
     </configuration>
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="AnatomyViewer3D" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -251,6 +1272,7 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -262,6 +1284,7 @@
     </configuration>
     <configuration default="true" type="Tox" factoryName="Tox">
       <module name="AnatomyViewer3D" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
@@ -269,10 +1292,12 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="RUN_TOOL" value="" />
       <method v="2" />
     </configuration>
     <configuration default="true" type="ccruntests" factoryName="Run Study Tests">
       <module name="AnatomyViewer3D" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -283,6 +1308,7 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="RUN_TOOL" value="" />
       <option name="SCRIPT_NAME" value="" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -294,14 +1320,22 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Maven.clean run" />
-      <item itemvalue="Maven.run" />
+      <item itemvalue="Application.Launch" />
+      <item itemvalue="Maven.clean run win" />
+      <item itemvalue="Maven.run win" />
+      <item itemvalue="Maven.jlink win" />
+      <item itemvalue="Maven.exec jpackage win" />
     </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Launch" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-WS-252.25557.126" />
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.32098.37" />
       </set>
     </attachedChunks>
   </component>
@@ -314,54 +1348,6 @@
       <option name="presentableId" value="Default" />
       <updated>1745488979873</updated>
       <workItem from="1772618072037" duration="79000" />
-    </task>
-    <task id="LOCAL-00001" summary="HelloWorldModule directory">
-      <option name="closed" value="true" />
-      <created>1745490669215</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1745490669215</updated>
-    </task>
-    <task id="LOCAL-00002" summary="Started A02. completed task 1">
-      <option name="closed" value="true" />
-      <created>1746021429156</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1746021429156</updated>
-    </task>
-    <task id="LOCAL-00003" summary="Create AITreeIntegration.fxml">
-      <option name="closed" value="true" />
-      <created>1771597690344</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1771597690344</updated>
-    </task>
-    <task id="LOCAL-00004" summary="Create TreeAnalysis.fxml">
-      <option name="closed" value="true" />
-      <created>1771600822917</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1771600822917</updated>
-    </task>
-    <task id="LOCAL-00005" summary="Initial commit">
-      <option name="closed" value="true" />
-      <created>1771601536221</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1771601536221</updated>
-    </task>
-    <task id="LOCAL-00006" summary=":kappa:">
-      <option name="closed" value="true" />
-      <created>1771831768531</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1771831768531</updated>
     </task>
     <task id="LOCAL-00007" summary="Import Slicing code from TreeEditor_SlicingTest">
       <option name="closed" value="true" />
@@ -483,7 +1469,279 @@
       <option name="project" value="LOCAL" />
       <updated>1773237087829</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="Some commands that change which MeshViews are drawn but previously did not remember their potentially sliced meshes do so now by using the new RememberHasFXGroupContents.&#10;&#10;Refactor parts of Selection Model to specifically use Type MeshView instead of Node to reduce need for Casting.&#10;&#10;Fixed a bug in SliceCommand where it did not remember potentially sliced Meshes of MeshViews which are completely removed during the slicing, which caused their default Mesh to be drawn upon undo() instead of the potentially previously sliced Mesh. &#10;&#10;EnableDisableBP3DV3Parts has been modified to not need the dictionary anymore to look up file ids because so far in 3.0, fileIDs were always identical to conceptIDs. &#10;&#10;Removed 3.0 OBJ Files from the 4.0 directory so they would not get falsely loaded which would cause bugs.">
+      <option name="closed" value="true" />
+      <created>1773668141042</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1773668141042</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Create ObjParser_V3 which loads OBJ files using deduplication. Unfortunately, with the BP3D DB, this yields no improvement in RAM usage.&#10;&#10;HasFXGroupContents::select now sets CullFace(CullFace.BACK) to fully restore original look.&#10;&#10;MeshView::getId == null now signifies that its mesh is the original one.">
+      <option name="closed" value="true" />
+      <created>1773848780215</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1773848780215</updated>
+    </task>
+    <task id="LOCAL-00024" summary="Create ObjParser_V3 which loads OBJ files using deduplication. Unfortunately, with the BP3D DB, this yields no improvement in RAM usage.&#10;&#10;HasFXGroupContents::select now sets CullFace(CullFace.BACK) to fully restore original look.&#10;&#10;MeshView::getId == null now signifies that its mesh is the original one.">
+      <option name="closed" value="true" />
+      <created>1773849109124</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1773849109124</updated>
+    </task>
+    <task id="LOCAL-00025" summary="Now does not try to load non-OBJ files">
+      <option name="closed" value="true" />
+      <created>1773849366484</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1773849366484</updated>
+    </task>
+    <task id="LOCAL-00026" summary="ObjParser_V3 demands a bool to decide whether to use Normals or not. Disabled by default for HUGE RAM savings.">
+      <option name="closed" value="true" />
+      <created>1773850670002</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1773850670002</updated>
+    </task>
+    <task id="LOCAL-00027" summary="Refactored AnatomyExplorer.java to show() the stage before initializing WindowPresenter so that WindowPresenter can show the loading UI while constructing.&#10;&#10;Created method addMeshViews() to HasFXGroupContents to allow for bulk-adding but more specifically, to allow for creation of MeshViews to be a separate step from adding them to the JFX thread controlled group so that creating MeshViews can be multithreaded.&#10;&#10;loadOBJs() is replaced by loadOBJsMulti() which uses multithreading to speed up loading many OBJs and also shows the loading UI while doing so.&#10;&#10;RememberTreeViewSelection no longer takes ages.&#10;&#10;SelectAllTreeViewCommand no longer takes ages when selecting overlapping subtrees.&#10;&#10;WindowPresenter now provides static method to access its instance. Also, a loading UI now exists which needs to be bound to a Task. Other classes may offer Task to WindowPresenter to be executed while the loading UI shows.">
+      <option name="closed" value="true" />
+      <created>1774255094288</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1774255094289</updated>
+    </task>
+    <task id="LOCAL-00028" summary="Create util methods in FileIDCollector.java rename to FileUtil for collecting fileIDs in a tree. These are used to create a whitelist of files to load when loading files for a model or when estimating size of OBJ files of a model.&#10;&#10;HasFXGroupContentsContainer now skips files that aren't files or OBJ files or are not in a whitelist that is required now.&#10;&#10;LittlePopUp showMsg() now is nicely sized by using default size but being resizable.&#10;&#10;SliceCommand is now multithreaded!&#10;&#10;Size of OBJ of loaded models is now correctly estimated in WindowPresenter. Every model loaded (even default anatomy and BP3D3.0) now contributes to the size for easy tracking of how much is loaded.&#10;&#10;WindowPresenter::manageRAM now frees up RAM until threshold is satisfied when threshold is violated.">
+      <option name="closed" value="true" />
+      <created>1774282721225</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1774282721225</updated>
+    </task>
+    <task id="LOCAL-00029" summary="Cleanup EnableDisableBP3DV3Parts unused code.">
+      <option name="closed" value="true" />
+      <created>1774966583392</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1774966583395</updated>
+    </task>
+    <task id="LOCAL-00030" summary="Create LegendItem, which represents a colored dot next to a description.&#10;&#10;Include Legend in FileIDInfo.fxml and RestructureTreeUI.fxml.&#10;&#10;Made TreeEditing undoable by implementing TreeEditorMockCommand and UndoableANodeTreeViewEditor and fixing TreeRestructuring, TreeViewSetup and some other things.&#10;&#10;TreeViewSetup no longer modifies the tree itself but instead relies on UndoableANodeTreeViewEditor. &#10;&#10;Implement a root logger which can be used by defining the static logger in any class using the class.name.">
+      <option name="closed" value="true" />
+      <created>1774966915167</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1774966915167</updated>
+    </task>
+    <task id="LOCAL-00031" summary="Fixed the bug were deleting the subtree worked on by TreeRestructuring would throw.&#10;Fixed a bug where opening TreeRestructuring in a TreeRestructuring and closing the first one would throw when the second one accepted (because root of the first one is null at that point)">
+      <option name="closed" value="true" />
+      <created>1774969381022</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1774969381022</updated>
+    </task>
+    <task id="LOCAL-00032" summary="WindowPresenter.EnableBP3DV3Command / WindowPresenter.DisableBP3DV3Command now extends WindowPresenter.AddModelCommand / WindowPresenter.RemoveModelCommand instead of having one such. Also, they both expose WindowPresenter.AddModelCommand.getModelIDs to be able to tell when a Model was loaded / removed.&#10;&#10;Implemented mock function WindowPresenter.requestExit that handles orderly closing of the application with the possibility of asking the user to save and such things in the future.">
+      <option name="closed" value="true" />
+      <created>1775021961514</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1775021961514</updated>
+    </task>
+    <task id="LOCAL-00033" summary="LittlePopUp.showScrollableTextPopup now has a header text.&#10;LittlePopUp.showMsg can now display up to three buttons (Yes, No, Cancel).&#10;&#10;WindowPresenter now knows which treeviews have unsaved changes and &#10;- asks to save before closing the app&#10;- asks to save before removing an unsaved model&#10;- shows a little hint in tabs of unsaved models.&#10;&#10;TreeRestructuring.searchForDupIDs has been made more general and static. it is now also used by TreeViewSetup paste().">
+      <option name="closed" value="true" />
+      <created>1775140014667</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1775140014667</updated>
+    </task>
+    <task id="LOCAL-00034" summary="HasFXGroupContentsContainer now communicates if it is loading OBJs. WindowPresenter.RemoveModelCommand listens to this to avoid trying to use RememberHasFXGroupContents.restoreSelection to draw MeshViews that HasFXGroupContents cannot draw yet.&#10;&#10;WindowPresenter.forgetModel now removes only those MeshViews from HasFXGroupContents that aren't part of any other model and that are not drawn. &#10;WindowPresenter.RemoveModelCommand undraws all MeshViews from that model that are not part of any other model.">
+      <option name="closed" value="true" />
+      <created>1775457329355</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1775457329355</updated>
+    </task>
+    <task id="LOCAL-00035" summary="anatomy tree was modified.&#10;&#10;Project.ThreeDPaneHandling was restructured.&#10;&#10;DrawItemIn3DCommand and RemoveObjFrom3DCommand now specifically use HasFXGroupContents instead of SelectionGroup.&#10;&#10;Made SelectionContainer.transformGroupItemToSelectionItem public because i need it and it makes sense not to hide it since the selections of the container and the group are also public.&#10;&#10;LittlePopUp.selectTreeItemDialog allows user to choose a TreeItem from a tree.&#10;&#10;SelectionEffect now handles 3D selection effects. Also, FILL MODE selection effect has been implemented. &#10;&#10;Created Quiz and Question interfaces.">
+      <option name="closed" value="true" />
+      <created>1775713246334</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1775713246335</updated>
+    </task>
+    <task id="LOCAL-00036" summary="Created implementations of the Question interface and an unfinished implementation of the Quiz interface.">
+      <option name="closed" value="true" />
+      <created>1776165329757</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1776165329757</updated>
+    </task>
+    <task id="LOCAL-00037" summary="Create unfinished Implementation of quiz. Works for / can show SimpleMultipleChoiceUIQuestion. Provides Next,Previous buttons and can display a timer.">
+      <option name="closed" value="true" />
+      <created>1776417545207</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1776417545207</updated>
+    </task>
+    <task id="LOCAL-00038" summary="CHANGE TO SelectionGroup and SelectionContainer.SelectionContainer(HasSelection, SelectionGroup). Constructor now calls SelectionGroup.addSelectionContainer as expected. Thus, separate call of the method is not needed anymore (it was before!). This makes more sense from what would be expected from that constructor.">
+      <option name="closed" value="true" />
+      <created>1776872602205</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1776872602205</updated>
+    </task>
+    <task id="LOCAL-00039" summary="change bone color&#10;&#10;Implement LittlePopUp.selectTreeItemDialog to allow user to select TreeItems.&#10;&#10;Create Needs3DAccess to implement Questions that need 3D Access.&#10;Implement ThreeDGroupHandler to encapsulate a 3D Pane and provide access via HasSelection and Containers. &#10;&#10;Now have RANDOMIZED MC and SelectIn3D questions!&#10;&#10;Quiz setup via RandomUIQuizGenerator works aside from time and difficulty. &#10;Also, Ending the quiz is not implemented.&#10;&#10;Refactor RememberFXMeshViewColors to use HasSelection instead of SelectionGroup.">
+      <option name="closed" value="true" />
+      <created>1777379342333</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1777379342333</updated>
+    </task>
+    <task id="LOCAL-00040" summary="HasFXGroupContentsContainer and SliceCommand now don't give their Task to WindowPresenter by default anymore but instead just run it themselves.  setHandleLoadingTask() can be used to override this behaviour by passing a function that accepts the Task.">
+      <option name="closed" value="true" />
+      <created>1777443396339</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1777443396339</updated>
+    </task>
+    <task id="LOCAL-00041" summary="RemoveOBJ button and RemoveFrom3D button now no longer take forever when selection is synced.">
+      <option name="closed" value="true" />
+      <created>1777975138945</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1777975138945</updated>
+    </task>
+    <task id="LOCAL-00042" summary="Create Arrow class&#10;&#10;Create new Question types: SimpleSliceMCQuestion, Vein and artery specific hierarchy questions (implemented by MultipleChoiceQuestion">
+      <option name="closed" value="true" />
+      <created>1777993111061</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1777993111061</updated>
+    </task>
+    <task id="LOCAL-00043" summary="Make Time limit work in Quiz. &#10;Implement Quit button.&#10;Questions with only one correct answer now use radiobutton.&#10;Make blocking UI not dark anymore.">
+      <option name="closed" value="true" />
+      <created>1778055396560</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1778055396560</updated>
+    </task>
+    <task id="LOCAL-00044" summary="In RandomUIQuizGenerator Difficulty has been replaced by directly setting how many things should be drawn in 3D questions">
+      <option name="closed" value="true" />
+      <created>1778060486755</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1778060486755</updated>
+    </task>
+    <task id="LOCAL-00045" summary="Change color for endocrine, integumentary, reproductive.&#10;Fix some wrongly colored nodes.&#10;&#10;Attempting DrawIn3D with no FileIDs in the tree selection will give notification.&#10;&#10; Closing UIQuiz via X now yields UIQuiz.stop.&#10; &#10; RandomUIQuizGenerator now never draws the skin.&#10; &#10; Exceptions thrown in TreeLoader are now caught at the places that create models.">
+      <option name="closed" value="true" />
+      <created>1778150760632</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1778150760635</updated>
+    </task>
+    <task id="LOCAL-00046" summary="PrintFileIDs Menu now prints file list with format used to build tree.&#10;&#10;SearchTree now ignores letter case if regex is not enabled.">
+      <option name="closed" value="true" />
+      <created>1778153793097</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1778153793097</updated>
+    </task>
+    <task id="LOCAL-00047" summary="Refactor Model to not use URL to point at resources anymore but instead a String that can be used via getClass().getResource(...) and adapted the codebase to that.&#10;&#10;All MeshView loading functionality from HasFXGroupContentsContainer has been moved to HasFXGroupContents.&#10;&#10;Modified pom.xml to allow creation of a .msi installer for windows.">
+      <option name="closed" value="true" />
+      <created>1778401798341</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1778401798341</updated>
+    </task>
+    <task id="LOCAL-00048" summary="Added instructions to pom.xml as to how to run app, build runtime image and build installer.">
+      <option name="closed" value="true" />
+      <created>1778402444606</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1778402444606</updated>
+    </task>
+    <task id="LOCAL-00049" summary="Windows installer now also creates a shortcut on the desktop. Added an Icon.&#10;&#10;Size of loaded models (anatomy and BP3D3.0) is now correctly computed in the installed software. Was buggy previously because it relied on creating new File() from the resources.">
+      <option name="closed" value="true" />
+      <created>1778510806558</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1778510806558</updated>
+    </task>
+    <task id="LOCAL-00050" summary="TreeLoader.loadFileList no longer removes .obj suffix from fileIDs -&gt; the fileIDs in the file list contain file extensions.&#10;HasFXGroupContents.addFileDir expects the fileIDs to correspond exactly to file names -&gt; file extensions must be part of the fileIDs. This is ONLY THE CASE for CUSTOM MODELS for now! The main models loaded from the resources via HasFXGroupContents.addResourceLocation still allow the fileIDs to not have the .obj extension.&#10;&#10;FIXED A BUG where ShowInTree would not clear the previous tree selection.">
+      <option name="closed" value="true" />
+      <created>1778657175146</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1778657175147</updated>
+    </task>
+    <task id="LOCAL-00051" summary="TreeRestructuring.searchForDupIDs now displays the result as a nice table">
+      <option name="closed" value="true" />
+      <created>1778667970310</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1778667970310</updated>
+    </task>
+    <task id="LOCAL-00052" summary="TreeRestructuring.searchForDupIDs no longer lists the same item twice when searching for duplicate IDs in the same tree.">
+      <option name="closed" value="true" />
+      <created>1778671294719</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1778671294719</updated>
+    </task>
+    <task id="LOCAL-00053" summary="Blood vessel related MC questions no longer show the target node as one of the possible answers.&#10;&#10;Fixed bug in TreeRestructuring that allowed missing treeItems to be added multiple times.&#10;&#10;AI stuff is now already disabled in FXML.">
+      <option name="closed" value="true" />
+      <created>1779178094236</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1779178094236</updated>
+    </task>
+    <task id="LOCAL-00054" summary="Help &gt; Guide now uses PDF.js to show a PDF guide. For now, CPMB report is used as mock document because for some reason, the unfinished guide pdf and the default PDF of PDF.js cause exceptions when trying to select text with the mouse. (CPMB report does not)">
+      <option name="closed" value="true" />
+      <created>1779178282034</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1779178282034</updated>
+    </task>
+    <task id="LOCAL-00055" summary="MainWindow.fxml: Sync selection button is now below the 3D view instead of below the tree. Makes more sense intuitively bcuz checking the box initially overrides the tree selection with the 3D selection and not the other way round.">
+      <option name="closed" value="true" />
+      <created>1779184419694</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1779184419697</updated>
+    </task>
+    <option name="localTasksCounter" value="56" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -501,27 +1759,42 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="HelloWorldModule directory" />
-    <MESSAGE value="Started A02. completed task 1" />
-    <MESSAGE value="Create AITreeIntegration.fxml" />
-    <MESSAGE value="Create TreeAnalysis.fxml" />
-    <MESSAGE value="Initial commit" />
-    <MESSAGE value=":kappa:" />
-    <MESSAGE value="Import Slicing code from TreeEditor_SlicingTest" />
-    <MESSAGE value="Refactoring:&#10;- move CompareBP3DV to TreeAnalysis&#10;- delete I Stringable" />
-    <MESSAGE value="Create SlicePlaneGroup" />
-    <MESSAGE value="Bind Slicing to Cut Button.&#10;Can Slice all or only selected items.&#10;Button also creates a visible Plane with red and green side, but its not functional and the coloring is buggy.&#10;Created Template SliceCommand" />
-    <MESSAGE value="SlicePlane and contentGroup can now be moved correctly via keys and scrolling. Scrolling moves them together while keys move them independently.&#10;SlicePlane always spawns in the middle of contentGroup.&#10;ResetView not working for SlicePlane yet." />
-    <MESSAGE value="SetupMouseRotate3D &amp; ContinuousRotator:&#10;Make pivot Observable so that ContinuousRotator can observe and always have the correct value.&#10;RememberFXPerspective:&#10;Comment out innergroup transforms because they're superfluous since the transforms of innergroup never change (except when it centers itself after its contents were changed)." />
-    <MESSAGE value="Rest view now correctly works with the SlicePlane as well" />
-    <MESSAGE value="Mame some things final. Delete GroupCameraCommand.java because it was unnecessary." />
-    <MESSAGE value="Slicing now happens at the visualized Plane. &#10;Also increased nearClip of the camera because the SlicingPlane was glitching at long distance" />
-    <MESSAGE value="SlicePlane size now in relationship to size of drawn objects. Size increases as additional objects are added but it does not decrease when they are removed. SlicePlane and contentGroup can no longer move so far that they do not overlap fully anymore." />
-    <MESSAGE value="Add workspace.xml to .gitignore" />
-    <MESSAGE value="Refactor the Model class to&#10;- only hold one root&#10;- have a name&#10;- not need a file list&#10;- hold the directory of its .obj files as URL or File (if file list provided)&#10;Now WindowPresenter receives and holds one model per Tree. Also, the Tabs and TreeViews are created per model as needed.&#10;&#10;User may load custom model (undoable).&#10;User may load the full BP3D 3.0 (undoable).&#10;&#10;Removed unused code from SelectionMediator_Tree_3.&#10;&#10;Set Locale to English.&#10;&#10;Moved all BP3D 4.0 OBJ Files into the part-of dir and renamed it to BP3D_4.0_obj_99.&#10;&#10;Replaced bp3d_v3_parts_v4_format.txt with bp3d_v3_parts_v4_format_cleaned.txt which does not anymore contain entries for FileIDs that have no corresponding .obj file.&#10;Added BP3D 3.0 files but did not commit them.&#10;Relation.loadFromFile() is now safe from lines where split(&quot;\t&quot;) yields length &lt; 4&#10;&#10;SelectAllTreeViewCommand is now substantially faster by using select(i, i..).&#10;&#10;In TreeLoader, every relation whose child already was read is skipped to prevent cycles.&#10;&#10;Removing many Meshes is now substantially faster.&#10;&#10;DrawIn3D now specifically draws the selection of the tree the user is looking at.&#10;&#10;ShowInTree now specifically updates the selection of the tree the user is looking at." />
-    <MESSAGE value="All leaves from BP3D 3.0 that are missing in 4.0 have now been added and marked with a disclaimer. By default they can't be drawn. &#10;Enabling BP3D 3.0 not only loads the full version 3.0 but also makes those leaves with a disclaimer drawable. Is undoable." />
-    <MESSAGE value="MeshSlicer_Aware now requires a BooleanProperty set to false. If any Triangle of the Mesh is modified, the property is set to true.&#10;&#10;SliceCommand is now undoable. HOWEVER other Draw-related commands break it because they re-create default MeshViews without regarding whether they've been modified. &#10;&#10;BUG fixed where another slice box was added to the sliceplane for every child of innergroup that changed while the user was in slice mode." />
-    <option name="LAST_COMMIT_MESSAGE" value="MeshSlicer_Aware now requires a BooleanProperty set to false. If any Triangle of the Mesh is modified, the property is set to true.&#10;&#10;SliceCommand is now undoable. HOWEVER other Draw-related commands break it because they re-create default MeshViews without regarding whether they've been modified. &#10;&#10;BUG fixed where another slice box was added to the sliceplane for every child of innergroup that changed while the user was in slice mode." />
+    <MESSAGE value="Fixed the bug were deleting the subtree worked on by TreeRestructuring would throw.&#10;Fixed a bug where opening TreeRestructuring in a TreeRestructuring and closing the first one would throw when the second one accepted (because root of the first one is null at that point)" />
+    <MESSAGE value="WindowPresenter.EnableBP3DV3Command / WindowPresenter.DisableBP3DV3Command now extends WindowPresenter.AddModelCommand / WindowPresenter.RemoveModelCommand instead of having one such. Also, they both expose WindowPresenter.AddModelCommand.getModelIDs to be able to tell when a Model was loaded / removed.&#10;&#10;Implemented mock function WindowPresenter.requestExit that handles orderly closing of the application with the possibility of asking the user to save and such things in the future." />
+    <MESSAGE value="LittlePopUp.showScrollableTextPopup now has a header text.&#10;LittlePopUp.showMsg can now display up to three buttons (Yes, No, Cancel).&#10;&#10;WindowPresenter now knows which treeviews have unsaved changes and &#10;- asks to save before closing the app&#10;- asks to save before removing an unsaved model&#10;- shows a little hint in tabs of unsaved models.&#10;&#10;TreeRestructuring.searchForDupIDs has been made more general and static. it is now also used by TreeViewSetup paste()." />
+    <MESSAGE value="HasFXGroupContentsContainer now communicates if it is loading OBJs. WindowPresenter.RemoveModelCommand listens to this to avoid trying to use RememberHasFXGroupContents.restoreSelection to draw MeshViews that HasFXGroupContents cannot draw yet.&#10;&#10;WindowPresenter.forgetModel now removes only those MeshViews from HasFXGroupContents that aren't part of any other model and that are not drawn. &#10;WindowPresenter.RemoveModelCommand undraws all MeshViews from that model that are not part of any other model." />
+    <MESSAGE value="anatomy tree was modified.&#10;&#10;Project.ThreeDPaneHandling was restructured.&#10;&#10;DrawItemIn3DCommand and RemoveObjFrom3DCommand now specifically use HasFXGroupContents instead of SelectionGroup.&#10;&#10;Made SelectionContainer.transformGroupItemToSelectionItem public because i need it and it makes sense not to hide it since the selections of the container and the group are also public.&#10;&#10;LittlePopUp.selectTreeItemDialog allows user to choose a TreeItem from a tree.&#10;&#10;SelectionEffect now handles 3D selection effects. Also, FILL MODE selection effect has been implemented. &#10;&#10;Created Quiz and Question interfaces." />
+    <MESSAGE value="Created implementations of the Question interface and an unfinished implementation of the Quiz interface." />
+    <MESSAGE value="Create unfinished Implementation of quiz. Works for / can show SimpleMultipleChoiceUIQuestion. Provides Next,Previous buttons and can display a timer." />
+    <MESSAGE value="CHANGE TO SelectionGroup and SelectionContainer.SelectionContainer(HasSelection, SelectionGroup). Constructor now calls SelectionGroup.addSelectionContainer as expected. Thus, separate call of the method is not needed anymore (it was before!). This makes more sense from what would be expected from that constructor." />
+    <MESSAGE value="change bone color&#10;&#10;Implement LittlePopUp.selectTreeItemDialog to allow user to select TreeItems.&#10;&#10;Create Needs3DAccess to implement Questions that need 3D Access.&#10;Implement ThreeDGroupHandler to encapsulate a 3D Pane and provide access via HasSelection and Containers. &#10;&#10;Now have RANDOMIZED MC and SelectIn3D questions!&#10;&#10;Quiz setup via RandomUIQuizGenerator works aside from time and difficulty. &#10;Also, Ending the quiz is not implemented.&#10;&#10;Refactor RememberFXMeshViewColors to use HasSelection instead of SelectionGroup." />
+    <MESSAGE value="HasFXGroupContentsContainer and SliceCommand now don't give their Task to WindowPresenter by default anymore but instead just run it themselves.  setHandleLoadingTask() can be used to override this behaviour by passing a function that accepts the Task." />
+    <MESSAGE value="RemoveOBJ button and RemoveFrom3D button now no longer take forever when selection is synced." />
+    <MESSAGE value="Create Arrow class&#10;&#10;Create new Question types: SimpleSliceMCQuestion, Vein and artery specific hierarchy questions (implemented by MultipleChoiceQuestion" />
+    <MESSAGE value="Make Time limit work in Quiz. &#10;Implement Quit button.&#10;Questions with only one correct answer now use radiobutton.&#10;Make blocking UI not dark anymore." />
+    <MESSAGE value="In RandomUIQuizGenerator Difficulty has been replaced by directly setting how many things should be drawn in 3D questions" />
+    <MESSAGE value="Change color for endocrine, integumentary, reproductive.&#10;Fix some wrongly colored nodes.&#10;&#10;Attempting DrawIn3D with no FileIDs in the tree selection will give notification.&#10;&#10; Closing UIQuiz via X now yields UIQuiz.stop.&#10; &#10; RandomUIQuizGenerator now never draws the skin.&#10; &#10; Exceptions thrown in TreeLoader are now caught at the places that create models." />
+    <MESSAGE value="PrintFileIDs Menu now prints file list with format used to build tree.&#10;&#10;SearchTree now ignores letter case if regex is not enabled." />
+    <MESSAGE value="Refactor Model to not use URL to point at resources anymore but instead a String that can be used via getClass().getResource(...) and adapted the codebase to that.&#10;&#10;All MeshView loading functionality from HasFXGroupContentsContainer has been moved to HasFXGroupContents.&#10;&#10;Modified pom.xml to allow creation of a .msi installer for windows." />
+    <MESSAGE value="Added instructions to pom.xml as to how to run app, build runtime image and build installer." />
+    <MESSAGE value="Windows installer now also creates a shortcut on the desktop. Added an Icon.&#10;&#10;Size of loaded models (anatomy and BP3D3.0) is now correctly computed in the installed software. Was buggy previously because it relied on creating new File() from the resources." />
+    <MESSAGE value="TreeLoader.loadFileList no longer removes .obj suffix from fileIDs -&gt; the fileIDs in the file list contain file extensions.&#10;HasFXGroupContents.addFileDir expects the fileIDs to correspond exactly to file names -&gt; file extensions must be part of the fileIDs. This is ONLY THE CASE for CUSTOM MODELS for now! The main models loaded from the resources via HasFXGroupContents.addResourceLocation still allow the fileIDs to not have the .obj extension.&#10;&#10;FIXED A BUG where ShowInTree would not clear the previous tree selection." />
+    <MESSAGE value="TreeRestructuring.searchForDupIDs now displays the result as a nice table" />
+    <MESSAGE value="TreeRestructuring.searchForDupIDs no longer lists the same item twice when searching for duplicate IDs in the same tree." />
+    <MESSAGE value="Blood vessel related MC questions no longer show the target node as one of the possible answers.&#10;&#10;Fixed bug in TreeRestructuring that allowed missing treeItems to be added multiple times.&#10;&#10;AI stuff is now already disabled in FXML." />
+    <MESSAGE value="Help &gt; Guide now uses PDF.js to show a PDF guide. For now, CPMB report is used as mock document because for some reason, the unfinished guide pdf and the default PDF of PDF.js cause exceptions when trying to select text with the mouse. (CPMB report does not)" />
+    <MESSAGE value="MainWindow.fxml: Sync selection button is now below the 3D view instead of below the tree. Makes more sense intuitively bcuz checking the box initially overrides the tree selection with the 3D selection and not the other way round." />
+    <option name="LAST_COMMIT_MESSAGE" value="MainWindow.fxml: Sync selection button is now below the 3D view instead of below the tree. Makes more sense intuitively bcuz checking the box initially overrides the tree selection with the 3D selection and not the other way round." />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.ArrayIndexOutOfBoundsException" package="java.lang" />
+          <option name="timeStamp" value="1" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

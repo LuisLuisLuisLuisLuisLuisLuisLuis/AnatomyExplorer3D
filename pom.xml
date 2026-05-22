@@ -4,134 +4,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <!--
-  How to use via command line:
-  run app                                                     -> mvn javafx:run@anatomyExplorer
-  build runtime image (executable via anatomyExploer.bat)     -> mvn clean javafx:jlink@anatomyExplorer
-  build installer from runtime image                          -> mvn exec:exec@jpackage
-  -->
-
-  <!-- use these to configure which installer to build -->
-  <!-- use by appending -Pxxx at the end of the mvn command, where xxx is the name of the profile-->
-
-  <profiles>
-
-    <profile>
-      <id>windows</id>
-
-      <properties>
-        <javafx.platform>win</javafx.platform>
-        <jpackage.type>msi</jpackage.type>
-      </properties>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-
-            <executions>
-              <execution>
-                <id>jpackage</id>
-
-                <configuration>
-                  <arguments combine.children="append">
-
-                    <argument>--win-dir-chooser</argument>
-                    <argument>--win-shortcut</argument>
-                    <argument>--icon</argument>
-                    <argument>${project.build.outputDirectory}/Project/icons/skull.ico</argument>
-
-                  </arguments>
-                </configuration>
-
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>linux</id>
-      <properties>
-        <javafx.platform>linux</javafx.platform>
-        <jpackage.type>deb</jpackage.type>
-      </properties>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-
-            <executions>
-              <execution>
-                <id>jpackage</id>
-
-                <configuration>
-                  <arguments combine.children="append">
-
-                    <argument>--linux-shortcut</argument>
-                    <argument>--icon</argument>
-                    <argument>${project.build.outputDirectory}/Project/icons/skull.png</argument>
-
-                  </arguments>
-                </configuration>
-
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>mac</id>
-      <properties>
-        <javafx.platform>mac</javafx.platform>
-        <jpackage.type>dmg</jpackage.type>
-      </properties>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-
-            <executions>
-              <execution>
-                <id>jpackage</id>
-
-                <configuration>
-                  <arguments combine.children="append">
-
-                    <argument>--icon</argument>
-                    <argument>${project.build.outputDirectory}/Project/icons/skull.icns</argument>
-
-                  </arguments>
-                </configuration>
-
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-  </profiles>
-
-  <groupId>com.example</groupId>
-  <artifactId>HelloWorldModule</artifactId>
+  <groupId>AnatomyExplorer</groupId>
+  <artifactId>AnatomyExplorer</artifactId>
   <version>1</version>
-  <packaging>jlink</packaging>
-  <name>HelloWorldModule</name>
+  <packaging>jar</packaging>
+  <name>AnatomyExplorer</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>5.9.2</junit.version>
     <javafx.version>24</javafx.version>
-    <javafx.platform>linux</javafx.platform>
+    <javafx.platform>win</javafx.platform>
+    <main.class>Project.Launch</main.class>
   </properties>
 
   <dependencies>
@@ -150,7 +34,13 @@
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-media</artifactId>
-      <version>24</version>
+      <version>${javafx.version}</version>
+      <classifier>${javafx.platform}</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-graphics</artifactId>
+      <version>${javafx.version}</version>
       <classifier>${javafx.platform}</classifier>
     </dependency>
     <dependency>
@@ -175,16 +65,16 @@
     </exclusions>
   </dependency>
     <dependency>
-    <groupId>com.github.almasb</groupId>
-    <artifactId>fxgl</artifactId>
-    <version>11.17</version>
-    <exclusions>
-      <exclusion>
-        <groupId>org.openjfx</groupId>
-        <artifactId>*</artifactId>
-      </exclusion>
-    </exclusions>
-  </dependency>
+      <groupId>com.github.almasb</groupId>
+      <artifactId>fxgl</artifactId>
+      <version>11.17</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.openjfx</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
@@ -205,7 +95,14 @@
     <dependency>
       <groupId>org.jetbrains</groupId>
       <artifactId>annotations</artifactId>
-      <version>24.0.0</version><!-- because jlink doesnt like annotations? like imported by fasterxml. -->
+      <version>24.0.0</version>
+    </dependency>
+    <!-- Source: https://mvnrepository.com/artifact/com.dlsc.pdfviewfx/pdfviewfx -->
+    <dependency>
+      <groupId>com.dlsc.pdfviewfx</groupId>
+      <artifactId>pdfviewfx</artifactId>
+      <version>3.4.2</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 
@@ -217,8 +114,45 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.11.0</version>
         <configuration>
-          <release>21</release>
+          <release>24</release>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>${main.class}</mainClass>
+              <addClasspath>true</addClasspath> <!--  VERY IMPORTANT. Otherwise all the dependencies will be in lib/ but
+                                                      the .jar will not know about them and not be able to use them! -> ClassNotFoundDefError-->
+              <classpathPrefix>lib/</classpathPrefix>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <!-- copy runtime dependencies to target/lib -->
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.6.1</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              <includeScope>runtime</includeScope>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>
@@ -230,36 +164,21 @@
             <id>anatomyExplorer</id>
             <goals>
               <goal>run</goal>
-              <goal>jlink</goal>
             </goals>
             <configuration>
-             <options>
-               <option>-Xmx4g</option>  <!-- use up to 4G RAM-->
-             </options>
+              <options>
+                <option>-Xmx4g</option>  <!-- use up to 4G RAM-->
+              </options>
               <mainClass>Project.AnatomyExplorer</mainClass>
-              <launcher>anatomyExplorer</launcher>
-              <stripDebug>true</stripDebug>
-              <compress>2</compress>
-              <noHeaderFiles>true</noHeaderFiles>
-              <noManPages>true</noManPages>
             </configuration>
           </execution>
         </executions>
       </plugin>
 
       <plugin>
-        <artifactId>maven-jlink-plugin</artifactId>
-        <version>3.2.0</version>
-        <extensions>true</extensions>
-        <configuration>
-          <goal>jlink:jlink</goal>
-        </configuration>
-      </plugin>
-
-      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.3.0</version>
 
         <executions>
           <execution>
@@ -273,23 +192,39 @@
               <executable>${java.home}/bin/jpackage</executable>
 
               <arguments>
-                <!-- input is the jlink image -->
-                <argument>--runtime-image</argument>
-                <argument>${project.build.directory}/image</argument>
 
-                <!-- Where to put the installer / result -->
-                <argument>--dest</argument>
-                <argument>${project.build.directory}</argument>
+                <argument>--type</argument>
+                <argument>msi</argument>
 
-                <argument>--module</argument>
-                <argument>com.anatomyExplorer/Project.AnatomyExplorer</argument>
-
-                <!-- Application name -->
                 <argument>--name</argument>
                 <argument>AnatomyExplorer</argument>
 
-                <argument>--type</argument>
-                <argument>${jpackage.type}</argument>
+                <argument>--input</argument>
+                <argument>${project.build.directory}</argument>
+
+                <argument>--dest</argument>
+                <argument>${project.build.directory}/dist</argument>
+
+                <argument>--main-jar</argument>
+                <argument>${project.build.finalName}.jar</argument>
+
+                <argument>--java-options</argument>
+                <argument>-Xmx4g</argument>
+
+                <!-- optional but useful -->
+                <argument>--win-shortcut</argument>
+                <argument>--win-menu</argument>
+
+                <argument>--win-console</argument>
+
+                <argument>--java-options</argument>
+                <argument>-Dprism.verbose=true</argument>
+
+                <argument>--java-options</argument>
+                <argument>-XshowSettings:properties</argument>
+
+                <argument>--java-options</argument>
+                <argument>--enable-native-access=javafx.graphics</argument>
 
               </arguments>
             </configuration>

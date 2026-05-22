@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!--
+  How to use via command line:
+  run app                                                     -> mvn javafx:run@anatomyExplorer
+  build runtime image (executable via anatomyExploer.bat)     -> mvn clean javafx:jlink@anatomyExplorer
+  build installer from runtime image                          -> mvn exec:exec@jpackage
+  -->
+
+  <!-- use these to configure which installer to build -->
+  <!-- use by appending -Pxxx at the end of the mvn command, where xxx is the name of the profile-->
+
+  <profiles>
+
+    <profile>
+      <id>windows</id>
+
+      <properties>
+        <javafx.platform>win</javafx.platform>
+        <jpackage.type>msi</jpackage.type>
+      </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+
+            <executions>
+              <execution>
+                <id>jpackage</id>
+
+                <configuration>
+                  <arguments combine.children="append">
+
+                    <argument>--win-dir-chooser</argument>
+                    <argument>--win-shortcut</argument>
+                    <argument>--icon</argument>
+                    <argument>${project.build.outputDirectory}/Project/icons/skull.ico</argument>
+
+                  </arguments>
+                </configuration>
+
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>linux</id>
+      <properties>
+        <javafx.platform>linux</javafx.platform>
+        <jpackage.type>deb</jpackage.type>
+      </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+
+            <executions>
+              <execution>
+                <id>jpackage</id>
+
+                <configuration>
+                  <arguments combine.children="append">
+
+                    <argument>--linux-shortcut</argument>
+                    <argument>--icon</argument>
+                    <argument>${project.build.outputDirectory}/Project/icons/skull.png</argument>
+
+                  </arguments>
+                </configuration>
+
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>mac</id>
+      <properties>
+        <javafx.platform>mac</javafx.platform>
+        <jpackage.type>dmg</jpackage.type>
+      </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+
+            <executions>
+              <execution>
+                <id>jpackage</id>
+
+                <configuration>
+                  <arguments combine.children="append">
+
+                    <argument>--icon</argument>
+                    <argument>${project.build.outputDirectory}/Project/icons/skull.icns</argument>
+
+                  </arguments>
+                </configuration>
+
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+  </profiles>
+
+  <groupId>com.anatomyExplorer</groupId>
+  <artifactId>AnatomyExplorer</artifactId>
+  <version>1</version>
+<!--  <packaging>jlink</packaging>-->
+  <packaging>jar</packaging>
+  <name>AnatomyExplorer</name>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <junit.version>5.9.2</junit.version>
+    <javafx.version>24</javafx.version>
+    <javafx.platform>win</javafx.platform>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>${javafx.version}</version>
+      <classifier>${javafx.platform}</classifier> <!--only platform specific jars-->
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-fxml</artifactId>
+      <version>${javafx.version}</version>
+      <classifier>${javafx.platform}</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-media</artifactId>
+      <version>24</version>
+      <classifier>${javafx.platform}</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-web</artifactId>
+      <version>${javafx.version}</version>
+      <classifier>${javafx.platform}</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.controlsfx</groupId>
+      <artifactId>controlsfx</artifactId>
+      <version>11.1.2</version>
+    </dependency><dependency>
+    <groupId>com.dlsc.formsfx</groupId>
+    <artifactId>formsfx-core</artifactId>
+    <version>11.6.0</version>
+    <exclusions>
+      <exclusion>
+        <groupId>org.openjfx</groupId>
+        <artifactId>*</artifactId>
+      </exclusion>
+    </exclusions>
+  </dependency>
+    <dependency>
+    <groupId>com.github.almasb</groupId>
+    <artifactId>fxgl</artifactId>
+    <version>11.17</version>
+    <exclusions>
+      <exclusion>
+        <groupId>org.openjfx</groupId>
+        <artifactId>*</artifactId>
+      </exclusion>
+    </exclusions>
+  </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.17.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jetbrains</groupId>
+      <artifactId>annotations</artifactId>
+      <version>24.0.0</version><!-- because jlink doesnt like annotations? like imported by fasterxml. -->
+    </dependency>
+    <!-- Source: https://mvnrepository.com/artifact/com.dlsc.pdfviewfx/pdfviewfx -->
+    <dependency>
+      <groupId>com.dlsc.pdfviewfx</groupId>
+      <artifactId>pdfviewfx</artifactId>
+      <version>3.4.2</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+          <release>21</release>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-maven-plugin</artifactId>
+        <version>0.0.8</version>
+        <executions>
+          <execution>
+            <id>anatomyExplorer</id>
+            <goals>
+              <goal>run</goal>
+<!--              <goal>jlink</goal>-->
+            </goals>
+            <configuration>
+             <options>
+               <option>-Xmx4g</option>  <!-- use up to 4G RAM-->
+             </options>
+              <mainClass>Project.AnatomyExplorer</mainClass>
+<!--              <launcher>anatomyExplorer</launcher>-->
+<!--              <stripDebug>true</stripDebug>-->
+<!--              <compress>2</compress>-->
+<!--              <noHeaderFiles>true</noHeaderFiles>-->
+<!--              <noManPages>true</noManPages>-->
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+<!--      <plugin>-->
+<!--        <artifactId>maven-jlink-plugin</artifactId>-->
+<!--        <version>3.2.0</version>-->
+<!--        <extensions>true</extensions>-->
+<!--        <configuration>-->
+<!--          <goal>jlink:jlink</goal>-->
+<!--        </configuration>-->
+<!--      </plugin>-->
+
+<!--      <plugin>-->
+<!--        <groupId>org.codehaus.mojo</groupId>-->
+<!--        <artifactId>exec-maven-plugin</artifactId>-->
+<!--        <version>3.1.0</version>-->
+
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <id>jpackage</id>-->
+<!--            <phase>package</phase>-->
+<!--            <goals>-->
+<!--              <goal>exec</goal>-->
+<!--            </goals>-->
+
+<!--            <configuration>-->
+<!--              <executable>${java.home}/bin/jpackage</executable>-->
+
+<!--&lt;!&ndash;              <arguments>&ndash;&gt;-->
+<!--                &lt;!&ndash; input is the jlink image &ndash;&gt;-->
+<!--&lt;!&ndash;                <argument>&#45;&#45;runtime-image</argument>&ndash;&gt;-->
+<!--&lt;!&ndash;                <argument>${project.build.directory}/image</argument>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                &lt;!&ndash; Where to put the installer / result &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                <argument>&#45;&#45;dest</argument>&ndash;&gt;-->
+<!--&lt;!&ndash;                <argument>${project.build.directory}</argument>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                <argument>&#45;&#45;module</argument>&ndash;&gt;-->
+<!--&lt;!&ndash;                <argument>com.anatomyExplorer/Project.AnatomyExplorer</argument>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                &lt;!&ndash; Application name &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                <argument>&#45;&#45;name</argument>&ndash;&gt;-->
+<!--&lt;!&ndash;                <argument>AnatomyExplorer</argument>&ndash;&gt;-->
+
+<!--&lt;!&ndash;                <argument>&#45;&#45;type</argument>&ndash;&gt;-->
+<!--&lt;!&ndash;                <argument>${jpackage.type}</argument>&ndash;&gt;-->
+
+
+
+<!--&lt;!&ndash;              </arguments>&ndash;&gt;-->
+<!--              <arguments>-->
+
+<!--                <argument>&#45;&#45;input</argument>-->
+<!--                <argument>${project.build.directory}</argument>-->
+
+<!--                <argument>&#45;&#45;main-jar</argument>-->
+<!--                <argument>AnatomyExplorer-1.jar</argument>-->
+
+<!--                <argument>&#45;&#45;main-class</argument>-->
+<!--                <argument>Project.AnatomyExplorer</argument>-->
+
+<!--                <argument>&#45;&#45;dest</argument>-->
+<!--                <argument>${project.build.directory}</argument>-->
+
+<!--                <argument>&#45;&#45;name</argument>-->
+<!--                <argument>AnatomyExplorer</argument>-->
+
+<!--                <argument>&#45;&#45;type</argument>-->
+<!--                <argument>msi</argument>-->
+
+<!--              </arguments>-->
+<!--            </configuration>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--      </plugin>-->
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.5.0</version>
+
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+
+            <configuration>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>
+                    Project.AnatomyExplorer
+                  </mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.3.0</version>
+
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>
+                Project.AnatomyExplorer
+              </mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+</project>

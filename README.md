@@ -6,7 +6,7 @@ This program allows you to explore human anatomy in 3D:
 - Select what you want to see and hit ``Draw in 3D``
 - Use coloring and animations for better understanding
 
-For more details, also see [Doc.html](src/main/resources/Project/Doc.html), which you can also find
+For more details, also see [Doc.html](Project/doc/guide/HTML/main.html), which you can also find
 in the app via ``About > Guide``, or watch the short [video](src/main/resources/Project/video.mp4).
 
 
