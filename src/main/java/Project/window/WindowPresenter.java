@@ -1528,6 +1528,10 @@ public class WindowPresenter {
         }
         logger.log(Level.CONFIG, "size of loaded models: " + sizeOfLoadedModels);
 
+        hasInnerGroupContents.getIsLoadingOBJs().addListener((_, _, nw) -> {
+            if (nw == false) addMeshviewTooltips(model);
+        });
+
         this.isModelUnsaved.put(model.getName(), new SimpleBooleanProperty(false));
         Circle circle = new Circle(3,Color.GRAY);
         this.isModelUnsaved.get(model.getName()).addListener((observable, oldValue, newValue) -> {
@@ -1535,6 +1539,23 @@ public class WindowPresenter {
             else tab.setGraphic(null);
         });
 
+    }
+
+    /**
+     * To every MeshView in hasInnerGroupContents, adds a Tooltip with the
+     * @param model
+     */
+    private void addMeshviewTooltips(Model model) {
+        TreeAnalysisUtils.applyRec(
+                model.getRoot(),
+                node -> {
+                    for (String fileID : node.fileIds()) {
+                        MeshView meshView = hasInnerGroupContents.getMeshViewWithID(fileID);
+                        if (meshView == null) continue;
+                        Tooltip.install(meshView, new Tooltip(node.getName() + " (ID=" + node.conceptId() + ")" + " [File=" + fileID + "]"));
+                    }
+                    return null;
+                });
     }
 
     /**

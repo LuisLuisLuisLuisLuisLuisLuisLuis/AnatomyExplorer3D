@@ -103,6 +103,11 @@ public class TreeAnalysisUtils {
         for (TreeItem<T> child : root.getChildren()) applyRec(child, fun);
     }
 
+    public static <T,O> void applyRec(ANode root, Function<ANode, O> fun) {
+        fun.apply(root);
+        for (ANode child : root.getChildren()) applyRec(child, fun);
+    }
+
     /**
      * Find and return the ANode with the specified name in the ANode tree with the given root or null if not present.
      */
