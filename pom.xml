@@ -18,6 +18,123 @@
     <main.class>Project.Launch</main.class>
   </properties>
 
+  <!--
+How to use via command line:
+run app via  mvn javafx:run@anatomyExplorer
+build installer´via  mvn clean package
+-->
+
+  <!-- use these to configure which installer to build -->
+  <!-- use by appending -Pxxx at the end of the mvn command, where xxx is the name of the profile-->
+
+  <profiles>
+
+    <profile>
+      <id>windows</id>
+
+      <properties>
+        <javafx.platform>win</javafx.platform>
+        <jpackage.type>msi</jpackage.type>
+      </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+
+            <executions>
+              <execution>
+                <id>jpackage</id>
+
+                <configuration>
+                  <arguments combine.children="append">
+
+                    <argument>--win-dir-chooser</argument>
+                    <argument>--win-shortcut</argument>
+                    <argument>--icon</argument>
+                    <argument>${project.build.outputDirectory}/Project/icons/skull.ico</argument>
+
+                  </arguments>
+                </configuration>
+
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>linux</id>
+      <properties>
+        <javafx.platform>linux</javafx.platform>
+        <jpackage.type>deb</jpackage.type>
+      </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+
+            <executions>
+              <execution>
+                <id>jpackage</id>
+
+                <configuration>
+                  <arguments combine.children="append">
+
+                    <argument>--linux-shortcut</argument>
+                    <argument>--icon</argument>
+                    <argument>${project.build.outputDirectory}/Project/icons/skull.png</argument>
+
+                  </arguments>
+                </configuration>
+
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>mac</id>
+      <properties>
+        <javafx.platform>mac</javafx.platform>
+        <jpackage.type>dmg</jpackage.type>
+      </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+
+            <executions>
+              <execution>
+                <id>jpackage</id>
+
+                <configuration>
+                  <arguments combine.children="append">
+
+                    <argument>--icon</argument>
+                    <argument>${project.build.outputDirectory}/Project/icons/skull.icns</argument>
+
+                  </arguments>
+                </configuration>
+
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+  </profiles>
+
+
   <dependencies>
     <dependency>
       <groupId>org.openjfx</groupId>
@@ -211,7 +328,6 @@
                 <argument>--java-options</argument>
                 <argument>-Xmx4g</argument>
 
-                <!-- optional but useful -->
                 <argument>--win-shortcut</argument>
                 <argument>--win-menu</argument>
 

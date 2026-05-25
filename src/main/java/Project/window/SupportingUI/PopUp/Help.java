@@ -22,8 +22,11 @@ public class Help {
         return webView;
     }
 
+    /**
+     * Shows a Popup with user guide.
+     */
     public static void showGuide() {
-        PDFView pdfView = new PDFView();    //doesnt get any easier <3
+        PDFView pdfView = new PDFView();    //doesnt get any easier
         pdfView.load(Help.class.getResourceAsStream("/Project/guide.pdf"));
         LittlePopUp.showPopup(pdfView, "Guide", 1000, 500);
 
