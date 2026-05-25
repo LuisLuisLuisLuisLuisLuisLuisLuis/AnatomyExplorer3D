@@ -473,6 +473,7 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
 
         long startTime = System.nanoTime();
         String anatomicalGroup = findAnatomyGroupForID(id);
+
         //fileGroupingScheme.groupToColor returns hex values of the color (String) which must be converted to Color using Color.web(string)
         MeshView result = OpenOBJ.objInputStreamToMeshViews(inputStream, id, getColorForGroup(anatomicalGroup));
         long endTime = System.nanoTime();
