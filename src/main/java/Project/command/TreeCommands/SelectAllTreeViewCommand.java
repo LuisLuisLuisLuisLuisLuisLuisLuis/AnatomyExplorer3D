@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class SelectAllTreeViewCommand extends TreeCommand {
     private RememberTreeViewSelection rememberTreeViewSelection;
@@ -76,7 +77,7 @@ public class SelectAllTreeViewCommand extends TreeCommand {
         }
     }
 
-    public static void bulkSelect(@NotNull HashSet<TreeItem<ANode>> itemsToSelect, @NotNull TreeView<ANode> treeView) {
+    public static void bulkSelect(@NotNull Set<TreeItem<ANode>> itemsToSelect, @NotNull TreeView<ANode> treeView) {
         if (itemsToSelect.isEmpty()) return;
         for (TreeItem<ANode> treeItem : itemsToSelect) treeItem.setExpanded(true);
         if (itemsToSelect.size() == 1) {

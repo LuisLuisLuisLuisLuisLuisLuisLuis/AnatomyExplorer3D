@@ -1,5 +1,6 @@
 package Project.window.TreeView.TreeViewEditing;
 
+import Project.command.TreeCommands.SelectAllTreeViewCommand;
 import Project.model.ANode;
 import Project.model.TreeExport;
 import Project.window.SupportingUI.PopUp.LegendItem;
@@ -97,7 +98,7 @@ public class TreeViewSetup {
     public void setCellFactory(TreeView<ANode> treeView, UndoableANodeTreeViewEditor _treeViewEditor, ANode modelRoot, boolean allowEditing) {
         treeView.setEditable(allowEditing);
         _treeViewEditor.addTreeView(treeView);
-        treeView.setCellFactory(tv -> {
+        treeView.setCellFactory(_ -> {
             return new TextFieldTreeCell<ANode>(
                     new StringConverter<ANode>() {
                         @Override
@@ -123,11 +124,11 @@ public class TreeViewSetup {
                     } else {
                         //show menu on right click
                         setText(item.toString());
+                        MenuItem selectBelow = new MenuItem("Select below");
                         MenuItem cut = new MenuItem("Cut");
                         MenuItem paste = new MenuItem("Paste");
                         MenuItem rename = new MenuItem("Rename");
                         MenuItem delete = new MenuItem("Delete");
-//                        MenuItem restore = new MenuItem("Restore");
                         MenuItem extract = new MenuItem("Extract children");
                         MenuItem create = new MenuItem("Create");
                         MenuItem fileIDInfo = new MenuItem("FileID Info");
@@ -137,6 +138,7 @@ public class TreeViewSetup {
                         MenuItem moveLRBehind1LastWord = new MenuItem("Move L/R behind n'th last word");
                         MenuItem restrucTree = new MenuItem("Restructure Subtree");
 
+                        selectBelow.setOnAction(e -> SelectAllTreeViewCommand.bulkSelect(TreeAnalysisUtils.accumulateAllTreeItemsBelow(this.getTreeItem()), treeView));
                         cut.setOnAction(e -> cut(this.getTreeItem()));
                         paste.setOnAction(e -> paste(this.getTreeItem(), this.getTreeView().getRoot()));
                         paste.disableProperty().bind(treeViewEditor1.canPaste().not());
@@ -169,10 +171,10 @@ public class TreeViewSetup {
                             treeViewEditor1.restructureTree(this.getTreeItem(), this.getTreeView().getId());
                         });
                         if (allowEditing) {
-                            if (getTreeItem().getParent() != null) setContextMenu(new ContextMenu(cut, paste, delete, rename, create, extract, restrucTree, fileIDInfo, print, printF));
-                            else setContextMenu(new ContextMenu(paste, rename, create, restrucTree, fileIDInfo, print, printF));
+                            if (getTreeItem().getParent() != null) setContextMenu(new ContextMenu(selectBelow, cut, paste, delete, rename, create, extract, restrucTree, fileIDInfo, print, printF));
+                            else setContextMenu(new ContextMenu(selectBelow, paste, rename, create, restrucTree, fileIDInfo, print, printF));
                         } else {
-                            setContextMenu(new ContextMenu(fileIDInfo, print, printF));
+                            setContextMenu(new ContextMenu(selectBelow, fileIDInfo, print, printF));
                         }
                     }
                 }
@@ -393,15 +395,6 @@ public class TreeViewSetup {
         });
 
     }
-
-
-//    public void restore() {
-//        if (!treeViewEditor1.canRestore().get()) return;
-//        TreeItem<ANode> restored = treeViewEditor1.restore();
-////        addFileIDsToParentsRec(restored.getParent(), new LinkedList<>());   //add the fileIDs to all parents
-//        restored.getParent().getValue().children().add(restored.getValue());
-//        runOnANodeFileIDsModified();
-//    }
 
 
     /**

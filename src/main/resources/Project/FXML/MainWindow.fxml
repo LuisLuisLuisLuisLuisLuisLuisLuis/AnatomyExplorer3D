@@ -43,8 +43,8 @@
                                       <items>
                                         <Button fx:id="treeExpandButton" mnemonicParsing="false" text="Expand" />
                                           <Button fx:id="treeCollapseButton" mnemonicParsing="false" text="Collapse" />
-                                          <Button fx:id="treeSelectAllButton" mnemonicParsing="false" text="Select All of" />
-                                          <Button fx:id="treeSelectNoneButton" mnemonicParsing="false" text="Select None" />
+                                          <Button fx:id="treeSelectAllButton" mnemonicParsing="false" text="Select below" />
+                                          <Button fx:id="treeSelectNoneButton" mnemonicParsing="false" text="Select none" />
                                           <Button fx:id="infoButton" disable="true" mnemonicParsing="false" text="Leaf Info" visible="false" />    <!-- disabled for now because I don't see the use of it -->
                                       </items>
                                     </ToolBar>

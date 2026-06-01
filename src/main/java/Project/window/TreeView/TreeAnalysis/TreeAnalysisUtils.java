@@ -200,8 +200,8 @@ public class TreeAnalysisUtils {
         for (TreeItem<ANode> child : root.getChildren()) accumulateAllTreeItemsBelow(child, dump);
     }
 
-    public static Collection<TreeItem<ANode>> accumulateAllTreeItemsBelow(TreeItem<ANode> root) {
-        LinkedList<TreeItem<ANode>> result = new LinkedList<>();
+    public static Set<TreeItem<ANode>> accumulateAllTreeItemsBelow(TreeItem<ANode> root) {
+        HashSet<TreeItem<ANode>> result = new HashSet<>();
         accumulateAllTreeItemsBelow(root, result);
         return result;
     }
