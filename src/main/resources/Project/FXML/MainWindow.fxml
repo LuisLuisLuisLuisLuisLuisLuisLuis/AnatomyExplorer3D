@@ -188,13 +188,13 @@
                                           <Button fx:id="moveLeftButton" mnemonicParsing="false" text="←" />
                                           <Button fx:id="moveRightButton" mnemonicParsing="false" text="→" />
                                           <Separator orientation="VERTICAL" />
-                                          <Button fx:id="tiltAntiClButton" mnemonicParsing="false" text="⤻" />
-                                          <Button fx:id="tiltClockwButton" mnemonicParsing="false" text="⤺" />
+                                          <Button fx:id="tiltAntiClButton" mnemonicParsing="false" text="↶" />
+                                          <Button fx:id="tiltClockwButton" mnemonicParsing="false" text="↷" />
                                           <Separator orientation="VERTICAL" />
                                           <Button fx:id="rotLeftButton" mnemonicParsing="false" text="↩" />
                                           <Button fx:id="rotRightButton" mnemonicParsing="false" text="↪" />
-                                          <Button fx:id="rotUpButton" mnemonicParsing="false" text="↶" />
-                                          <Button fx:id="rotDownButton" mnemonicParsing="false" text="↷" />
+                                          <Button fx:id="rotUpButton" mnemonicParsing="false" text="↟" />
+                                          <Button fx:id="rotDownButton" mnemonicParsing="false" text="↡" />
                                        </items>
                                     </ToolBar>
                                  </top>

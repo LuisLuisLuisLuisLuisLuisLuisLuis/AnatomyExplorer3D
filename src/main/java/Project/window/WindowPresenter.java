@@ -597,7 +597,7 @@ public class WindowPresenter {
 //            for (String item : new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionGroup.getSelection()))) {  //need to create this again to not concurrently modify doDraw
             HashSet<String> toDraw = new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()));
             if (toDraw.isEmpty()) {
-                controller.getTreeInfoLabel().setText(" No 3D Files in selection");
+                controller.getTreeInfoLabel().setText(" No 3D Files in selection!");
                 treeInfoTimeline.playFromStart();
                 return;
             }
@@ -1186,7 +1186,7 @@ public class WindowPresenter {
         });
         //-------------------------------------------------------------------
 
-        hasInnerGroupContents.getSelection().addListener((ListChangeListener<? super Node>) i -> controller.getBotLabelDrawCount().setText(hasInnerGroupContents.getSelection().size() + " items drawn."));
+        hasInnerGroupContents.getSelection().addListener((ListChangeListener<? super Node>) i -> controller.getBotLabelDrawCount().setText(hasInnerGroupContents.getSelection().size() + " items drawn. "));
 
 
 
@@ -1196,7 +1196,7 @@ public class WindowPresenter {
 
     //updates the label in the bottom left
     private void updateTreeBotLabel() {
-        controller.getBotLabel_Tree().setText(getSelectedTreeView().getSelectionModel().getSelectedItems().size() + " items selected");
+        controller.getBotLabel_Tree().setText(getSelectedTreeView().getSelectionModel().getSelectedItems().size() + " items selected.");
     }
 
     private void update3DBotLabel(String text) {

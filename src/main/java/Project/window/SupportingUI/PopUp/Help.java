@@ -13,13 +13,16 @@ public class Help {
 
     private static final Logger logger = Logger.getLogger(Help.class.getName());
 
-    public static WebView getHelp() {
+    /**
+     * Shows the HTML version of the guide. MALFORMATTED.
+     */
+    public static void getHelp() {
         WebView webView = new WebView();
         WebEngine webEngine = webView.getEngine();
         URL doc = Help.class.getResource("/Project/doc/guide/HTML/main.html");
         if (doc != null) webEngine.load(doc.toExternalForm());
         else logger.log(Level.SEVERE, "Help doc is null");
-        return webView;
+        LittlePopUp.showPopup(webView, "Guide", 1000, 500);
     }
 
     /**
