@@ -1,0 +1,26 @@
+name: Make macOS Installer
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '24'
+
+      - name: Build
+        run: mvn package -Pmac
+
+      - name: Upload Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-installer
+          path: target/dist/*
