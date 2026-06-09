@@ -14,7 +14,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>5.9.2</junit.version>
     <javafx.version>24</javafx.version>
-    <javafx.platform>win</javafx.platform>
     <main.class>Project.Launch</main.class>
   </properties>
 
@@ -50,8 +49,16 @@ build installer´via  mvn clean package
                 <configuration>
                   <arguments combine.children="append">
 
-                    <argument>--win-dir-chooser</argument>
+                    <argument>--type</argument>
+                    <argument>msi</argument>
+
                     <argument>--win-shortcut</argument>
+                    <argument>--win-menu</argument>
+
+                    <argument>--win-console</argument>
+
+                    <argument>--win-dir-chooser</argument>
+
                     <argument>--icon</argument>
                     <argument>${project.build.outputDirectory}/Project/icons/skull.ico</argument>
 
@@ -85,9 +92,14 @@ build installer´via  mvn clean package
                 <configuration>
                   <arguments combine.children="append">
 
-                    <argument>--linux-shortcut</argument>
-                    <argument>--icon</argument>
-                    <argument>${project.build.outputDirectory}/Project/icons/skull.png</argument>
+                    <argument>--type</argument>
+                    <argument>deb</argument>
+
+                    <!--                    causes error when trying to install on WSL via sudo apt install bcuz WSL doesnt have a desktop.-->
+<!--                    workaround: use dpkg instead to install. but not using those altogether is more reliable.-->
+<!--                    <argument>&#45;&#45;linux-shortcut</argument>-->
+<!--                    <argument>&#45;&#45;icon</argument>-->
+<!--                    <argument>${project.build.outputDirectory}/Project/icons/skull.png</argument>-->
 
                   </arguments>
                 </configuration>
@@ -310,9 +322,6 @@ build installer´via  mvn clean package
 
               <arguments>
 
-                <argument>--type</argument>
-                <argument>msi</argument>
-
                 <argument>--name</argument>
                 <argument>AnatomyExplorer</argument>
 
@@ -327,11 +336,6 @@ build installer´via  mvn clean package
 
                 <argument>--java-options</argument>
                 <argument>-Xmx4g</argument>
-
-                <argument>--win-shortcut</argument>
-                <argument>--win-menu</argument>
-
-                <argument>--win-console</argument>
 
                 <argument>--java-options</argument>
                 <argument>-Dprism.verbose=true</argument>
