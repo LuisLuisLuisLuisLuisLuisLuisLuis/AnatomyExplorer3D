@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-macos:
-    runs-on: macos-13
+    runs-on: macos-15-intel
 
     steps:
       - uses: actions/checkout@v4
@@ -15,6 +15,9 @@ jobs:
         with:
           distribution: temurin
           java-version: '24'
+
+      - name: Check architecture
+        run: uname -m java -XshowSettings:properties -version 2>&1 | grep os.arch
 
       - name: Build
         run: mvn clean package -Pmac
