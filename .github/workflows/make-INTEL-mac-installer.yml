@@ -17,7 +17,7 @@ jobs:
           java-version: '24'
 
       - name: Check architecture
-        run: uname -m java -XshowSettings:properties -version 2>&1 | grep os.arch
+        run: uname -m java -XshowSettings:properties -version 2>&1 grep os.arch
 
       - name: Build
         run: mvn clean package -Pmac
