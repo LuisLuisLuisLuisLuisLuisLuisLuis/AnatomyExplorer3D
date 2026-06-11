@@ -25,10 +25,10 @@ public class Setup3DSubPane {
         Group contentGroup = new Group(); // gets the objects to draw
         Group root3d = new Group(contentGroup);
 
-        var subScene = new SubScene(root3d, 600, 600, true, SceneAntialiasing.BALANCED);
+        SubScene subScene = new SubScene(root3d, 600, 600, true, SceneAntialiasing.BALANCED);
         subScene.widthProperty().bind(drawPane.widthProperty());
         subScene.heightProperty().bind(drawPane.heightProperty());
-        // make suScene background lightgrey
+        //background lightgrey
         subScene.setFill(Color.LIGHTGRAY);
 
         // add camera

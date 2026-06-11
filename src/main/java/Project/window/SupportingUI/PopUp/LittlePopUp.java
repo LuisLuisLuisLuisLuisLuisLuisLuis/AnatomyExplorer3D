@@ -11,7 +11,6 @@ import Project.window.TreeView.TreeViewEditing.Command.UndoableANodeTreeViewEdit
 import Project.window.TreeView.TreeViewEditing.TreeViewSetup;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;

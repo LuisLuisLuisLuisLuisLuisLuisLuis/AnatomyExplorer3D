@@ -11,6 +11,14 @@ import javafx.scene.layout.VBox;
 public class MainWindowController {
 
     @FXML
+    private SplitPane splitPane;
+    @FXML
+    private CheckBox fileIDbotCheck;
+    @FXML
+    private CheckMenuItem showInfo3DButton;
+//    @FXML
+//    private Button info3DButton;
+    @FXML
     private Label treeInfoLabel;
     @FXML
     private Button quizButton;
@@ -470,5 +478,21 @@ public class MainWindowController {
 
     public Label getTreeInfoLabel() {
         return treeInfoLabel;
+    }
+
+//    public Button getInfo3DButton() {
+//        return info3DButton;
+//    }
+
+    public CheckMenuItem getShowInfo3DButton() {
+        return showInfo3DButton;
+    }
+
+    public CheckBox getFileIDbotCheck() {
+        return fileIDbotCheck;
+    }
+
+    public SplitPane getSplitPane() {
+        return splitPane;
     }
 }

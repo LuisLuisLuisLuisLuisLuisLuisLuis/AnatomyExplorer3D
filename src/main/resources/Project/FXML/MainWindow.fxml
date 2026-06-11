@@ -25,15 +25,15 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
+<?import javafx.scene.layout.Region?>
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="419.0" prefWidth="583.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Project.window.MainWindowController">
    <children>
       <StackPane prefHeight="419.0" prefWidth="583.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <BorderPane fx:id="mainBorderpain" prefHeight="400.0" prefWidth="600.0">
                <center>
-                  <SplitPane dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                  <SplitPane dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER" fx:id="splitPane">
                     <items>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                            <children>
@@ -104,7 +104,7 @@
                                     <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="288.0" BorderPane.alignment="CENTER">
                                        <children>
                                           <Label fx:id="botLabel_Tree" text="0 items selected.  " />
-                                          <Label fx:id="treeInfoLabel" />
+                                          <Label fx:id="treeInfoLabel" style="fx-text-fill: red"/>
                                        </children>
                                     </HBox>
                                  </bottom>
@@ -166,21 +166,15 @@
                                           <Label fx:id="botLabelDrawCount" text="0 items drawn. " />
                                           <Label fx:id="botLabel_3D" text="0 items selected." />
                                           <TextField fx:id="fileIDTextfield" editable="false" prefHeight="26.0" prefWidth="111.0" HBox.hgrow="ALWAYS" />
+                                           <Region prefWidth="2"/>
+                                          <CheckBox fx:id="fileIDbotCheck" mnemonicParsing="false" text="FileID " />
                                        </children>
                                     </HBox>
                                  </bottom>
                                  <top>
                                     <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                                        <items>
-                                           <Label text="🛈">
-                                               <tooltip>
-                                                   <Tooltip showDuration="10s" text="Try scrolling, Ctrl/Alt + Scroll, Ctrl/Alt + Arrow/+/- keys. Hold Shift to modify slice plane." />
-                                               </tooltip>
-                                               <font>
-                                                   <Font size="14.0" />
-                                               </font>
-                                           </Label>
-                                        <Button fx:id="zoomInButton" mnemonicParsing="false" text="+" />
+                                           <Button fx:id="zoomInButton" mnemonicParsing="false" text="+" />
                                           <Button fx:id="zoomOutButton" mnemonicParsing="false" text="-" />
                                           <Separator orientation="VERTICAL" />
                                           <Button fx:id="moveUpButton" mnemonicParsing="false" text="↑" />
@@ -230,6 +224,7 @@
                               <items>
                                   <MenuItem fx:id="menuGuide" mnemonicParsing="false" text="Guide" />
                                 <MenuItem fx:id="menuAbout" mnemonicParsing="false" text="About" />
+                                  <CheckMenuItem fx:id="showInfo3DButton" mnemonicParsing="false" text="Show 3D Info Button" selected="true"/>
       
                               </items>
                             </Menu>

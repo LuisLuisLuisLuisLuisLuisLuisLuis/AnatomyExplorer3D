@@ -32,7 +32,6 @@ public class Help {
         PDFView pdfView = new PDFView();    //doesnt get any easier
         pdfView.load(Help.class.getResourceAsStream("/Project/guide.pdf"));
         LittlePopUp.showPopup(pdfView, "Guide", 1000, 500);
-
     }
 
 }

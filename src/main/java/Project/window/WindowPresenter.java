@@ -70,6 +70,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.MenuItem;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.input.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
@@ -126,6 +127,7 @@ public class WindowPresenter {
     private final Group slicePlaneGroup;//will hold plane for slicing meshes
     private final Group contentGroup;   //holds the innerGroup
     private final Group innerGroup;     //holds the meshViews
+    private final Group buttonsIn3DGroup;
 
     private final CamMover camMover = new CamMover(camera); // controls camera movement. not actually used anymore since i switched to moving group instead of camera..
     private final Group3DRotation contentGroupRotator;      // implements rotation of the 3D view via rotation of a group
@@ -204,6 +206,8 @@ public class WindowPresenter {
         root3d.getChildren().add(this.slicePlaneGroup);
         contentGroup = outerGroups.get(1);
         this.innerGroup = new Group();
+        this.buttonsIn3DGroup = new Group();
+        root3d.getChildren().add(buttonsIn3DGroup);
 
 
         // Rotation
@@ -351,6 +355,38 @@ public class WindowPresenter {
         //controller.getMenuRmAxes().setOnAction(e -> executeCommand(new RemoveAxesCommand(innerGroup)));
 
         //3D related buttons
+        Button info3DButton = new Button("🛈");
+        AnchorPane anchorPane = new AnchorPane(info3DButton);
+        AnchorPane.setLeftAnchor(info3DButton, 6.0);
+        AnchorPane.setTopAnchor(info3DButton, 5.0);
+        info3DButton.setOnAction(e -> {
+            if (LittlePopUp.showMsg(
+                    "How to use the 3D view",
+                    """
+                            Mouse drag to rotate
+                            Scroll to zoom
+                            
+                            Ctrl + Scroll to move up/down
+                            Alt + Scroll to move left/right
+                            
+                            Ctrl + Arrow keys to move up/down/left/right
+                            Alt + Arrow keys to rotate
+                            
+                            Shift + Ctrl/Alt + Scroll/Keys to move the plane of cross section
+                            
+                            
+                            You can show/hide this button via Help > Show 3D Info Button
+                            """,
+                    "Hide Info Button",
+                    "Cancel"
+            )) controller.getShowInfo3DButton().setSelected(false);
+        });
+        controller.getThreeDPane().getChildren().add(anchorPane);
+//        info3DButton.setTranslateX(-230);
+//        info3DButton.setTranslateZ(-960);
+//        info3DButton.setTranslateY(-230);
+
+
 
         controller.getMoveDownButton().setOnAction(e -> rotationControl(KeyCode.DOWN, false));
         controller.getMoveUpButton().setOnAction(e -> rotationControl(KeyCode.UP, false));
@@ -598,6 +634,7 @@ public class WindowPresenter {
             HashSet<String> toDraw = new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionContainer.getSelectionFormatted()));
             if (toDraw.isEmpty()) {
                 controller.getTreeInfoLabel().setText(" No 3D Files in selection!");
+                controller.getTreeInfoLabel().setStyle("-fx-text-background-color: crimson; ");
                 treeInfoTimeline.playFromStart();
                 return;
             }
@@ -800,15 +837,13 @@ public class WindowPresenter {
             }
         };
 
-//        for (TreeView<ANode> treeView : treeViews) treeView.getSelectionModel().getSelectedItems().addListener((InvalidationListener) i -> updateTreeBotLabel());
 
         hasInnerGroupSelectedItems.getSelection().addListener((ListChangeListener<? super MeshView>) i -> {
             update3DBotLabel(hasInnerGroupSelectedItems.getSelection().size() + " items selected.");
-            StringBuilder stringBuilder = new StringBuilder();
-            for (Node node : hasInnerGroupSelectedItems.getSelection()) stringBuilder.append(node.getId() + ", ");
-            String text = stringBuilder.toString();
-            updateFileIDBotTextField(text.substring(0, text.length() > 2 ? text.length()-2 : text.length()));
+            updateFileIDBotTextField();
         });
+
+        controller.getFileIDbotCheck().selectedProperty().addListener(e -> updateFileIDBotTextField());
         //------------------------------
 
 
@@ -1020,6 +1055,7 @@ public class WindowPresenter {
         //------------Menu: Help----------
         controller.getMenuGuide().setOnAction(e -> Help.showGuide());
         controller.getMenuAbout().setOnAction(e -> LittlePopUp.showPaddedPopup(About.getAbout(), "About", 400, 100));
+        controller.getShowInfo3DButton().selectedProperty().addListener((obs, old, nw) -> info3DButton.setVisible(nw));
 
 
 
@@ -1096,93 +1132,8 @@ public class WindowPresenter {
 
         //-------------------------------quiz------------------------------
         controller.getQuizButton().setOnAction(e -> {
-//
-//            SimpleMultipleChoice3DQuestion<String, Integer> question1 = null;
-//            SimpleSelectIn3DUIQuestion<Integer> question3 = null;
-//            SimpleSelectIn3DUIQuestion<Integer> question31 = null;
-//            SimpleSelectIn3DUIQuestion<Integer> question4 = null;
-//
-//            try {
-//                question1 = new SimpleMultipleChoice3DQuestion<>(
-//                        Difficulty.EASY, 0, 1,
-//                        "brachioradialis",
-//                        List.of("brachioradialis", "extensor carpi radialis brevis", "extensor carpi ulnaris"),
-//                        List.of("FJ1487M", "FJ1489M", "FJ1517M", "FJ1517M", "FJ1517M"),
-//                        List.of("FJ1487M"),
-//                        List.of(mainModel.getFilesDirURL().toURI()));
-//                question3 = new SimpleSelectIn3DUIQuestion<>(
-//                        Difficulty.EASY, 0, 1,
-//                        List.of("FJ3289", "FJ3269"),
-//                        List.of("FJ3375", "FJ3269", "FJ3289"),
-//                        List.of(mainModel.getFilesDirURL().toURI()),
-//                        true
-//                );
-//                question31 = new SimpleSelectIn3DUIQuestion<>(
-//                        Difficulty.EASY, 0, 1,
-//                        List.of("FJ3289", "FJ3269"),
-//                        List.of("FJ3375", "FJ3269", "FJ3289"),
-//                        List.of(mainModel.getFilesDirURL().toURI()),
-//                        true
-//                );
-//                question4 = new SimpleSelectIn3DUIQuestion<>(
-//                        Difficulty.EASY, 0, 1,
-//                        List.of("FJ3427", "FJ1932"),
-//                        List.of("FJ3427", "FJ1932", "FJ3411", "FJ3413"),
-//                        List.of(mainModel.getFilesDirURL().toURI()),
-//                        true
-//                );
-//
-//            } catch (URISyntaxException ex) {
-//                throw new RuntimeException(ex);
-//            }
-//
-//            SimpleMultipleChoiceUIQuestion<String, Integer> question2 = new SimpleMultipleChoiceUIQuestion<String, Integer>(
-//                    Difficulty.EASY, 0,1,
-//                    List.of("yess", "maybe"),
-//                    List.of("yess", "noo", "maybe"),
-//                    false);
-//
-//            question1.setName("Question 1");
-//            question1.setInstructions("What is the highlighted anatomical structure called?");
-//            question2.setName("Question 2");
-//            question2.setInstructions("Choose yes and maybe");
-//            question3.setName("Question 3");
-//            question3.setInstructions("Select the mandible and left maxilla");
-//            question31.setName("Question 3");
-//            question31.setInstructions("Select the mandible and left maxilla");
-//            question4.setName("Question 4");
-//            question4.setInstructions("Select the descending aorta i think");
-//            List<UIQuestion<?, Integer>> list = new LinkedList<>();
-//            list.add(question1);
-//            list.add(question2);
-//            list.add(question3);
-//            list.add(question31);
-//            list.add(question4);
-//
-//            UIQuiz<Integer> quiz3 = new UIQuizInt(list, true, true);//, 5, TimeUnit.MINUTES);
-//            quiz3.start();
-
-//            UIQuiz<Integer> quiz = new UIQuizInt(List.of(question1, question2), true, true);
-//            UIQuiz<Integer> quiz2 = new UIQuizInt(List.of(question1, question2), false, false);
-//            UIQuiz<Integer> quiz4 = new UIQuizInt(List.of(question1, question2), true, false);
-
             RandomUIQuizGenerator r = new RandomUIQuizGenerator(models);
             r.addOnCreateRunnable(() -> {r.getIntegerUIQuiz().start();});
-
-
-//            question.setName("Question 1");
-//            question.setInstructions("What's the name of the selected item?");
-//            LittlePopUp.showChartPopup(question.ask(), "Quiz", 500,500);
-//            question.getAnsweredProperty().addListener(new ChangeListener<Boolean>() {
-//                @Override
-//                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-//                    if (newValue) LittlePopUp.showMsg("your result", Integer.toString(question.getScore()), "OK");
-//                }
-//            });
-
-//            TreeItem<ANode> picked = LittlePopUp.selectTreeItemDialog(getSelectedTreeView().getRoot());
-//            if (picked == null) return;
-//            getSelectedTreeView().getSelectionModel().select(picked);
         });
         //-------------------------------------------------------------------
 
@@ -1202,7 +1153,19 @@ public class WindowPresenter {
     private void update3DBotLabel(String text) {
         controller.getBotLabel_3D().setText(text);
     }
-    private void updateFileIDBotTextField(String text) {controller.getFileIDTextfield().setText(text);}
+
+    private void updateFileIDBotTextField() {
+        String text = "";
+        if (controller.getFileIDbotCheck().isSelected()) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (Node node : hasInnerGroupSelectedItems.getSelection()) stringBuilder.append(node.getId()).append(", ");
+            text = stringBuilder.toString();
+            text = (text.substring(0, text.length() > 2 ? text.length()-2 : text.length()));
+        } else {
+            text = selectionMediatorTree3D_Selection.transformBSelectionToASelection(threeDSelectionGroup.getSelection()) + "";
+            text = (text.substring(1, text.length()-1));
+        }
+        controller.getFileIDTextfield().setText(text);}
 
     /**
      * Set up the bindings of the tree text search buttons which depend on which tree is shown
