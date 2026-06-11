@@ -236,6 +236,11 @@ public class RandomUIQuizGenerator {
                 ANode pulmTrunkNode = TreeAnalysisUtils.getANodeWithName("pulmonary trunk", model.getRoot());
                 ANode hepPortalNode = TreeAnalysisUtils.getANodeWithName("hepatic portal vein", model.getRoot());
                 ANode prehepPortalNode = TreeAnalysisUtils.getANodeWithName("pre-hepatic portal vein", model.getRoot());
+                ANode leftEyeballAndChambers1 = TreeAnalysisUtils.getANodeWithName("left eyeball and chambers", model.getRoot());
+                ANode rightEyeballAndChambers1 = TreeAnalysisUtils.getANodeWithName("right eyeball and chambers", model.getRoot());
+                ANode orbitalPartOfLeftEye1 = TreeAnalysisUtils.getANodeWithName("orbital part of left eye", model.getRoot());
+                ANode orbitalPartOfRightEye1 = TreeAnalysisUtils.getANodeWithName("orbital part of right eye", model.getRoot());
+
 
                 if (aortaANode != null) aortaTreeItem = TreeAnalysisUtils.getTreeItemWANodeId(aortaANode.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
                 if (supVenaCavaANode != null) superiorVenaCava = TreeAnalysisUtils.getTreeItemWANodeId(supVenaCavaANode.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
@@ -249,12 +254,17 @@ public class RandomUIQuizGenerator {
                 if (hepPortalNode != null) hepaticPortal = TreeAnalysisUtils.getTreeItemWANodeId(hepPortalNode.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
                 if (prehepPortalNode != null) prehepPortal = TreeAnalysisUtils.getTreeItemWANodeId(prehepPortalNode.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
 
+                if (leftEyeballAndChambers1 != null) leftEyeballAndChambers = TreeAnalysisUtils.getTreeItemWANodeId(leftEyeballAndChambers1.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
+                if (rightEyeballAndChambers1 != null) rightEyeballAndChambers = TreeAnalysisUtils.getTreeItemWANodeId(rightEyeballAndChambers1.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
+                if (orbitalPartOfLeftEye1 != null) orbitalPartOfLeftEye = TreeAnalysisUtils.getTreeItemWANodeId(orbitalPartOfLeftEye1.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
+                if (orbitalPartOfRightEye1 != null) orbitalPartOfRightEye = TreeAnalysisUtils.getTreeItemWANodeId(orbitalPartOfRightEye1.conceptId(), mainTreeViewMaybe.getFirst().getRoot());
+
                 break;
             }
         }
-
-
     }
+
+
 
     /**
      * @param target A treeItem
@@ -263,8 +273,8 @@ public class RandomUIQuizGenerator {
     private List<AllQuestionTypes> getQuestTypesForTarget(TreeItem<ANode> target) {
         if (forbiddenIDs.contains(target.getValue().conceptId())) return List.of();
         List<AllQuestionTypes> result = new LinkedList<>();
-        result.add(AllQuestionTypes.IDENTIFY_IN_3D);
-        if (!forbiddenIDsForSelectIn3D.contains(target.getValue().conceptId()) && !TreeAnalysisUtils.isPartOfTree(respiratorySystem, target)) result.add(AllQuestionTypes.SELECT_IN_3D);  // resp system has many (leaf) nodes with broad names that still have fileIDs because
+        if (allowedForIdentifyIn3D(target)) result.add(AllQuestionTypes.IDENTIFY_IN_3D);
+        if (!forbiddenIDsForSelectIn3D.contains(target.getValue().conceptId()) && allowedForSelectIn3D(target)) result.add(AllQuestionTypes.SELECT_IN_3D);  // resp system has many (leaf) nodes with broad names that still have fileIDs because
                                                                                                                     // they represent an important category. but they are difficult to pin down in such a selection question.
         for (TreeItem<ANode> tI : List.of(aortaTreeItem, pulmonaryTrunk)) {
             if (tI != null) {
@@ -314,6 +324,32 @@ public class RandomUIQuizGenerator {
     private TreeItem<ANode> pulmonaryTrunk = null;
     private TreeItem<ANode> hepaticPortal = null;
     private TreeItem<ANode> prehepPortal = null;
+
+
+    private TreeItem<ANode> leftEyeballAndChambers = null;
+    private TreeItem<ANode> rightEyeballAndChambers = null;
+    private TreeItem<ANode> orbitalPartOfLeftEye = null;
+    private TreeItem<ANode> orbitalPartOfRightEye = null;
+
+    private boolean allowedForSelectIn3D(TreeItem<ANode> target) {
+        Set<TreeItem<ANode>> forbiddenItems = Set.of(leftEyeballAndChambers, rightEyeballAndChambers, orbitalPartOfLeftEye, orbitalPartOfRightEye, respiratorySystem);
+        for (TreeItem<ANode> item : forbiddenItems) {
+            if (TreeAnalysisUtils.isPartOfTree(item, target)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean allowedForIdentifyIn3D(TreeItem<ANode> target) {
+        Set<TreeItem<ANode>> forbiddenItems = Set.of(leftEyeballAndChambers, rightEyeballAndChambers, orbitalPartOfLeftEye, orbitalPartOfRightEye);
+        for (TreeItem<ANode> item : forbiddenItems) {
+            if (TreeAnalysisUtils.isPartOfTree(item, target)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 
     /** these must not be target for select in 3d questions*/
