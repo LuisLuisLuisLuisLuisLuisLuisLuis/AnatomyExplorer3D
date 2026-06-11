@@ -27,7 +27,7 @@
                         <Label text="Topics"/>
                         <Label text="🛈">
                             <tooltip>
-                                <Tooltip text="Trees from which questions will be generated. Topics will be distributed evenly across questions." />
+                                <Tooltip text="Trees from which questions will be generated. Topics will be distributed evenly across questions." showDuration="10s"/>
                             </tooltip>
                            <font>
                               <Font size="14.0" />
@@ -67,11 +67,11 @@
                   </ToolBar>
                   <ToolBar fx:id="difficultyToolbar" prefHeight="40.0" prefWidth="200.0">
                     <items>
-                        <Label text="How much to draw in 3D questions">
+                        <Label text="How much to draw in 3D questions (advanced)">
                         </Label>
                         <Label text="🛈">
                            <tooltip>
-                              <Tooltip text="How many objects to draw in 3D questions (excl. cross section) besides the object that is asked about" />
+                              <Tooltip text="How many objects to draw in 3D questions (excluding cross section questions). Set higher if you want to see more items" showDuration="60s"/>
                            </tooltip>
                            <font>
                               <Font size="14.0" />
