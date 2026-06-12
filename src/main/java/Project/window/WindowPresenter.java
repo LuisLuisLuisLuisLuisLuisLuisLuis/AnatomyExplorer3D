@@ -147,6 +147,7 @@ public class WindowPresenter {
      * Maps model id to a boolean property. True if the model has unsaved changes.
      */
     private final HashMap<String, BooleanProperty> isModelUnsaved = new HashMap<>();
+    private final boolean[] bp3dV3_unsavedReminder = new boolean[2];
 
 
     private final HasFXGroupContents hasInnerGroupContents;
@@ -331,14 +332,14 @@ public class WindowPresenter {
                     executeCommand(new EnableBP3DV3Command());
                 }
                 else {
-                    if (tabs.stream().filter(tab -> tab.getText().equals("BP3D 3.0 part-of") || tab.getText().equals("BP3D 3.0 is-a")).toList().size() == 2) executeCommand(new DisableBP3DV3Command());
+                    if (tabs.stream().filter(tab -> tab.getText().equals("BP3D 3.0 part-of") || tab.getText().equals("BP3D 3.0 is-a")).toList().size() > 0) executeCommand(new DisableBP3DV3Command());
                 }
             }
         });
         controller.getTreeTabPane().getTabs().addListener(new InvalidationListener() {  //if BP3D 3.0 is added/removed via undo/redo the menu must still show the correct check.
             @Override
             public void invalidated(Observable observable) {
-                if (tabs.stream().filter(tab -> tab.getText().equals("BP3D 3.0 part-of") || tab.getText().equals("BP3D 3.0 is-a")).toList().size() == 2) {
+                if (tabs.stream().filter(tab -> tab.getText().equals("BP3D 3.0 part-of") || tab.getText().equals("BP3D 3.0 is-a")).toList().size() > 0) {
                     controller.getEnableBP3DV3checkMenu().setUserData(true);
                     controller.getEnableBP3DV3checkMenu().setSelected(true);
                 } else {
@@ -1589,7 +1590,7 @@ public class WindowPresenter {
      */
     private class AddModelCommand implements Command {
         private final List<Model> models;
-        private final List<ContextMenu> contextMenus;
+        protected final List<ContextMenu> contextMenus;
 
         public List<String> getModelIDs() {return models.stream().map(Model::getName).toList();}
 
@@ -1668,6 +1669,7 @@ public class WindowPresenter {
                 if (tab_ == null) this.contextMenus.add(null);
 
                 isUnsaved[i] = isModelUnsaved.get(model.getName()).get();
+                i++;
             }
             logger.log(Level.CONFIG, "meshviewIDsToRemove before: " + meshViewIDsToRemove);
             Collection<String> modelsToRMNames = modelsToRm.stream().map(Model::getName).toList();
@@ -1725,30 +1727,45 @@ public class WindowPresenter {
     }
 
     private class EnableBP3DV3Command extends AddModelCommand {
-
+//        muss sich iwo erinnern ob BP3D schon modifiziert wurde (änlich wie in RemoveModelCommand implementiert)
         public EnableBP3DV3Command() {
-            super(List.of(partof_v3, isa_v3));
+            super(List.of(partof_v3, isa_v3), List.of(new ContextMenu(), new ContextMenu()));
         }
 
         @Override
         public void undo() {
+            bp3dV3_unsavedReminder[0] = isModelUnsaved.get(partof_v3.getName()).get();
+            bp3dV3_unsavedReminder[1] = isModelUnsaved.get(isa_v3.getName()).get();
             super.undo();
             TreeView<ANode> mainModelTreeView = null;
             for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
             if (mainModelTreeView == null) return;
             EnableDisableBP3DV3Parts.removeV3FilesFromTree(mainModelTreeView.getRoot());
-
         }
 
         @Override
         public void execute() {
             super.execute();
+
+            for (int i = 0; i < 2; i++) {
+                Model model = (i == 0 ? partof_v3 : isa_v3);
+                ContextMenu contextMenu = this.contextMenus.get(i);
+                contextMenu.getItems().clear();
+
+                MenuItem save = new MenuItem("Save");
+                // can only bind disable property once the isunsaved boolean property exists
+                save.setOnAction(actionEvent -> tryToSaveTree(treeViews.stream().filter(t -> t.getId().equals(model.getName())).toList().getFirst()));
+                save.disableProperty().bind(isModelUnsaved.get(model.getName()).not());
+                contextMenu.getItems().add(save);
+            }
+            isModelUnsaved.get(partof_v3.getName()).set(bp3dV3_unsavedReminder[0]);
+            isModelUnsaved.get(isa_v3.getName()).set(bp3dV3_unsavedReminder[1]);
+
             TreeView<ANode> mainModelTreeView = null;
             for (TreeView<ANode> treeView : treeViews) if (treeView.getId().equals(mainModel.getName())) mainModelTreeView = treeView;
             if (mainModelTreeView == null) return;
 
             EnableDisableBP3DV3Parts.addV3FilesToTree(mainModelTreeView.getRoot());
-
         }
 
         @Override
@@ -1765,7 +1782,11 @@ public class WindowPresenter {
     private class DisableBP3DV3Command extends RemoveModelCommand {
 
         public DisableBP3DV3Command() {
-            super(List.of(partof_v3, isa_v3));
+            super(tabs.stream().map(tab -> {
+                if (tab.getText().equals("BP3D 3.0 part-of")) return partof_v3;
+                else if (tab.getText().equals("BP3D 3.0 is-a")) return isa_v3;
+                return null;
+            }).filter(model -> !(model == null)).toList());
         }
 
         @Override
@@ -1788,9 +1809,9 @@ public class WindowPresenter {
             EnableDisableBP3DV3Parts.removeV3FilesFromTree(mainModelTreeView.getRoot());
             selectionMediatorTree3D_Selection.reloadDicts();
             selectionMediatorTree_3D_Content.reloadDicts();
-
+            bp3dV3_unsavedReminder[0] = isModelUnsaved.get(partof_v3.getName()).get();
+            bp3dV3_unsavedReminder[1] = isModelUnsaved.get(isa_v3.getName()).get();
             super.execute();
-
         }
 
         @Override
