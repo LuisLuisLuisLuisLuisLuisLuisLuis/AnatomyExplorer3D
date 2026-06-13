@@ -3,6 +3,8 @@ package Project.model;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Utility class responsible for loading a tree structure from tab-separated data files.
@@ -58,6 +60,8 @@ public class TreeLoader {
         HashSet<String> notRootID = new HashSet<>(); //all nodes that are children
         //the set and map will be compared to find the node that is the root
 
+        HashSet<ANode> children = new HashSet<>();
+
         for (Relation relation : relations) {
             String parentID = relation.parentID();
             String parentName = relation.parentName();
@@ -69,10 +73,13 @@ public class TreeLoader {
                 continue;
             }
 
-            if (nodes.containsKey(childID)) continue;   // prevents cycles
-
             //get child/parent
             ANode child = nodes.containsKey(childID) ? nodes.get(childID) : new ANode(childID, childName, new HashSet<>(), fileList.getOrDefault(childID, new HashSet<>()));
+            if (children.contains(child)) {
+                logger.log(Level.WARNING, "Skipping relation " + relation + " because it would create a cycle.");
+                continue; // prevents cycles
+            }
+            else children.add(child);
             ANode parent = nodes.containsKey(parentID) ? nodes.get(parentID) : new ANode(parentID, parentName, new HashSet<>(), fileList.getOrDefault(parentID, new HashSet<>()));
 
             //add child to parents children
@@ -151,4 +158,6 @@ public class TreeLoader {
         } catch (IOException e) {e.printStackTrace();}
         return stringBuilder.toString();
     }
+
+    private static final Logger logger = Logger.getLogger(TreeLoader.class.getName());
 }

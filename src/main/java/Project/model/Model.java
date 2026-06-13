@@ -2,8 +2,7 @@ package Project.model;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
+
 
 /**
  * Loads the Tree from the files and stores the root.
