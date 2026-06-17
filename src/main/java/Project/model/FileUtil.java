@@ -1,5 +1,6 @@
 package Project.model;
 
+import Project.SelectionModel.FXGroupDraw.HasFXGroupContents;
 import Project.window.SupportingUI.PopUp.LittlePopUp;
 import Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils;
 import javafx.scene.control.TreeItem;
@@ -7,6 +8,8 @@ import javafx.scene.control.TreeItem;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class FileUtil {
 
@@ -51,8 +54,9 @@ public class FileUtil {
      * @return Size in MB. 0 if dir does not specify a directory or an exception is thrown.
      */
     public static long estimateSizeOfOBJsInDir(File dir, Set<String> whiteList, Set<String> supportedFileExtensions) {
-        System.out.println(Arrays.toString(whiteList.toArray()));
-        try {System.out.println("directory size: " + Files.size(dir.toPath()));}
+        HasFXGroupContents.appendFileExtension(whiteList);
+
+        try {logger.log(Level.CONFIG, "directory size (bytes) = " + Files.size(dir.toPath()) + " of " + dir);}
         catch (IOException i) {return 0;}
 
         if (dir.isDirectory() && dir.listFiles() != null) {
@@ -65,13 +69,13 @@ public class FileUtil {
                     if (!file.getName().contains(".")) continue; //so that the next statement can safely run
                     String extension = file.getName().substring(file.getName().lastIndexOf("."));
                     if (!supportedFileExtensions.contains(extension)) continue;
-                    if (!whiteList.contains(file.getName().substring(0, file.getName().lastIndexOf(".")))) continue;
+                    if (!whiteList.contains(file.getName())) continue;
                     sumFileSizes += Files.size(file.toPath());
                 }
-                catch (IOException ignored) {System.out.println("skipping file");}
+                catch (IOException ignored) {logger.log(Level.CONFIG,"skipping file");}
             }
             sumFileSizes /= (1024 * 1024);
-            System.out.println("file sizes: " + sumFileSizes );
+            logger.log(Level.CONFIG,"file sizes: " + sumFileSizes );
             return sumFileSizes;
         }
         return 0;
@@ -87,10 +91,15 @@ public class FileUtil {
             Set<String> files = new HashSet<>();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileListStream));
             String line = null;
+            boolean skip = true;    //skip first line
             while ((line = bufferedReader.readLine()) != null) {
                 if (line.isBlank()) continue;
                 String[] fields = line.split("\t");
                 if (fields.length != 3) continue;
+                if (skip) {
+                    skip = false;
+                    continue;
+                }
                 files.add(fields[2].trim());
             }
             return files;
@@ -131,4 +140,6 @@ public class FileUtil {
         }
         for (ANode child : root.children()) collectFileIDsBelowRec(child, fileIDtoANode);
     }
+    
+    private static final Logger logger = Logger.getLogger(FileUtil.class.getName());
 }

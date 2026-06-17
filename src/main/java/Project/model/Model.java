@@ -8,10 +8,9 @@ import java.io.InputStream;
  * Loads the Tree from the files and stores the root.
  */
 public class Model {
-
     /**
      * Returns the root of this tree. If the file from which this model was constructed did not contain a single unifying root
-     * then a new root was created on top to make this a rooted tree.
+     * then a new root was created on top to make this a single rooted tree.
      */
     private final ANode root;
     public ANode getRoot() {return root;}
@@ -28,15 +27,6 @@ public class Model {
     private File filesDir = null;
     public File getFilesDir() {return filesDir;}
     public void setFilesDir(File filesDir) {this.filesDir = filesDir;}
-
-
-    /*
-    NOTES regarding File and URL:
-    ❌ Don’t do:
-    file.toURL();  // deprecated, unsafe
-    ✅ Do:
-    URL url = file.toURI().toURL();
-     */
 
 
     /**

@@ -1,6 +1,8 @@
 package Project.model;
 
 
+import Project.SelectionModel.FXGroupDraw.HasFXGroupContents;
+
 import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
@@ -141,6 +143,9 @@ public class TreeLoader {
             HashSet<String> fileList = IDtoFilelist.containsKey(conceptID) ? IDtoFilelist.get(conceptID) : new HashSet<>();
             fileList.add(lineArr[2].trim());
             IDtoFilelist.put(conceptID, fileList);
+        }
+        for (String id : IDtoFilelist.keySet()) {
+            HasFXGroupContents.appendFileExtension(IDtoFilelist.get(id)); // every fileID must have a file extension.
         }
         return IDtoFilelist;
     }

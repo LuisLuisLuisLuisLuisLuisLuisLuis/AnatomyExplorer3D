@@ -231,7 +231,7 @@ public class WindowPresenter {
         try {
             mainModel = new Model(
                     getClass().getResourceAsStream("/Project/anatomy/anatomy_edge_list.txt"),
-                    getClass().getResourceAsStream("/Project/anatomy/anatomy_file_list.txt"),
+                    getClass().getResourceAsStream("/Project/anatomy/anatomy_file_list_obj.txt"),
                     "anatomy",
                     "/Project/anatomy/BP3D_4.0_obj_99/");
         } catch (IllegalArgumentException illegalArgumentException) {LittlePopUp.showMsg("Error", "Failed to load main model. Perhaps the files were modified or moved.\nError: " + illegalArgumentException.getMessage(), "OK");}
@@ -1478,10 +1478,14 @@ public class WindowPresenter {
         }
         controller.getTreeTabPane().getTabs().add(tab);
 
+        hasInnerGroupContents.getIsLoadingOBJs().addListener((_, _, nw) -> {
+            if (nw == false) addMeshviewTooltips(model);
+        });
+
         if (model.getFilesDir() != null) {  //it is only possible to determine directory size via File. but in the compiled shipped product, resources aren't accessible as File anymore,
-                                            //thus i hardcode the size of the shipped models. this may lead to incorrect calculations since the user has the ability to modify them.
-                                            //an improvement for this would be to count the number of fileIDs in the tree and multiply that with the average OBJ file size.
-                                            //a further improvement to this could be to discard those fileIDs for which no inputstream can be created to avoid fileIDs that were added to the tree even when no corresponding file exists.
+            //thus i hardcode the size of the shipped models. this may lead to incorrect calculations since the user has the ability to modify them.
+            //an improvement for this would be to count the number of fileIDs in the tree and multiply that with the average OBJ file size.
+            //a further improvement to this could be to discard those fileIDs for which no inputstream can be created to avoid fileIDs that were added to the tree even when no corresponding file exists.
             sizeOfLoadedModels += FileUtil.estimateSizeOfOBJsInDir(model.getFilesDir(), FileUtil.collectFileIDsBelowToSet(model.getRoot()), supportedFileExtensions);
         } else {
             if (model.equals(mainModel)) {
@@ -1491,10 +1495,6 @@ public class WindowPresenter {
             }
         }
         logger.log(Level.CONFIG, "size of loaded models: " + sizeOfLoadedModels);
-
-        hasInnerGroupContents.getIsLoadingOBJs().addListener((_, _, nw) -> {
-            if (nw == false) addMeshviewTooltips(model);
-        });
 
         this.isModelUnsaved.put(model.getName(), new SimpleBooleanProperty(false));
         Circle circle = new Circle(3,Color.GRAY);
@@ -1516,7 +1516,9 @@ public class WindowPresenter {
                     for (String fileID : node.fileIds()) {
                         MeshView meshView = hasInnerGroupContents.getMeshViewWithID(fileID);
                         if (meshView == null) continue;
-                        Tooltip.install(meshView, new Tooltip(node.getName() + " (ID=" + node.conceptId() + ")" + " [File=" + fileID + "]"));
+                        Tooltip tooltip = new Tooltip(node.getName() + " (ID=" + node.conceptId() + ")" + " [File=" + fileID + "]");
+                        tooltip.setShowDuration(new Duration(16000));
+                        Tooltip.install(meshView, tooltip);
                     }
                     return null;
                 });

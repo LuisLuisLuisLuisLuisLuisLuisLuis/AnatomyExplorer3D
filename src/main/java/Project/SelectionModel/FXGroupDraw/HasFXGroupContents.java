@@ -16,10 +16,7 @@ import javafx.scene.shape.TriangleMesh;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -198,7 +195,7 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
 
     {
         try {
-            this.fileGroupingScheme = new ObjectMapper().readValue(this.getClass().getResourceAsStream("/Project/3DSupport/fileGroupingScheme_manual_V6.json"), FileGroupingScheme.class);
+            this.fileGroupingScheme = new ObjectMapper().readValue(this.getClass().getResourceAsStream("/Project/3DSupport/fileGroupingScheme_manual_V6_obj.json"), FileGroupingScheme.class);
             this.anatomicalGroupLevel = 0;
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Failed to load fileGroupingScheme, e");
@@ -316,6 +313,7 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
 
 
     private void loadOBJsMulti(File dir, Set<String> whiteList) {
+        appendFileExtension(whiteList);
         Task<List<MeshView>> task = new Task<>() {
 
             @Override
@@ -329,7 +327,7 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
                 for (File file : files) {
                     if (!file.isFile()) continue;
                     if (!file.getName().endsWith(".obj")) continue;
-                    String name = file.getName();//.substring(0, file.getName().lastIndexOf("."));
+                    String name = file.getName();
                     logger.log(Level.CONFIG, name + "!!");
                     if (!whiteList.contains(name)) continue;
                     if (getMeshViewWithID(name) != null) continue;
@@ -360,51 +358,6 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
         else task.run();
     }
 
-
-
-//    private void loadOBJsMulti(URL url, Set<String> whiteList) {
-//        File[] files = url.listFiles();
-//        if (files == null) return;
-//        Task<List<MeshView>> task = new Task<>() {
-//
-//            @Override
-//            protected List<MeshView> call() throws Exception {
-//                isLoadingOBJs.set(true);
-//                updateMessage("Loading OBJ files...");
-//                ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-//                List<Future<MeshView>> meshViewF = new ArrayList<>(files.length);
-//                for (File file1 : files) {
-//                    if (!file1.isFile()) continue;
-//                    if (!file1.getName().endsWith(".obj")) continue;
-//                    String name = file1.getName().substring(0, file1.getName().lastIndexOf("."));
-//                    if (!whiteList.contains(name)) continue;
-//                    if (hasFXGroupContents.getMeshViewWithID(name) != null) continue;
-//                    meshViewF.add(executor.submit(() -> createMeshView(name)));
-//                }
-//                executor.shutdown();
-//
-//                List<MeshView> result = new ArrayList<>(meshViewF.size());
-//
-//                int total = meshViewF.size();
-//                int done = 0;
-//
-//                for (Future<MeshView> f : meshViewF) {
-//                    result.add(f.get());
-//                    updateProgress(++done, total);
-//                }
-//                return result;
-//            }
-//        };
-//
-//        task.setOnSucceeded(e -> {
-//            logger.log(Level.CONFIG, "loading OBJs task done");
-//            hasFXGroupContents.addMeshViews(task.getValue());
-//            isLoadingOBJs.set(false);
-//        });
-//
-//        if (handleLoadingTask != null) handleLoadingTask.apply(task);
-//        else task.run();
-//    }
 
     private void loadOBJs(File file, Set<String> whiteList) {
         loadOBJsMulti(file, whiteList);
@@ -480,6 +433,18 @@ public class HasFXGroupContents implements HasSelection<MeshView> {
         long durationMillis = (endTime - startTime) / 1000000;
         logger.log(Level.FINEST, "creating meshview took " + durationMillis);
         return result;
+    }
+
+    /**
+     * Appends '.obj' to every entry that does not contain '.'.
+     * Because every fileID must correspond to a file name and file names have extensions.
+     * So this class assumes that if a name without extension is given it refers to an OBJ file with that name.
+     */
+    public static void appendFileExtension(Set<String> fileIDs) {
+        for (String fileID : new HashSet<>(fileIDs)) if (!fileID.contains(".")) {
+            fileIDs.remove(fileID);
+            fileIDs.add(fileID.trim() + ".obj");
+        }
     }
 
 }

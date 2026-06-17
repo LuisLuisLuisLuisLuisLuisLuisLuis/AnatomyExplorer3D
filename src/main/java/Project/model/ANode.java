@@ -69,7 +69,7 @@ public class ANode implements Comparable<ANode> {
     }
 
     /**
-     * Does the computation required by printTree(). Hands back the complete String, ready to be printed to stdout.
+     * Does the computation required by printTree(). Hands back the complete String, ready to be printed.
      * @param root
      * @param p
      * @param filters
