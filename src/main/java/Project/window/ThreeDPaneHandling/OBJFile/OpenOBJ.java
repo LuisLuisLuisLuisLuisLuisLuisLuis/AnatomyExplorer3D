@@ -120,20 +120,6 @@ public class OpenOBJ {
             } catch (IOException m) {
                 return null;
             }
-
-//          Legacy
-//            String objPath = objFile.getAbsolutePath();
-//            File imgFile = new File(objPath.substring(0, objPath.length() - 3) + "png");
-//            try {
-//                //generate mesh from the OBJ file
-//                MeshView meshView = createMeshWithIMG(ObjParser_V2.load(objPath), imgFile);
-//                //set file name as ID
-//                meshView.setId(removeFileExtension(objFile.getName()));
-//
-//                return meshView;
-//            } catch (Exception e) {
-//                System.err.println("Failed to parse OBJ file: " + objPath);
-//            }
         } return null;
     }
 

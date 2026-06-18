@@ -131,6 +131,9 @@ build installer´via  mvn clean package
                 <configuration>
                   <arguments combine.children="append">
 
+                    <argument>--type</argument>
+                    <argument>dmg</argument>
+
                     <argument>--icon</argument>
                     <argument>${project.build.outputDirectory}/Project/icons/skull.icns</argument>
 
@@ -321,6 +324,8 @@ build installer´via  mvn clean package
               <executable>${java.home}/bin/jpackage</executable>
 
               <arguments>
+
+                <argument>--verbose</argument>
 
                 <argument>--name</argument>
                 <argument>AnatomyExplorer</argument>
