@@ -7,28 +7,20 @@ import java.io.*;
 import java.util.*;
 
 /*
-Adapted from Huson (2025) to include deduplication.
+Adapted from Huson (2025)
  */
 public class ObjParser_V3 {
 
     public static TriangleMesh load(InputStream inputStream, boolean useNormals) throws IOException {
 
-        // OBJ raw data
+        // OBJ data
         var objVertices = new ArrayList<Float>();
         var objNormals = new ArrayList<Float>();
         var objTexCoords = new ArrayList<Float>();
 
-        // Final mesh data (deduplicated)
-        var meshPoints = new ArrayList<Float>();
-        var meshNormals = new ArrayList<Float>();
-        var meshTexCoords = new ArrayList<Float>();
         var meshFaces = new ArrayList<Integer>();
 
-        // Deduplication map
-        Map<VertexKey, Integer> vertexMap = new HashMap<>();
-
         boolean hasNormals = false;
-        boolean hasTexCoords = false;
 
         try (var br = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;
@@ -53,9 +45,8 @@ public class ObjParser_V3 {
                         break;
 
                     case "vt":
-                        hasTexCoords = true;
                         objTexCoords.add(Float.parseFloat(tokens[1]));
-                        objTexCoords.add(1 - Float.parseFloat(tokens[2])); // flip V
+                        objTexCoords.add(1 - Float.parseFloat(tokens[2]));
                         break;
 
                     case "f":
@@ -73,7 +64,7 @@ public class ObjParser_V3 {
                             if (parts.length >= 2 && !parts[1].isEmpty()) {
                                 tIndices[i] = Integer.parseInt(parts[1]) - 1;
                             } else {
-                                tIndices[i] = -1; // mark as "no texcoord"
+                                tIndices[i] = 0;
                             }
 
                             nIndices[i] = (parts.length == 3 && !parts[2].isEmpty())
@@ -81,98 +72,41 @@ public class ObjParser_V3 {
                                     : 0;
                         }
 
-                        // triangulate (fan)
+                        // this loop triangulates faces that consist of > 3 points, i.e. turns a polygon into triangles
+                        // because trianglemesh wants triangles.
                         for (int i = 1; i < n - 1; i++) {
-                            addFaceVertex(vIndices[0], tIndices[0], nIndices[0],
-                                    objVertices, objTexCoords, objNormals,
-                                    meshPoints, meshTexCoords, meshNormals,
-                                    meshFaces, vertexMap, hasNormals, hasTexCoords);
+                            if (hasNormals) Collections.addAll(meshFaces,
+                                    vIndices[0], nIndices[0], tIndices[0],
+                                    vIndices[i], nIndices[i], tIndices[i],
+                                    vIndices[i + 1], nIndices[i + 1], tIndices[i + 1]);
+                            else Collections.addAll(meshFaces,
+                                    vIndices[0], tIndices[0],
+                                    vIndices[i], tIndices[i],
+                                    vIndices[i + 1], tIndices[i + 1]);
 
-                            addFaceVertex(vIndices[i], tIndices[i], nIndices[i],
-                                    objVertices, objTexCoords, objNormals,
-                                    meshPoints, meshTexCoords, meshNormals,
-                                    meshFaces, vertexMap, hasNormals, hasTexCoords);
-
-                            addFaceVertex(vIndices[i + 1], tIndices[i + 1], nIndices[i + 1],
-                                    objVertices, objTexCoords, objNormals,
-                                    meshPoints, meshTexCoords, meshNormals,
-                                    meshFaces, vertexMap, hasNormals, hasTexCoords);
                         }
                         break;
                 }
             }
         }
 
-        if (meshTexCoords.isEmpty()) {
-            meshTexCoords.add(0.0f);
-            meshTexCoords.add(0.0f);
+        if (objTexCoords.isEmpty()) {
+            objTexCoords.add(0.0f);
+            objTexCoords.add(0.0f);
         }
 
         TriangleMesh mesh = new TriangleMesh();
 
-        mesh.getPoints().setAll(toFloatArray(meshPoints));
-        mesh.getTexCoords().setAll(toFloatArray(meshTexCoords));
+        mesh.getPoints().setAll(toFloatArray(objVertices));
+        mesh.getTexCoords().setAll(toFloatArray(objTexCoords));
         mesh.getFaces().setAll(toIntArray(meshFaces));
 
-        if (hasNormals && !meshNormals.isEmpty()) {
-            mesh.getNormals().setAll(toFloatArray(meshNormals));
+        if (hasNormals && !objNormals.isEmpty()) {
+            mesh.getNormals().setAll(toFloatArray(objNormals));
             mesh.setVertexFormat(VertexFormat.POINT_NORMAL_TEXCOORD);
         }
 
         return mesh;
-    }
-
-    private static void addFaceVertex(
-            int v, int vt, int vn,
-            List<Float> objVertices,
-            List<Float> objTexCoords,
-            List<Float> objNormals,
-            List<Float> meshPoints,
-            List<Float> meshTexCoords,
-            List<Float> meshNormals,
-            List<Integer> meshFaces,
-            Map<VertexKey, Integer> vertexMap,
-            boolean hasNormals,
-            boolean hasTexCoords
-    ) {
-
-        VertexKey key = new VertexKey(v, hasTexCoords ? vt : -1, hasNormals ? vn : -1);
-
-        Integer index = vertexMap.get(key);
-        if (index == null) {
-            index = vertexMap.size();
-            vertexMap.put(key, index);
-
-            // position
-            meshPoints.add(objVertices.get(3 * v));
-            meshPoints.add(objVertices.get(3 * v + 1));
-            meshPoints.add(objVertices.get(3 * v + 2));
-
-            // texcoord
-            if (hasTexCoords) {
-                meshTexCoords.add(objTexCoords.get(2 * vt));
-                meshTexCoords.add(objTexCoords.get(2 * vt + 1));
-            }
-
-            // normal
-            if (hasNormals) {
-                meshNormals.add(objNormals.get(3 * vn));
-                meshNormals.add(objNormals.get(3 * vn + 1));
-                meshNormals.add(objNormals.get(3 * vn + 2));
-            }
-        }
-
-        // JavaFX face format: (pointIndex, texCoordIndex)
-        meshFaces.add(index);
-
-        if (hasNormals) meshFaces.add(index);
-
-        // texCoord index
-        if (hasTexCoords) {
-            meshFaces.add(index);
-        } else {
-            meshFaces.add(0); // always reference at least the single dummy texcoord
-        }
     }
 
     private static float[] toFloatArray(List<Float> list) {
@@ -187,26 +121,4 @@ public class ObjParser_V3 {
         return array;
     }
 
-    private static class VertexKey {
-        final int v, vt, vn;
-
-        VertexKey(int v, int vt, int vn) {
-            this.v = v;
-            this.vt = vt;
-            this.vn = vn;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof VertexKey)) return false;
-            VertexKey key = (VertexKey) o;
-            return v == key.v && vt == key.vt && vn == key.vn;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(v, vt, vn);
-        }
-    }
 }

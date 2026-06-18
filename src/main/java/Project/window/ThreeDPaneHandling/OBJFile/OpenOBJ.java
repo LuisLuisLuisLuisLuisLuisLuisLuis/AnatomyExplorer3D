@@ -90,7 +90,7 @@ public class OpenOBJ {
             logger.log(Level.FINE, inputStream + ", name="+nameWithoutExtension);
             File imgFile = new File(nameWithoutExtension + ".png");
             try {
-                //generate mesh from OBJ inputstream. For now I ignore normals to save RAM.
+                //generate mesh from OBJ inputstream. For now I ignore normals to save ~2GB of RAM.
                 MeshView meshView = createMeshWithIMG(ObjParser_V3.load(inputStream, false), imgFile, color);
                 //set file name as ID
                 meshView.setId(nameWithoutExtension);
