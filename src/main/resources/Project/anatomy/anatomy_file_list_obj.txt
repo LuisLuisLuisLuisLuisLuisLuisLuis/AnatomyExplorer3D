@@ -2752,3 +2752,12 @@ FMA54319	pubic hair	FJ2815.obj
 FMA54237	eyebrow	FJ2812.obj
 FMA52781	external ear	FJ2811.obj
 FMA7163	skin	FJ2810.obj
+FMA46288	inferior oblique part of left longus colli	FJ1557.obj
+FMA46284	superior oblique part of left longus colli	FJ1600.obj
+FMA46286	vertical intermediate part of left longus colli	FJ1601.obj
+artcensur	artery of right central sulcus	FJ1664.obj
+artcensul	artery of left central sulcus	FJ1664M.obj
+artcensur	artery of right central sulcus	FJ1665.obj
+artcensul	artery of left central sulcus	FJ1665M.obj
+FMA14340	middle hepatic vein	FJ1867.obj
+FMA4950	right ascending lumbar vein	FJ3658.obj

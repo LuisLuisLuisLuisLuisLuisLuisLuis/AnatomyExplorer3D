@@ -835,6 +835,7 @@ newnode2674643	superior terminal branch of right middle cerebral artery	newnode2
 newnode2674643	superior terminal branch of right middle cerebral artery	newnode4844969	right prefrontal artery
 newnode2674643	superior terminal branch of right middle cerebral artery	newnode6252618	right lateral frontobasal artery
 newnode2674643	superior terminal branch of right middle cerebral artery	newnode6545319	artery of right postcentral sulcus
+newnode2674643	superior terminal branch of right middle cerebral artery	artcensur	artery of right central sulcus
 newnode1024608	subdivision of cerebral part of right internal carotid artery	newnode7294846	right ophthalmic artery
 newnode1024608	subdivision of cerebral part of right internal carotid artery	newnode3176467	right anterior cerebral artery
 newnode3176467	right anterior cerebral artery	FMA50169	anterior communicating artery
@@ -1054,6 +1055,7 @@ newnode2136913	branch of left middle cerebral artery	newnode441043	superior term
 newnode441043	superior terminal branch of left middle cerebral artery	newnode6565801	left prefrontal artery
 newnode441043	superior terminal branch of left middle cerebral artery	newnode5507411	left lateral frontobasal artery
 newnode441043	superior terminal branch of left middle cerebral artery	newnode3479241	artery of left postcentral sulcus
+newnode441043	superior terminal branch of left middle cerebral artery	artcensul	artery of left central sulcus
 newnode441043	superior terminal branch of left middle cerebral artery	newnode839901	left anterior parietal artery
 newnode441043	superior terminal branch of left middle cerebral artery	newnode9072844	left posterior parietal artery
 newnode441043	superior terminal branch of left middle cerebral artery	newnode4715377	artery of left precentral sulcus
@@ -2079,13 +2081,13 @@ FMA46312	rectus capitis anterior	FMA46313	right rectus capitis anterior
 newnode9617002	muscles of neck - deep anterior	FMA46279	longus colli
 FMA46279	longus colli	FMA46281	inferior oblique part of longus colli
 FMA46281	inferior oblique part of longus colli	FMA46287	inferior oblique part of right longus colli (available in BP3D 3.0)
-FMA46281	inferior oblique part of longus colli	FMA46288	inferior oblique part of left longus colli (available in BP3D 3.0)
+FMA46281	inferior oblique part of longus colli	FMA46288	inferior oblique part of left longus colli
 FMA46279	longus colli	FMA46282	vertical intermediate part of longus colli
-FMA46282	vertical intermediate part of longus colli	FMA46286	vertical intermediate part of left longus colli (available in BP3D 3.0)
+FMA46282	vertical intermediate part of longus colli	FMA46286	vertical intermediate part of left longus colli
 FMA46282	vertical intermediate part of longus colli	FMA46285	vertical intermediate part of right longus colli (available in BP3D 3.0)
 FMA46279	longus colli	FMA46280	superior oblique part of longus colli
 FMA46280	superior oblique part of longus colli	FMA46283	superior oblique part of right longus colli (available in BP3D 3.0)
-FMA46280	superior oblique part of longus colli	FMA46284	superior oblique part of left longus colli (available in BP3D 3.0)
+FMA46280	superior oblique part of longus colli	FMA46284	superior oblique part of left longus colli
 newnode5955503	neck	newnode9617003	muscles of neck - posterior
 newnode9617003	muscles of neck - posterior	FMA71443	posterior cervical intertransversarii
 newnode9617003	muscles of neck - posterior	FMA22770	spinalis cervicis
