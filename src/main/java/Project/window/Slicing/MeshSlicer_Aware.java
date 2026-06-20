@@ -1,7 +1,7 @@
 package Project.window.Slicing;
 
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.shape.VertexFormat;
 
@@ -17,6 +17,8 @@ public class MeshSlicer_Aware {
             SimpleBooleanProperty modified
     ) {
         modified.set(false);
+        SimpleIntegerProperty edgeRedundancyCounter = new SimpleIntegerProperty(0);
+        SimpleIntegerProperty edgeCounter = new SimpleIntegerProperty(0);
         VertexFormat vertexFormat = input.getVertexFormat();
 
         // --- Determine face layout ---
@@ -63,13 +65,6 @@ public class MeshSlicer_Aware {
         // this means you can also check if an original point/Vertex v (with index i) has been yet added to the list of outgoing points (where it may have index j)
         Map<Integer,Integer> pointMap = new HashMap<>();
 
-        // Keep track of all new points created at intersections of triangles with the plane given by F.
-        // An Edge is an edge between Points A and B of a triangle. That edge intersects with the plane and at the intersection,
-        // a new point is created. The map maps the Edge to the rank of that point in outPts.
-        Map<Edge,Integer> edgeToPoint = new HashMap<>();
-
-
-
         class Dist {
             double eval(double x,double y,double z) {
                 return nx*x + ny*y + nz*z - d;
@@ -111,8 +106,6 @@ public class MeshSlicer_Aware {
              * @return The rank I of that point in outPts. Obtain the coords of that point at outPts[I*3], [I*3 + 1] and [I*3 + 2].
              */
             int apply(int a, int b, double sa, double sb) {
-                Edge e = new Edge(Math.min(a,b), Math.max(a,b));    // 'normalize' the edge to always go in the same direction (small to large) so that Edge(b,a) won't be added if Edge(a,b) already exists.
-                if (edgeToPoint.containsKey(e)) return edgeToPoint.get(e);  // if this edge has already been solved, don't do it again (to save time and to not create identical points on top of each other).
 
                 int ia = a*3, ib = b*3; // list indices
                 double x0 = inPts[ia],   y0 = inPts[ia+1], z0 = inPts[ia+2];    // retrieve the point coords from inPts
@@ -131,7 +124,6 @@ public class MeshSlicer_Aware {
                 outPts.add((float)zi);
 
                 int newIdx = (outPts.size()/3) - 1; // the rank of the new point (by which it can be accessed in outPts via newIdx * 3)
-                edgeToPoint.put(e, newIdx);         // create an entry in edgeToPoint
 
                 return newIdx;
             }
@@ -139,10 +131,9 @@ public class MeshSlicer_Aware {
         AddIntersection addIntersection = new AddIntersection();
 
 
-        // --- Face writer ---
         class AddFace {
             /**
-             * Write a triangle (face) to outFaces.
+             * conveniance class to write a triangle (face) to outFaces. uses the correct format.
              * @param p0 Index of point p0. Same for p1, p2.
              * @param n0 Index of Normal for p0. Same for n1, n2.
              * @param t0 Index of texture coordinate of p0 in outTex. Same for p1, p2.
@@ -152,12 +143,12 @@ public class MeshSlicer_Aware {
                          int p2,int n2,int t2) {
                 // choose the right format
                 if (!hasNormals) {
-                    // POINT_TEXCOORD: (p,t)
+                    // POINT_TEXCOORD
                     outFaces.add(p0); outFaces.add(t0);
                     outFaces.add(p1); outFaces.add(t1);
                     outFaces.add(p2); outFaces.add(t2);
                 } else {
-                    // POINT_NORMAL_TEXCOORD: (p,n,t)
+                    // POINT_NORMAL_TEXCOORD
                     outFaces.add(p0); outFaces.add(n0); outFaces.add(t0);
                     outFaces.add(p1); outFaces.add(n1); outFaces.add(t1);
                     outFaces.add(p2); outFaces.add(n2); outFaces.add(t2);
@@ -195,15 +186,7 @@ public class MeshSlicer_Aware {
             int inside = (in0?1:0)+(in1?1:0)+(in2?1:0); // count how many of them are kept.
 
             if (!modified.get()) modified.set(inside != 3);
-//            if (meshSliceState.get().equals(MeshSliceState.UNMODIFIED)) if (inside != 3) meshSliceState.set(MeshSliceState.SLICED);
-//            if (inside != 3) {
-//                if (inside == 0) {
-//                    if (first round) {
-//                        meshSliceState.set(MeshSliceState.FULLY_REMOVED);
-//                    }
-//                } else meshSliceState.set(MeshSliceState.SLICED);
-//            } if (meshSliceState.get().equals(MeshSliceState.FULLY_REMOVED)) meshSliceState.set(MeshSliceState.SLICED);
-//
+
             if (inside == 0) continue;
 
             // This triangle can be kept entirely.
@@ -317,7 +300,7 @@ public class MeshSlicer_Aware {
 
         }
 
-        // --- Build output mesh ---
+
         TriangleMesh out = new TriangleMesh(vertexFormat);
 
         out.getPoints().setAll(toFloatArray(outPts));
@@ -338,7 +321,6 @@ public class MeshSlicer_Aware {
         return out;
     }
 
-    // --- Helpers ---
     private static float[] toFloatArray(List<Float> list) {
         float[] arr = new float[list.size()];
         for (int i=0;i<list.size();i++) arr[i]=list.get(i);
@@ -351,23 +333,4 @@ public class MeshSlicer_Aware {
         return arr;
     }
 
-    /**
-     * An Edge between a and b.
-     */
-    private static class Edge {
-        final int a,b;
-        Edge(int a,int b){this.a=a;this.b=b;}
-        public boolean equals(Object o){
-            if(!(o instanceof Edge)) return false;
-            Edge e=(Edge)o;
-            return a==e.a && b==e.b;
-        }
-        public int hashCode(){return 31*a+b;}
-    }
-
-    public enum MeshSliceState {
-        FULLY_REMOVED,
-        UNMODIFIED,
-        SLICED
-    }
 }
