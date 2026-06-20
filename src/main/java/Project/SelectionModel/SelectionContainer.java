@@ -88,7 +88,6 @@ public abstract class SelectionContainer<selectionType, groupSelectionType> {
      * @return those items that were failed to be selected.
      */
     protected ObservableList<groupSelectionType> changeSelection(@NotNull Set<groupSelectionType> groupSelection, boolean clear, boolean remove) {
-        long startTime = System.nanoTime();
         if (!isUpdatingGroup()) {
             isBeingUpdated(true);
             clearFailedList();
@@ -110,9 +109,6 @@ public abstract class SelectionContainer<selectionType, groupSelectionType> {
             isUpdatingGroup(false);
             clearFailedList();
         }
-        long endTime = System.nanoTime();
-        long durationMillis = (endTime - startTime) / 1000000;
-        System.out.println("changeSelection took " + durationMillis);
 
         return getFailedToSelect();
     }
