@@ -123,9 +123,7 @@ public class MeshSlicer_Aware {
                 outPts.add((float)yi);
                 outPts.add((float)zi);
 
-                int newIdx = (outPts.size()/3) - 1; // the rank of the new point (by which it can be accessed in outPts via newIdx * 3)
-
-                return newIdx;
+                return (outPts.size()/3) - 1;   // the rank of the new point (by which it can be accessed in outPts via newIdx * 3)
             }
         }
         AddIntersection addIntersection = new AddIntersection();

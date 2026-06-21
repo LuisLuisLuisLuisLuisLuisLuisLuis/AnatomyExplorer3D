@@ -134,16 +134,11 @@ public class SliceCommand implements Command {
                                 else cutTheFirstTime.add(meshView.getId());
 
                                 meshesToSet.put(meshView, cutMesh);
-//                    meshView.setMesh(cutMesh);
-//                    meshView.setCullFace(CullFace.NONE);    // VERY IMPORTANT! because now we can see inside the MeshView, i.e. we can see both sides of the faces -> both sides need to be rendered -> FRONT/BACK wont suffice
-//                    meshView.setUserData("cut");
                             } else {
                                 if (meshView.getUserData() != null) modMeshesToRemoveFully.add(meshView);
                                 else {
                                     meshViewIDToOgMesh.put(meshView.getId(), null);
                                     unmodMeshesToRemoveFully.add(meshView);
-//                        threeDSelectionGroup.changeSelection(Set.of(meshView.getId()), false, true);
-//                        this.hasFXGroupContents.unselect(meshView);
                                 }
                             }
                         }
@@ -158,7 +153,6 @@ public class SliceCommand implements Command {
         };
         task.setOnSucceeded(e -> {
             if (!unmodMeshesToRemoveFully.isEmpty()) {
-//                threeDSelectionGroup.changeSelection(unmodMeshesToRemoveFully.stream().map(Node::getId).collect(Collectors.toSet()), false, true);
                 hasFXGroupSelection.unselect(unmodMeshesToRemoveFully);
                 for (MeshView meshView : unmodMeshesToRemoveFully) this.hasFXGroupContents.unselect(meshView);
             }
@@ -169,7 +163,6 @@ public class SliceCommand implements Command {
             }
             if (!modMeshesToRemoveFully.isEmpty()) {
                 this.rememberHasFXGroupContents = new RememberHasFXGroupContents(hasFXGroupContents, modMeshesToRemoveFully);
-//                threeDSelectionGroup.changeSelection(modMeshesToRemoveFully.stream().map(Node::getId).collect(Collectors.toSet()), false, true);
                 hasFXGroupSelection.unselect(modMeshesToRemoveFully);
                 for (MeshView meshView : modMeshesToRemoveFully) this.hasFXGroupContents.unselect(meshView);
             }

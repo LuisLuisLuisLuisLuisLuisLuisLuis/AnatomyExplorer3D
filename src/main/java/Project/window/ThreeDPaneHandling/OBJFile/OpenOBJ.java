@@ -35,7 +35,6 @@ public class OpenOBJ {
         material.setSpecularColor(Color.DARKGREY);
 
         if (image.exists()) {
-            //meshView.setCullFace(CullFace.FRONT); strangely caused the cube to deform when rotating.
             material.setDiffuseMap(new Image(image.toURI().toString()));
         } else {
             if (color == null) color = HasFXGroupContents.DEFAULT_COLOR;
