@@ -127,12 +127,6 @@ public class SimpleSliceMCQuestion<T,S extends Comparable<S>> extends SimpleMult
 
         threeDGroupHandler.createSlicePlaneAtMeshView(sliceTarget, sliceAxis, sliceAxisPositive);
 
-//        this.arrow = threeDGroupHandler.pointArrowAt(
-//                threeDGroupHandler.getHasFXGroupContents().getMeshViewWithID(sliceTarget),
-//                getArrowPlaneForSlicePlane(sliceAxis),
-//                sliceAxisPositive,
-//                false,
-//                arrowColor);
         changeArrow();
 
         threeDGroupHandler.slice(threeDGroupHandler.getHasFXGroupContents().getSelection());    //slice everything

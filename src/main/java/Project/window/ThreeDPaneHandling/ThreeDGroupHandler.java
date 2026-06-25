@@ -159,7 +159,7 @@ public class ThreeDGroupHandler {
             Group3DRotation.applyGlobalRotation(node,rotateAxis, rotateAngle);
         }
 
-        switch (bodyAxis) {
+        switch (bodyAxis) { // so that red and green side are not inside each other
             case CORONAL -> {
                 slicePlaneGroup.getChildren().getFirst().setTranslateY(1);
             }

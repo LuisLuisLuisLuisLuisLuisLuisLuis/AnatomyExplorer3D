@@ -107,23 +107,7 @@ public class RandomUIQuizGenerator {
 
         controller.getNquestionsTextfield().setTextFormatter(new TextFormatter<>(nquestionsFilter));
         controller.getTimeTextField().setTextFormatter(new TextFormatter<>(timeFilter));
-//        controller.getDifficultySlider().setLabelFormatter(new StringConverter<Double>() {    // when the slider still encoded difficulty
-//            @Override
-//            public String toString(Double value) {
-//                return switch (value.intValue()) {
-//                    case 100 -> "Very easy";
-//                    case 200 -> "Easy";
-//                    case 300 -> "Medium";
-//                    case 400 -> "Hard";
-//                    case 500 -> "Very hard";
-//                    default -> controller.getDifficultySlider().getValue() + "";
-//                };
-//            }
-//            @Override
-//            public Double fromString(String string) {
-//                return 0.0;
-//            }
-//        });
+
         controller.getDifficultySlider().setLabelFormatter(new StringConverter<Double>() {
             @Override
             public String toString(Double object) {
@@ -190,16 +174,6 @@ public class RandomUIQuizGenerator {
 //                    resourceLocations.add(model.getFilesDir().toURI());
 //                }
             }
-
-//            Difficulty difficulty =
-//                    switch ((int) controller.getDifficultySlider().getValue()) {
-//                case 100 -> Difficulty.VERY_EASY;
-//                case 200 -> Difficulty.EASY;
-//                case 300 -> Difficulty.MEDIUM;
-//                case 400 -> Difficulty.HARD;
-//                case 500 -> Difficulty.VERY_HARD;
-//                default -> new Difficulty((int) controller.getDifficultySlider().getValue(), "Custom: " + (int) controller.getDifficultySlider().getValue());
-//            };
 
             HOW_MUCH_TO_DRAW = (int) controller.getDifficultySlider().getValue() + 1;   //+1 because at least the target needs to be drawn
 
@@ -325,7 +299,7 @@ public class RandomUIQuizGenerator {
     private TreeItem<ANode> hepaticPortal = null;
     private TreeItem<ANode> prehepPortal = null;
 
-
+    //these can't be used for 3D questions because the eye is an enclosed sphere and you can't see the stuff that's inside
     private TreeItem<ANode> leftEyeballAndChambers = null;
     private TreeItem<ANode> rightEyeballAndChambers = null;
     private TreeItem<ANode> orbitalPartOfLeftEye = null;
@@ -356,7 +330,7 @@ public class RandomUIQuizGenerator {
     private final Set<String> forbiddenIDsForSelectIn3D = Set.of("FJ1913");
 
     /** these must not be drawn at all*/
-    private final Set<String> forbiddenIDs; //for now only skin. reason: it hides everything else.
+    private final Set<String> forbiddenIDs; //for now only the skin because it covers everything else.
     {
         Set<String> result = HashSet.newHashSet(2);
         result.add("FJ2810");
@@ -383,8 +357,8 @@ public class RandomUIQuizGenerator {
      * @return the UIQuiz
      */
     public UIQuiz<Integer> simpleIntQuizFromTree(Map<TreeItem<ANode>, Model> topicToModel, int nquestions, Difficulty difficulty, int time, TimeUnit timeUnit, boolean showCorrectAnswerOnWrong) {
-        List<UIQuestion<?, Integer>> questions = new ArrayList<>(topicToModel.size());
         for (TreeItem<ANode> root : new LinkedList<>(topicToModel.keySet())) if (root.getChildren().isEmpty() && forbiddenIDs.contains(root.getValue().conceptId())) topicToModel.remove(root);
+        List<UIQuestion<?, Integer>> questions = new ArrayList<>(nquestions);
         int topicInd = 0;
         int sliceAxisInd = 0;
 
