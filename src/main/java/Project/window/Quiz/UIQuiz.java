@@ -136,7 +136,7 @@ public abstract class UIQuiz<S extends Comparable<S>> implements Quiz<S>{
      * @param questions the questions for this quiz
      * @param showScore whether to display the currents score (and highscore) during the quiz
      * @param showCorrect whether to inform the user if their answer was correct or not and if not to show them the correct solution
-     * @param allowedTime time after which the quiz will automatically end
+     * @param allowedTime time after which the quiz will automatically end. Set to -1 for no limit.
      * @param timeUnit time unit of the given allowed time. Must be one of {HOURS, MINUTES, SECONDS}.
      */
     public UIQuiz(List<UIQuestion<?, S>> questions, boolean showScore, boolean showCorrect, int allowedTime, TimeUnit timeUnit) {

@@ -60,18 +60,20 @@ public class Plane {
     }
 
     /**
-     * Assume the Box represents a Plane whose normal was originally (0,0,1).
+     * Assume the Box represents a Plane whose normal was originally (0,0,-1).
      * Obtain the direction of the normal in the coordinate system of meshGroup.
-     * @return The plane as normal (x,y,z,d)
+     * @return The normal (x,y,z,d) as array
+     * mostly generated with the help of GPT 5.1, see https://chatgpt.com/s/t_6a3d653434b08191ac261ce8c74b3bb3
+     * with prompt: if i have a javafx Box (height=width=2000, depth=1; at the origin) that i use to visualize where the slice will happen, how can i extract the nx ny nz and d inputs needed for the slice method from the box? the box itself is inside a javafx Group which is not the same as the Group which holds the meshes that will be sliced
      */
     public static double[] extractPlaneFromBox(Box box, Group meshGroup) throws NonInvertibleTransformException {
 
-        // 1. local normal (thin axis = Z)
-        Point3D localNormal = new Point3D(0,0,-1);
+        // 1. local normal
+        Point3D boxNormal = new Point3D(0,0,-1);
 
         // 2. normal to world
         Point3D worldNormal = box.getLocalToSceneTransform()
-                .deltaTransform(localNormal)
+                .deltaTransform(boxNormal)
                 .normalize();
 
         // 3. point on plane (box center)
@@ -80,10 +82,7 @@ public class Plane {
         // 4. convert to mesh local space
         Point3D meshPoint = meshGroup.sceneToLocal(worldPoint);
 
-        Point3D meshNormal = meshGroup.getLocalToSceneTransform()
-                .createInverse()
-                .deltaTransform(worldNormal)
-                .normalize();
+        Point3D meshNormal = meshGroup.getLocalToSceneTransform().createInverse().deltaTransform(worldNormal).normalize();
 
         // 5. compute d
         double nx = meshNormal.getX();

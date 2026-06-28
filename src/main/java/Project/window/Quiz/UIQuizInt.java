@@ -12,7 +12,7 @@ public class UIQuizInt extends UIQuiz<Integer>{
     }
 
     public UIQuizInt(List<UIQuestion<?, Integer>> uiQuestions, boolean showScore, boolean showCorrect) {
-        super(uiQuestions, showScore, showCorrect);
+        this(uiQuestions, showScore, showCorrect, -1, TimeUnit.SECONDS);
     }
 
     @Override

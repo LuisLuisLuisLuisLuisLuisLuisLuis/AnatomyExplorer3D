@@ -145,7 +145,7 @@
                                                 <MenuButton fx:id="selectionStyleButton" mnemonicParsing="false" text="Selection style">
                                                   <items>
                                                     <CheckMenuItem fx:id="saturationStyleMenuitem" mnemonicParsing="false" selected="true" text="Saturation" />
-                                                    <CheckMenuItem fx:id="fillStyleMenuitem" mnemonicParsing="false" text="Fill mode" />
+                                                    <CheckMenuItem fx:id="fillStyleMenuitem" mnemonicParsing="false" text="Transparent" />
                                                   </items>
                                                 </MenuButton>
                                                 <Separator orientation="VERTICAL" />

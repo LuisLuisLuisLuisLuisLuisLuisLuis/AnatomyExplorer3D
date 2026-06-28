@@ -27,32 +27,6 @@ import static Project.window.TreeView.TreeAnalysis.TreeAnalysisUtils.*;
  */
 public class TreeViewSetup {
 
-
-//    private final ObjectProperty<Runnable> onEvent = new SimpleObjectProperty<>();
-//
-//    public final ObjectProperty<Runnable> onEventProperty() {
-//        return onEvent;
-//    }
-//
-//    /*
-//     * Set a Runnable that is run when changes are made to the tree.
-//     */
-//    public final void setOnEvent(Runnable runnable) {
-//        onEvent.set(runnable);
-//    }
-//
-//    /*
-//     * Runnable property. The Runnable runs whenever a change is made to the tree.
-//     */
-//    public final Runnable getOnEvent() {
-//        return onEvent.get();
-//    }
-//
-//    //this gets run when the tree (and the fileIDs) changes
-//    private void runOnANodeFileIDsModified() {
-//        if (getOnEvent() != null) onEvent.get().run();
-//    }
-
     private final UndoableANodeTreeViewEditor treeViewEditor1;
 
     public TreeViewSetup (UndoableANodeTreeViewEditor treeViewEditor) {
@@ -98,65 +72,64 @@ public class TreeViewSetup {
     public void setCellFactory(TreeView<ANode> treeView, UndoableANodeTreeViewEditor _treeViewEditor, ANode modelRoot, boolean allowEditing) {
         treeView.setEditable(allowEditing);
         _treeViewEditor.addTreeView(treeView);
-        treeView.setCellFactory(_ -> {
-            return new TextFieldTreeCell<ANode>(
-                    new StringConverter<ANode>() {
-                        @Override
-                        public String toString(ANode node) {
-                            return node == null ? "" : node.toString();
-                        }
-                        //create temporary ANode holding the string entered by the user
-                        @Override
-                        public ANode fromString(String newname) {
-                            return new ANode("", newname, new HashSet<>(), new HashSet<>());
-                        }
+        treeView.setCellFactory(_ -> new TextFieldTreeCell<ANode>(
+                new StringConverter<ANode>() {
+                    @Override
+                    public String toString(ANode node) {
+                        return node == null ? "" : node.toString();
                     }
-            ) {
-                private final UndoableANodeTreeViewEditor treeViewEditor1 = _treeViewEditor;
+                    //create temporary ANode holding the string entered by the user
+                    @Override
+                    public ANode fromString(String newname) {
+                        return new ANode("", newname, new HashSet<>(), new HashSet<>());
+                    }
+                }
+        ) {
+            private final UndoableANodeTreeViewEditor treeViewEditor1 = _treeViewEditor;
 
-                @Override
-                public void updateItem(ANode item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                        setGraphic(null);
-                        setContextMenu(null);
-                    } else {
-                        //show menu on right click
-                        setText(item.toString());
-                        MenuItem selectBelow = new MenuItem("Select below");
-                        MenuItem cut = new MenuItem("Cut");
-                        MenuItem paste = new MenuItem("Paste");
-                        MenuItem rename = new MenuItem("Rename");
-                        MenuItem delete = new MenuItem("Delete");
-                        MenuItem extract = new MenuItem("Extract children");
-                        MenuItem create = new MenuItem("Create");
-                        MenuItem fileIDInfo = new MenuItem("FileID Info");
-                        MenuItem print = new MenuItem("Print Subtree");
-                        MenuItem printF = new MenuItem("Print FileIDs of Subtree");
-                        MenuItem splitLeftRight = new MenuItem("Split Subtree in Left/Right");
-                        MenuItem moveLRBehind1LastWord = new MenuItem("Move L/R behind n'th last word");
-                        MenuItem restrucTree = new MenuItem("Restructure Subtree");
+            @Override
+            public void updateItem(ANode item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    setContextMenu(null);
+                } else {
+                    //show menu on right click
+                    setText(item.toString());
+                    MenuItem selectBelow = new MenuItem("Select below");
+                    MenuItem cut = new MenuItem("Cut");
+                    MenuItem paste = new MenuItem("Paste");
+                    MenuItem rename = new MenuItem("Rename");
+                    MenuItem delete = new MenuItem("Delete");
+                    MenuItem extract = new MenuItem("Extract children");
+                    MenuItem create = new MenuItem("Create");
+                    MenuItem fileIDInfo = new MenuItem("FileID Info");
+                    MenuItem print = new MenuItem("Print Subtree");
+                    MenuItem printF = new MenuItem("Print FileIDs of Subtree");
+                    MenuItem splitLeftRight = new MenuItem("Split Subtree in Left/Right");              //these don't work 100% and are
+                    MenuItem moveLRBehind1LastWord = new MenuItem("Move L/R behind n'th last word");    //also very specific use-case so they're omitted rn.
+                    MenuItem restrucTree = new MenuItem("Restructure Subtree");
 
-                        selectBelow.setOnAction(e -> SelectAllTreeViewCommand.bulkSelect(TreeAnalysisUtils.accumulateAllTreeItemsBelow(this.getTreeItem()), treeView));
-                        cut.setOnAction(e -> cut(this.getTreeItem()));
-                        paste.setOnAction(e -> paste(this.getTreeItem(), this.getTreeView().getRoot()));
-                        paste.disableProperty().bind(treeViewEditor1.canPaste().not());
-                        delete.setOnAction(e -> delete(this.getTreeItem()));
-                        rename.setOnAction(e -> getTreeView().edit(this.getTreeItem()));
-                        create.setOnAction(e -> this.create());
-                        extract.setOnAction(e -> extract(this.getTreeItem()));
-                        fileIDInfo.setOnAction(e -> {
-                            try {
-                                showFileIDInfo(this.getTreeItem());
-                            }
-                            catch (IOException ioe) {
-                                System.out.println("Failed to load FileIDInfo");
-                                ioe.printStackTrace();
-                            }
-                        });
-                        print.setOnAction(e -> LittlePopUp.showScrollableTextPopup("Subtree of " + this.getTreeItem().getValue().name() + "(" + this.getTreeItem().getValue().conceptId() + ")", TreeExport.printSubtreeBelow(this.getTreeItem(), true), false));
-                        printF.setOnAction(e -> LittlePopUp.showScrollableTextPopup("File List of " + this.getTreeItem().getValue().name() + "(" + this.getTreeItem().getValue().conceptId() + "). Format: node ID | node name | File ID", TreeExport.generateFileListRec(this.getTreeItem()).toString(), false));
+                    selectBelow.setOnAction(e -> SelectAllTreeViewCommand.bulkSelect(TreeAnalysisUtils.accumulateAllTreeItemsBelow(this.getTreeItem()), treeView));
+                    cut.setOnAction(e -> cut(this.getTreeItem()));
+                    paste.setOnAction(e -> paste(this.getTreeItem(), this.getTreeView().getRoot()));
+                    paste.disableProperty().bind(treeViewEditor1.canPaste().not());
+                    delete.setOnAction(e -> delete(this.getTreeItem()));
+                    rename.setOnAction(e -> getTreeView().edit(this.getTreeItem()));
+                    create.setOnAction(e -> this.create());
+                    extract.setOnAction(e -> extract(this.getTreeItem()));
+                    fileIDInfo.setOnAction(e -> {
+                        try {
+                            showFileIDInfo(this.getTreeItem());
+                        }
+                        catch (IOException ioe) {
+                            System.err.println("Failed to load FileIDInfo");
+                            ioe.printStackTrace();
+                        }
+                    });
+                    print.setOnAction(e -> LittlePopUp.showScrollableTextPopup("Subtree of " + this.getTreeItem().getValue().name() + "(" + this.getTreeItem().getValue().conceptId() + ")", TreeExport.printSubtreeBelow(this.getTreeItem(), true), false));
+                    printF.setOnAction(e -> LittlePopUp.showScrollableTextPopup("File List of " + this.getTreeItem().getValue().name() + "(" + this.getTreeItem().getValue().conceptId() + "). Format: node ID | node name | File ID", TreeExport.generateFileListRec(this.getTreeItem()).toString(), false));
 
 //                        splitLeftRight.setOnAction(e -> {UndoableANodeTreeViewEditor.splitSubtreeLeftRight(this.getTreeItem(), modelRoot);});
 
@@ -167,231 +140,208 @@ public class TreeViewSetup {
 //                            getTreeView().refresh();
 //                        });
 
-                        restrucTree.setOnAction(e -> {
-                            treeViewEditor1.restructureTree(this.getTreeItem(), this.getTreeView().getId());
-                        });
-                        if (allowEditing) {
-                            if (getTreeItem().getParent() != null) setContextMenu(new ContextMenu(selectBelow, cut, paste, delete, rename, create, extract, restrucTree, fileIDInfo, print, printF));
-                            else setContextMenu(new ContextMenu(selectBelow, paste, rename, create, restrucTree, fileIDInfo, print, printF));
+                    restrucTree.setOnAction(e -> {
+                        treeViewEditor1.restructureTree(this.getTreeItem(), this.getTreeView().getId());
+                    });
+                    if (allowEditing) {
+                        if (getTreeItem().getParent() != null) setContextMenu(new ContextMenu(selectBelow, cut, paste, delete, rename, create, extract, restrucTree, fileIDInfo, print, printF));
+                        else setContextMenu(new ContextMenu(selectBelow, paste, rename, create, restrucTree, fileIDInfo, print, printF));
+                    } else {
+                        setContextMenu(new ContextMenu(selectBelow, fileIDInfo, print, printF));
+                    }
+                }
+            }
+
+
+            private void create() {
+                String id = generateUnusedID(modelRoot);
+                ANode newnode = new ANode(
+                        id, id, new HashSet<>(), new HashSet<>()
+                );
+                TreeItem<ANode> newTreeItem = this.treeViewEditor1.create(this.getTreeItem(), newnode, treeView.getId());
+                getTreeView().edit(newTreeItem);
+            }
+
+            private void extract(TreeItem<ANode> parent) {
+                if (parent.getParent() == null) return;
+                treeViewEditor1.extractChildren(parent, treeView.getId());
+            }
+
+            private void cut(TreeItem<ANode> treeItem) {
+                this.treeViewEditor1.cut(treeItem, treeView.getId());
+            }
+
+            /**
+             * Paste under the given treeItem.
+             * @param treeItem
+             * @param root It will be checked if any of the conceptIDs of the ANodes being pasted already occur in the tree below
+             *             root. If so, the user will be informed via a PopUp window and asked if the pasted nodes in question
+             *             should receive new randomized conceptIDs or else the pasting will not be allowed.
+             *             Usually this means that this parameter is the master root of the tree that contains treeItem.
+             */
+            private void paste(TreeItem<ANode> treeItem, TreeItem<ANode> root) {
+                if (!treeViewEditor1.canPaste().get()) return;
+                // Check to see if there are already ANodes in this tree that have the same conceptID as any of the
+                // Anodes of the TreeItems being pasted now.
+                // If so, inform the user via a popup and ask whether to proceed.
+                // If so, replace every ANode whose ID already occurs in this tree with a new ANode with different ID that is otherwise identical.
+                //      Change the ANode relationships accordingly before pasting.
+                // Then follows the regular paste operation.
+
+                LinkedList<TreeItem<ANode>> itemsToPaste = new LinkedList<>();
+                TreeAnalysisUtils.accumulateForEveryNodeBelow(treeViewEditor1.clipBoardContent(), itemsToPaste, t -> t);
+
+                if (TreeRestructuring.searchForDupIDs(root, "Cannot paste in this tree. The following node IDs would be duplicated:", null, itemsToPaste, "Existing item", "Item to paste")) {
+                    return;
+
+                }
+
+                //now the regular pasting.
+                this.treeViewEditor1.paste(treeItem, treeView.getId()); //this node IS the targetParent
+
+            }
+
+            private void delete(TreeItem<ANode> treeItem) {
+                if (treeItem.getParent() == null) return;
+
+                this.treeViewEditor1.delete(treeItem, treeView.getId());
+            }
+
+            /**
+             * Shows popup window with FileID info
+             * @throws IOException
+             */
+            public void showFileIDInfo(TreeItem<ANode> treeItem) throws IOException {
+
+                final String fIDofThis = "lightgreen";
+                final String fIDofLeaf = "lightyellow";
+                final String fIDofInt = "darkseagreen";
+
+                FileIDView fileIDView = new FileIDView();
+
+                TableColumn<FileIDRow, String> col1 = new TableColumn<>("FileID");
+                TableColumn<FileIDRow, String> col2 = new TableColumn<>("Occurrences in Subtree");
+                col1.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().col1));
+                col1.setMinWidth(100);
+                col1.setPrefWidth(100);
+                col1.setMaxWidth(100);
+                col2.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().col2));
+                col2.setCellFactory(col -> new TableCell<>() {
+                    @Override
+                    protected void updateItem(String value, boolean empty) {
+                        super.updateItem(value, empty);
+                        setTextFill(Color.BLACK);   // otherwise selected -> white, which is hard to read
+                        if (empty || getTableRow().getItem() == null) {
+                            setText(null);
+                            setStyle("");
                         } else {
-                            setContextMenu(new ContextMenu(selectBelow, fileIDInfo, print, printF));
+                            FileIDRow row = getTableRow().getItem();
+                            setText(value);
+                            setStyle("-fx-background-color: " + row.colorCss() + ";");
                         }
                     }
-                }
+                });
 
-
-                private void create() {
-                    String id = generateUnusedID(modelRoot);
-                    ANode newnode = new ANode(
-                            id, id, new HashSet<>(), new HashSet<>()
-                    );
-                    TreeItem<ANode> newTreeItem = this.treeViewEditor1.create(this.getTreeItem(), newnode, treeView.getId());
-                    getTreeView().edit(newTreeItem);
-                }
-
-                private void extract(TreeItem<ANode> parent) {
-                    if (parent.getParent() == null) return;
-                    treeViewEditor1.extractChildren(parent, treeView.getId());
-                }
-
-                private void cut(TreeItem<ANode> treeItem) {
-                    this.treeViewEditor1.cut(treeItem, treeView.getId());
-                }
-
-                /**
-                 * Paste under the given treeItem.
-                 * @param treeItem
-                 * @param root It will be checked if any of the conceptIDs of the ANodes being pasted already occur in the tree below
-                 *             root. If so, the user will be informed via a PopUp window and asked if the pasted nodes in question
-                 *             should receive new randomized conceptIDs or else the pasting will not be allowed.
-                 *             Usually this means that this parameter is the master root of the tree that contains treeItem.
-                 */
-                private void paste(TreeItem<ANode> treeItem, TreeItem<ANode> root) {
-                    if (!treeViewEditor1.canPaste().get()) return;
-                    // Check to see if there are already ANodes in this tree that have the same conceptID as any of the
-                    // Anodes of the TreeItems being pasted now.
-                    // If so, inform the user via a popup and ask whether to proceed.
-                    // If so, replace every ANode whose ID already occurs in this tree with a new ANode with different ID that is otherwise identical.
-                    //      Change the ANode relationships accordingly before pasting.
-                    // Then follows the regular paste operation.
-
-                    LinkedList<TreeItem<ANode>> itemsToPaste = new LinkedList<>();
-                    TreeAnalysisUtils.accumulateForEveryNodeBelow(treeViewEditor1.clipBoardContent(), itemsToPaste, t -> t);
-//                    HashMap<TreeItem<ANode>, Collection<TreeItem<ANode>>> duplicateItemsMap = TreeAnalysisUtils.lookForDuplicateIDsInTree(itemsToPaste, root, false);
-
-//                    if (!duplicateItemsMap.isEmpty()) {
-                    if (TreeRestructuring.searchForDupIDs(root, "Cannot paste in this tree. The following node IDs would be duplicated:", null, itemsToPaste, "Existing item", "Item to paste")) {
-//                        StringBuilder stringBuilder = new StringBuilder();
-//                        for (TreeItem<ANode> dupTreeItem : duplicateItemsMap.keySet()) {
-//                            for (TreeItem<ANode> aNode : duplicateItemsMap.get(dupTreeItem)) stringBuilder.append("ID: " + dupTreeItem.getValue().conceptId() + " Name: " + dupTreeItem.getValue().name() + " | ID: " + aNode.getValue().conceptId() + " Name: " + aNode.getValue().name() + "\n");
-//                        }
-//
-////                        String popupText = """
-////                            Pasting will result in the following nodes being duplicated.
-////                            Assign new IDs to duplicated nodes and continue?
-////
-////                            Item to paste | already present item with same ID
-////
-////                            """ + stringBuilder.toString();
-//                        String popupText = """
-//                                Cannot paste in this tree. The following node IDs would be duplicated:
-//
-//                                Item to paste | already present item with same ID
-//
-//                                """ + stringBuilder.toString();
-//                        LittlePopUp.showScrollableTextPopup("Error", popupText, false);    // i dont want to implement this as undoable..
-                        return;
-//                        if (!LittlePopUp.showScrollableTextPopup("Warning", popupText)) return;
-//                        for (TreeItem<ANode> itemWDuplicateANode : duplicateItemsMap.keySet()) replaceANodeByCopy(itemWDuplicateANode, root);
+                ANode thisanode = treeItem.getValue();    //so i dont have to type getvalue all the time
+                HashMap<String, LinkedList<ANode>> fileIDtoANode = collectFileIDsBelow(thisanode);
+                LinkedList<String> sortedFileIDs = new LinkedList<>(fileIDtoANode.keySet());
+                sortedFileIDs.sort((fileID1, fileID2) -> {
+                    if ((fileIDtoANode.get(fileID1).getFirst() == thisanode )) {
+                        if (fileIDtoANode.get(fileID2).getFirst() != thisanode)  return -1;
+                        else return 0;
+                    } else {
+                        if (fileIDtoANode.get(fileID2).getFirst() == thisanode) return 1;
+                        else return 0;
                     }
+                });
 
-                    //now the regular pasting.
-                    this.treeViewEditor1.paste(treeItem, treeView.getId()); //this node IS the targetParent
-
-                }
-
-                private void delete(TreeItem<ANode> treeItem) {
-                    if (treeItem.getParent() == null) return;
-
-                    this.treeViewEditor1.delete(treeItem, treeView.getId());
-                }
-
-                /**
-                 * Shows popup window with FileID info
-                 * @throws IOException
-                 */
-                public void showFileIDInfo(TreeItem<ANode> treeItem) throws IOException {
-
-                    final String fIDofThis = "lightgreen";
-                    final String fIDofLeaf = "lightyellow";
-                    final String fIDofInt = "darkseagreen";
-
-                    FileIDView fileIDView = new FileIDView();
-
-                    TableColumn<FileIDRow, String> col1 = new TableColumn<>("FileID");
-                    TableColumn<FileIDRow, String> col2 = new TableColumn<>("Occurrences in Subtree");
-                    col1.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().col1));
-                    col1.setMinWidth(100);
-                    col1.setPrefWidth(100);
-                    col1.setMaxWidth(100);
-                    col2.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().col2));
-                    col2.setCellFactory(col -> new TableCell<>() {
-                        @Override
-                        protected void updateItem(String value, boolean empty) {
-                            super.updateItem(value, empty);
-                            setTextFill(Color.BLACK);   // otherwise selected -> white, which is hard to read
-                            if (empty || getTableRow().getItem() == null) {
-                                setText(null);
-                                setStyle("");
-                            } else {
-                                FileIDRow row = getTableRow().getItem();
-                                setText(value);
-                                setStyle("-fx-background-color: " + row.colorCss() + ";");
-                            }
+                ObservableList<FileIDRow> rows = FXCollections.observableArrayList();
+                for (String fileID : sortedFileIDs) {
+                    String colorCss;
+                    boolean occursInThisNode = fileIDtoANode.get(fileID).getFirst() == thisanode;
+                    boolean occursInLeaf = false;
+                    for (ANode anode : fileIDtoANode.get(fileID)) {
+                        if (anode.children().isEmpty()) {
+                            occursInLeaf = true;
+                            break;
                         }
-                    });
-
-                    ANode thisanode = treeItem.getValue();    //so i dont have to type getvalue all the time
-                    HashMap<String, LinkedList<ANode>> fileIDtoANode = collectFileIDsBelow(thisanode);
-                    LinkedList<String> sortedFileIDs = new LinkedList<>(fileIDtoANode.keySet());
-                    sortedFileIDs.sort((fileID1, fileID2) -> {
-                        if ((fileIDtoANode.get(fileID1).getFirst() == thisanode )) {
-                            if (fileIDtoANode.get(fileID2).getFirst() != thisanode)  return -1;
-                            else return 0;
-                        } else {
-                            if (fileIDtoANode.get(fileID2).getFirst() == thisanode) return 1;
-                            else return 0;
-                        }
-                    });
-
-                    ObservableList<FileIDRow> rows = FXCollections.observableArrayList();
-                    for (String fileID : sortedFileIDs) {
-                        String colorCss;
-                        boolean occursInThisNode = fileIDtoANode.get(fileID).getFirst() == thisanode;
-                        boolean occursInLeaf = false;
-                        for (ANode anode : fileIDtoANode.get(fileID)) {
-                            if (anode.children().isEmpty()) {
-                                occursInLeaf = true;
-                                break;
-                            }
-                        }
-                        if (!occursInThisNode) {
-                            if (!occursInLeaf) colorCss = fIDofInt;
-                            else colorCss = fIDofLeaf;
-                        } else {
-                            colorCss = fIDofThis;
-                        }
-                        rows.add(new FileIDRow(fileID, fileIDtoANode.get(fileID).toString(), colorCss));
                     }
-
-                    fileIDView.getController().getFileIDTableView().setItems(rows);
-
-                    fileIDView.getController().getFileIDTableView().getColumns().addAll(col1, col2);
-
-                    fileIDView.getController().getBotlabel().setText(String.valueOf(fileIDtoANode.keySet().size()) + " FileIDs");
-
-                    fileIDView.getController().getLegend().setSpacing(LegendItem.DEFAULT_SPACING);
-                    fileIDView.getController().getLegend().getChildren().addAll(
-                            new LegendItem(fIDofThis, "This Node"),
-                            new LegendItem(fIDofInt, "Internal Node"),
-                            new LegendItem(fIDofLeaf, "Leaf Node")
-                    );
-                    fileIDView.getController().getLegend().setAlignment(LegendItem.DEFAULT_ALIGNMENT_POS);
-                    fileIDView.getController().getLegend().setPadding(LegendItem.DEFAULT_PADDING);
-
-                    fileIDView.getController().getNameTextfield().setText(treeItem.getValue().name() + " (id=" + treeItem.getValue().conceptId() + ")");
-
-                    LittlePopUp.showPopup(fileIDView.getRoot(), "FileID Info for subtree of " + fileIDView.getController().getNameTextfield().getText(), 1000, 500);
-
-                    //--------window is now visible---------------------
-
-
-                    fileIDView.getController().getAddFileIDButton().setOnAction(e -> {
-                        String fileID = fileIDView.getController().getAddFileIDTextField().getCharacters().toString();
-                        if (fileID.isBlank() || thisanode.fileIds().contains(fileID)) return;
-                        treeViewEditor1.addFileID(treeItem, fileID, treeView.getId());
-                        rows.removeIf(row -> row.col1.equals(fileID));
-                        rows.add(new FileIDRow(fileID, thisanode.name(), "lightblue"));
-                    });
-                    fileIDView.getController().getAddFileIDButton().setDisable(!allowEditing);
-
-                    fileIDView.getController().getRemoveFileIDButton().setOnAction(e -> {
-                        String fileID = fileIDView.getController().getAddFileIDTextField().getCharacters().toString();
-                        if (fileID.isBlank() || !thisanode.fileIds().contains(fileID)) return;
-                        treeViewEditor1.removeFileID(treeItem, fileID, treeView.getId());
-
-                        rows.removeIf(row -> row.col1.equals(fileID));
-                        rows.add(new FileIDRow(fileID, thisanode.name(), "gray"));
-                    });
-                    fileIDView.getController().getRemoveFileIDButton().setDisable(!allowEditing);
-
-
-                    fileIDView.getController().getSearchButton().setOnAction(e -> {
-                        for (FileIDRow fileIDRow : rows) {
-                            if (col1.getCellData(fileIDRow).toUpperCase().contains(fileIDView.getController().getAddFileIDTextField().getText().toUpperCase())) {
-                                fileIDView.getController().getFileIDTableView().getSelectionModel().clearSelection();
-                                fileIDView.getController().getFileIDTableView().getSelectionModel().select(fileIDRow);
-                                fileIDView.getController().getFileIDTableView().scrollTo(fileIDRow);
-                            }
-                        }
-                    });
-
+                    if (!occursInThisNode) {
+                        if (!occursInLeaf) colorCss = fIDofInt;
+                        else colorCss = fIDofLeaf;
+                    } else {
+                        colorCss = fIDofThis;
+                    }
+                    rows.add(new FileIDRow(fileID, fileIDtoANode.get(fileID).toString(), colorCss));
                 }
 
-                //implements rename
-                //gets temporaryANode from StringConverter from which the entered name is extracted
-                @Override
-                public void commitEdit(ANode temporaryANode) {
-                    if (temporaryANode == null || temporaryANode.name().isBlank() || this.getItem().name().equals(temporaryANode.name())) {
-                        cancelEdit();
-                        return;
+                fileIDView.getController().getFileIDTableView().setItems(rows);
+
+                fileIDView.getController().getFileIDTableView().getColumns().addAll(col1, col2);
+
+                fileIDView.getController().getBotlabel().setText(String.valueOf(fileIDtoANode.keySet().size()) + " FileIDs");
+
+                fileIDView.getController().getLegend().setSpacing(LegendItem.DEFAULT_SPACING);
+                fileIDView.getController().getLegend().getChildren().addAll(
+                        new LegendItem(fIDofThis, "This Node"),
+                        new LegendItem(fIDofInt, "Internal Node"),
+                        new LegendItem(fIDofLeaf, "Leaf Node")
+                );
+                fileIDView.getController().getLegend().setAlignment(LegendItem.DEFAULT_ALIGNMENT_POS);
+                fileIDView.getController().getLegend().setPadding(LegendItem.DEFAULT_PADDING);
+
+                fileIDView.getController().getNameTextfield().setText(treeItem.getValue().name() + " (id=" + treeItem.getValue().conceptId() + ")");
+
+                LittlePopUp.showPopup(fileIDView.getRoot(), "FileID Info for subtree of " + fileIDView.getController().getNameTextfield().getText(), 1000, 500);
+
+                //--------window is now visible---------------------
+
+
+                fileIDView.getController().getAddFileIDButton().setOnAction(e -> {
+                    String fileID = fileIDView.getController().getAddFileIDTextField().getCharacters().toString();
+                    if (fileID.isBlank() || thisanode.fileIds().contains(fileID)) return;
+                    treeViewEditor1.addFileID(treeItem, fileID, treeView.getId());
+                    rows.removeIf(row -> row.col1.equals(fileID));
+                    rows.add(new FileIDRow(fileID, thisanode.name(), "lightblue"));
+                });
+                fileIDView.getController().getAddFileIDButton().setDisable(!allowEditing);
+
+                fileIDView.getController().getRemoveFileIDButton().setOnAction(e -> {
+                    String fileID = fileIDView.getController().getAddFileIDTextField().getCharacters().toString();
+                    if (fileID.isBlank() || !thisanode.fileIds().contains(fileID)) return;
+                    treeViewEditor1.removeFileID(treeItem, fileID, treeView.getId());
+
+                    rows.removeIf(row -> row.col1.equals(fileID));
+                    rows.add(new FileIDRow(fileID, thisanode.name(), "gray"));
+                });
+                fileIDView.getController().getRemoveFileIDButton().setDisable(!allowEditing);
+
+
+                fileIDView.getController().getSearchButton().setOnAction(e -> {
+                    for (FileIDRow fileIDRow : rows) {
+                        if (col1.getCellData(fileIDRow).toUpperCase().contains(fileIDView.getController().getAddFileIDTextField().getText().toUpperCase())) {
+                            fileIDView.getController().getFileIDTableView().getSelectionModel().clearSelection();
+                            fileIDView.getController().getFileIDTableView().getSelectionModel().select(fileIDRow);
+                            fileIDView.getController().getFileIDTableView().scrollTo(fileIDRow);
+                        }
                     }
-                    treeViewEditor1.rename(this.getTreeItem(), temporaryANode.getName(), treeView.getId());
+                });
+
+            }
+
+            //implements rename
+            //gets temporaryANode from StringConverter from which the entered name is extracted
+            @Override
+            public void commitEdit(ANode temporaryANode) {
+                if (temporaryANode == null || temporaryANode.name().isBlank() || this.getItem().name().equals(temporaryANode.name())) {
+                    cancelEdit();
+                    return;
+                }
+                treeViewEditor1.rename(this.getTreeItem(), temporaryANode.getName(), treeView.getId());
 //                    this.getItem().setName(temporaryANode.getName());
-                    super.commitEdit(this.getItem());
+                super.commitEdit(this.getItem());
 //                    setText(this.getItem().toString());
-                }
-            };
+            }
         });
 
     }
