@@ -17,7 +17,7 @@ module com.anatomyExplorer {
     requires jdk.compiler;
     requires java.logging;
     requires jdk.xml.dom;
-//    requires jdk.jsobject;
+    requires jdk.jsobject; // works if I comment out. uncomment this if needed to make installer.
     requires jdk.httpserver;
     requires com.dlsc.pdfviewfx;
 

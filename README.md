@@ -1,36 +1,37 @@
 **🫀 What is this?**
 
-This program allows you to explore human anatomy in 3D:
+This program allows you to study human anatomy in 3D:
 
-- Navigate anatomy parts via two tree hierarchies
+- Navigate anatomy parts via a tree hierarchy
 - Select what you want to see and hit ``Draw in 3D``
-- Use coloring and animations for better understanding
+- Create cross-sections
+- Take quizzes
 
-For more details, also see [Doc.html](Project/doc/guide/HTML/main.html), which you can also find
-in the app via ``About > Guide``, or watch the short [video](src/main/resources/Project/video.mp4).
+Additional features:
+
+- load any custom tree hierarchy
+- edit tree hierarchies
+- visualize OBJ files
+
+For more details, also see the guide [[HTML]](Project/doc/guide/HTML/main.html),[[PDF]](Project/guide.pdf), which you can also find
+in the app via ``Help > Guide``.
 
 
 **▶️ How to run project using Maven**
 
-Navigate to ``AnatomyViewer3d/`` and run ``mvn clean javafx:run@anatomyExplorer``
-
-Requires Java 21 or later.
+In the root directory, run ``mvn clean javafx:run@anatomyExplorer -Pwindows/mac/linux``
 
 ******
-**💻 How to build distributable image for Windows**
+**💻 How to build installer for your operating system**
 
-Navigate to `AnatomyViewer3d\` and run ``mvn clean javafx:jlink@anatomyExplorer``
+In the root directory, run ``mvn clean package -Pwindows/linux/mac``.
 
-The image contains all necessary dependencies, resources and a JRE to run the program. 
-
-Run via ``\target\image\bin\anatomyExplorer.bat``
+You will find the installer in ``target/dist/``.
 
 ******
 **🗒️Credits:**
 
 3D anatomy data by: BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International.
-
-The basic functionality of tree view and 3D view is adapted from previous work done in cooperation with Niklas Gerbes.
 
 ******
 
