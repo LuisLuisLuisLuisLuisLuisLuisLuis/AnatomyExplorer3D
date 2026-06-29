@@ -123,6 +123,7 @@ public class SimpleMultipleChoice3DQuestion<T,S extends Comparable<S>> extends S
         resetViewButton.setOnAction(e -> threeDGroupHandler.resetView());
         Button showArrowButton = new Button("Show Arrow");
         Button hideArrowButton = new Button("Remove arrow");
+        hideArrowButton.setDisable(true);
         Button changeSelEffectButton = new Button("Change selection effect");
         showArrowButton.setOnAction(e -> {
             new ColorMeshviewsCommand(arrowColor,new HashSet<>(idsToSelect), threeDGroupHandler.getHasFXGroupContents(), threeDGroupHandler.getHasFXGroupSelection()).execute();

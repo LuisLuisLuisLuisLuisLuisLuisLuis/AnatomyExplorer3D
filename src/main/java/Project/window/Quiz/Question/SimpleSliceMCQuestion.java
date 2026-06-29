@@ -145,9 +145,9 @@ public class SimpleSliceMCQuestion<T,S extends Comparable<S>> extends SimpleMult
     protected void focusTarget() {
         threeDGroupHandler.resetView();
         switch (sliceAxis) {
-            case SAGGITAL -> {threeDGroupHandler.applyGlobalRotation(new Point3D(0,1,0), (sliceAxisPositive ? 270 : 90));}
-            case AXIAL -> {threeDGroupHandler.applyGlobalRotation(new Point3D(1,0,0), (sliceAxisPositive ? 270 : 90));}
-            case CORONAL -> {threeDGroupHandler.applyGlobalRotation(new Point3D(0,1,0), (sliceAxisPositive ? 180 : 0));}
+            case SAGGITAL -> {threeDGroupHandler.applyGlobalRotation(new Point3D(0,1,0), (sliceAxisPositive ? 90 : 270));}
+            case AXIAL -> {threeDGroupHandler.applyGlobalRotation(new Point3D(1,0,0), (sliceAxisPositive ? 90 : 270));}
+            case CORONAL -> {threeDGroupHandler.applyGlobalRotation(new Point3D(0,1,0), (sliceAxisPositive ? 0 : 180));}
         }
         threeDGroupHandler.viewToMeshView(threeDGroupHandler.getHasFXGroupContents().getMeshViewWithID(sliceTarget));
     }
