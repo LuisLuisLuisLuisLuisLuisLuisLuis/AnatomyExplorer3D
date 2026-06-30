@@ -21,12 +21,16 @@ in the app via ``Help > Guide``.
 
 In the root directory, run ``mvn clean javafx:run@anatomyExplorer -Pwindows/mac/linux``
 
+Requires Maven, Java 24 or later.
+
 ******
-**💻 How to build installer for your operating system**
+**💻 How to build installer for your operating system using Maven**
 
 In the root directory, run ``mvn clean package -Pwindows/linux/mac``.
 
 You will find the installer in ``target/dist/``.
+
+Note that building installers may require operating system specific tools, like Wix on Windows or dpkg-deb on Linux to be installed on your machine.
 
 ******
 **🗒️Credits:**
