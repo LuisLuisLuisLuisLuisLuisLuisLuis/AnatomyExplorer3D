@@ -20,7 +20,7 @@ public class AI_API_Task extends Task<String> {
     private final OpenAIRequest openAIRequest;
     private final String key;
 
-    private final String api_url = "http://134.2.9.180/v1/chat/completions";
+    private final String api_url = ".../chat/completions";
 
     /**
      * @param openAIRequest: Your request.

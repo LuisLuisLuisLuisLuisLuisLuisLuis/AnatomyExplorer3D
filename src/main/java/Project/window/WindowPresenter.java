@@ -76,7 +76,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Affine;
-import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 import javafx.util.Duration;
 import org.jetbrains.annotations.NotNull;
@@ -106,7 +105,7 @@ public class WindowPresenter {
     private static final Logger logger = Logger.getLogger(WindowPresenter.class.getName());
 
 
-    private final MainWindowController controller; //holds all components of the UI (buttons etc)
+    private final MainWindowController controller; //holds all components of the UI (buttons etc.)
     private final ObservableList<Command> undoList = FXCollections.observableList(new LinkedList<>()); //undo-redo
     private final ObservableList<Command> redoList = FXCollections.observableList(new LinkedList<>());
 
@@ -175,7 +174,7 @@ public class WindowPresenter {
 
     private long sizeOfLoadedModels = 0;    // this counts the size of OBJ files associated with models loaded by the user in MB. (excluding the anatomy models shipped with this software).
                                             // The user is not allowed to load more than maxSizeOfUserModels MB of OBJ files.
-    private static final int maxSizeOfUserModels = 500 + 427;   // +427 is the size of the standard unmodified anatomy hierarchy
+    private static final int maxSizeOfUserModels = 500 + 460;   // +~460 is the size of the standard unmodified anatomy hierarchy
 
     private static final double freeRamFractionThreshold = 0.1; // when freeMemory / totalMemory < threshold manageRAM() will try to free up RAM
 
@@ -191,7 +190,6 @@ public class WindowPresenter {
      */
     public WindowPresenter(MainWindowController controller) {
 
-        if (windowPresenter != null) throw new RuntimeException("WindowPresenter instance already exists");
         windowPresenter = this;
 
         this.controller = controller;
@@ -254,9 +252,6 @@ public class WindowPresenter {
             );
         } catch (IllegalArgumentException e) {LittlePopUp.showMsg("Error", "Failed to load BP3D is-a. Perhaps the files were modified or moved.\nError: " + e.getMessage(), "OK");}
 
-//        this.models.add(mainModel);
-//        this.models.add(partof_v3);
-//        this.models.add(isa_v3);
 
         //--------initialize tree selection model----------
         this.treeViewSelectionGroup = new SelectionGroup<>("treeViewSelectionGroup");
@@ -383,9 +378,6 @@ public class WindowPresenter {
             )) controller.getShowInfo3DButton().setSelected(false);
         });
         controller.getThreeDPane().getChildren().add(anchorPane);
-//        info3DButton.setTranslateX(-230);
-//        info3DButton.setTranslateZ(-960);
-//        info3DButton.setTranslateY(-230);
 
 
 
@@ -560,12 +552,6 @@ public class WindowPresenter {
         //---------------------------------------------------
 
         //----------menu File: 3D
-//        controller.getMenuResetView().setOnAction(e -> executeCommand(new ResetViewDrawCommand(new Group[]{contentGroup, slicePlaneGroup}, camera, initialTransform, initialCameraPosition, setupMouseRotate3D)));
-//        controller.getMenuClearView().setOnAction(e -> {
-//            executeCommand(new ClearCommand(contentGroup, hasInnerGroupContents));
-//            threeDSelectionGroup.changeSelection(new HashSet<>(), true, false);
-//        });
-
         controller.getResetViewButton().setOnAction(e -> executeCommand(new ResetViewDrawCommand(new Group[]{contentGroup,slicePlaneGroup}, camera, initialTransform, initialCameraPosition, setupMouseRotate3D)));
         controller.getClearViewButton().setOnAction(e -> {
             executeCommand(new ClearCommand<>(contentGroup, hasInnerGroupContents));
@@ -628,7 +614,7 @@ public class WindowPresenter {
         controller.getDrawIn3DButton().setOnAction(e -> {
             TreeViewSelectionContainer treeViewSelectionContainer = null;
             for (TreeViewSelectionContainer treeViewSelectionContainer1 : this.treeViewSelectionContainers) if (treeViewSelectionContainer1.getId().equals(getSelectedTreeView().getId())) treeViewSelectionContainer = treeViewSelectionContainer1;
-            if (treeViewSelectionContainer == null) {System.out.println("drawin3dButton: treeViewSelectionContainer is null!"); return;}
+            if (treeViewSelectionContainer == null) {logger.log(Level.SEVERE, "drawin3dButton: treeViewSelectionContainer is null!"); return;}
             // commented out because if you switch to another treetab and there is stuff selected (because tabs are synced) then the button would still draw the selection of the tree where the selection was last changed (not the one youre looking at).
 //            HashSet<String> toDraw = new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionGroup.getSelection()));
 //            for (String item : new HashSet<String>(selectionMediatorTree_3D_Content.transformAselectionToBSelection(treeViewSelectionGroup.getSelection()))) {  //need to create this again to not concurrently modify doDraw
@@ -645,7 +631,6 @@ public class WindowPresenter {
                 }
             }
             if (!toDraw.isEmpty()) {
-//                executeCommand(new DrawItemIn3DCommand(toDraw, threeDContentGroup, threeDSelectionGroup));
                 Set<MeshView> meshViewsToDraw = new HashSet<>(toDraw.size());
                 for (String id : toDraw) meshViewsToDraw.addAll(hasTheeDContentsContainer.transformGroupItemToSelectionItem(id));
                 executeCommand(new DrawItemIn3DCommand(meshViewsToDraw, hasInnerGroupContents, hasInnerGroupSelectedItems));
@@ -670,13 +655,6 @@ public class WindowPresenter {
             if (!toRemove.isEmpty()) {
                 Set<MeshView> meshViews = new HashSet<>();
                 for (String id : toRemove) meshViews.addAll(hasTheeDContentsContainer.transformGroupItemToSelectionItem(id));
-
-//                executeCommand(new RemoveObjFrom3DCommand(meshViews, hasInnerGroupContents, hasInnerGroupSelectedItems));
-//                if (controller.getSelectionSynchCheck().isSelected()) {
-//                    treeViewSelectionGroup.setNoUpdating(true);
-//                    threeDSelectionGroup.changeSelection(toRemove, false, false);
-//                    treeViewSelectionGroup.setNoUpdating(false);
-//                }
 
                 if (controller.getSelectionSynchCheck().isSelected()) {
                     treeViewSelectionGroup.changeSelection(selectionMediatorTree3D_Selection.transformBSelectionToASelection(toRemove), false, true);   //prevents lengthy updating of treeviewgroup during removecommand by unselecting those items before already.
@@ -934,6 +912,8 @@ public class WindowPresenter {
 
 
         //-------------AI support-------------------------------
+        // disabled for now because the system prompt does not work sufficiently well
+        // and the service responsiveness needs to be improved.
         //---------create table for chat history
         String apiKey = System.getenv().get("OPENAPI_API_KEY");
         this.aiService = new AIService(apiKey);
@@ -1007,7 +987,7 @@ public class WindowPresenter {
             return cell;
         });
 
-        //--------setup correct UI behaviour (visibility, width)
+        //--------setup correct UI behavior (visibility, width)
 //        if (apiKey == null) controller.getShowAICheck().disableProperty().set(true);
 
         controller.getAiButtonBox().visibleProperty().bind(controller.getShowAICheck().selectedProperty());
@@ -1029,7 +1009,7 @@ public class WindowPresenter {
         aiAnswerCol.setSortable(false);
 
         //--------AI system prompt
-        aiService.initializeChat(AISystemPrompt.prompt2);
+        aiService.initializeChat(AISystemPrompt.prompt1);
 
         //-------------Ask AI button functionality
         controller.getAskAIButton().disableProperty().bind(aiService.runningProperty()); //disable if AIService is currently running
@@ -1128,7 +1108,6 @@ public class WindowPresenter {
             postCutEvent.apply(controller.getCutSelectedMenuItem());
         });
 
-
         //---------------------------end cutting-------------------------
 
         //-------------------------------quiz------------------------------
@@ -1217,24 +1196,6 @@ public class WindowPresenter {
     }
 
 
-
-    //only for debug purposes
-    private void printTreeSelection(TreeView<ANode> treeView) {
-        if (controller.getTreeTabPane().getSelectionModel().getSelectedIndex() == 0) System.out.println("getPartOfTreeView selection");
-        else System.out.println("getIsATreeView selection");
-        if (treeView.getSelectionModel().getSelectedItems().isEmpty()) System.out.println("EMPTY");
-
-        for (TreeItem<ANode> treeItem : treeView.getSelectionModel().getSelectedItems()) {
-            System.out.println(treeItem.getValue().name());
-        }
-    }
-    //debug purposes
-    private void print3DSelection(SelectionGroup<String> selectionGroup) {
-        System.out.println("selection of group:");
-        for (String s : selectionGroup.getSelection()) {
-            System.out.println(s);
-        }
-    }
 
     /**
      * Enables control of the 3D objects via arrow keys
@@ -1345,12 +1306,10 @@ public class WindowPresenter {
     private void executeCommand(Command command) {
         logger.log(Level.INFO, "Executing " + command.name());
         redoList.clear();
-//        WindowPresenter.printMem();
         manageRAM();
         command.execute();
         undoList.add(command);
         updateOnExecRedo(command);
-//        WindowPresenter.printMem();
     }
 
     /**
@@ -1389,22 +1348,27 @@ public class WindowPresenter {
         slicePlaneGroup.getChildren().clear();
         double planeSize = Math.max(Math.max(innerGroup.getBoundsInLocal().getMaxX() - innerGroup.getBoundsInLocal().getMinX(), innerGroup.getBoundsInLocal().getMaxY() - innerGroup.getBoundsInLocal().getMinY()), innerGroup.getBoundsInLocal().getMaxZ() - innerGroup.getBoundsInLocal().getMinZ()) * 2;
         Group slicePlane = Plane.makeSlicePlane((int) planeSize);
-        slicePlaneGroupRotator.setIsTransformForbidden(new Function<Transform, Boolean>() {
-            @Override
-            public Boolean apply(Transform transform) {
-                Transform conTrans = contentGroup.getTransforms().getFirst();
-                Point3D diff = new Point3D(Math.abs(transform.getTx() - conTrans.getTx()), Math.abs(transform.getTy() - conTrans.getTy()), Math.abs(transform.getTz() - conTrans.getTz()));
-                return diff.getX() >= planeSize / 4 || diff.getY() >= planeSize / 4|| diff.getZ() >= planeSize / 4;
-            }
-        });
-        contentGroupRotator.setIsTransformForbidden(new Function<Transform, Boolean>() {
-            @Override
-            public Boolean apply(Transform transform) {
-                Transform conTrans = slicePlaneGroup.getTransforms().getFirst();
-                Point3D diff = new Point3D(Math.abs(transform.getTx() - conTrans.getTx()), Math.abs(transform.getTy() - conTrans.getTy()), Math.abs(transform.getTz() - conTrans.getTz()));
-                return diff.getX() >= planeSize / 4 || diff.getY() >= planeSize / 4|| diff.getZ() >= planeSize / 4;
-            }
-        });
+        //slicing always slices every mesh, as if the slice plane were to extend indefinitely.
+        //but it does not. that means it is possible to for example move the slice plane all the way to the right
+        //so that it does not overlap with the meshes anymore. but they would still be sliced. thats perhapse a bit unintuitive
+        //so this code tries to prevent moving the slice plane (or the meshes) to such positions. unfortunately it does not
+        //work properly but I don't want to fix it right now.
+//        slicePlaneGroupRotator.setIsTransformForbidden(new Function<Transform, Boolean>() {
+//            @Override
+//            public Boolean apply(Transform transform) {
+//                Transform conTrans = contentGroup.getTransforms().getFirst();
+//                Point3D diff = new Point3D(Math.abs(transform.getTx() - conTrans.getTx()), Math.abs(transform.getTy() - conTrans.getTy()), Math.abs(transform.getTz() - conTrans.getTz()));
+//                return diff.getX() >= planeSize / 4 || diff.getY() >= planeSize / 4|| diff.getZ() >= planeSize / 4;
+//            }
+//        });
+//        contentGroupRotator.setIsTransformForbidden(new Function<Transform, Boolean>() {
+//            @Override
+//            public Boolean apply(Transform transform) {
+//                Transform conTrans = slicePlaneGroup.getTransforms().getFirst();
+//                Point3D diff = new Point3D(Math.abs(transform.getTx() - conTrans.getTx()), Math.abs(transform.getTy() - conTrans.getTy()), Math.abs(transform.getTz() - conTrans.getTz()));
+//                return diff.getX() >= planeSize / 4 || diff.getY() >= planeSize / 4|| diff.getZ() >= planeSize / 4;
+//            }
+//        });
         slicePlaneGroup.getTransforms().setAll(contentGroup.getTransforms().getFirst());    //setting the transfrom so that the plane spawns in the middle of the contentgroup
         slicePlaneGroup.getChildren().addAll(slicePlane.getChildren());
     }
