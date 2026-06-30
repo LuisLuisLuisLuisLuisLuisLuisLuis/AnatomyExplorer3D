@@ -13,7 +13,7 @@ Additional features:
 - edit tree hierarchies
 - visualize OBJ files
 
-For more details, also see the guide [[PDF]](src/main/resources/Project/guide.pdf), which you can also find
+For more details, also see the guide [[PDF]](./src/main/resources/Project/guide.pdf), which you can also find
 in the app via ``Help > Guide``.
 
 
