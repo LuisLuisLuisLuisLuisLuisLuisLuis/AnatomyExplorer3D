@@ -229,7 +229,7 @@ public class WindowPresenter {
         try {
             mainModel = new Model(
                     getClass().getResourceAsStream("/Project/anatomy/anatomy_edge_list.txt"),
-                    getClass().getResourceAsStream("/Project/anatomy/anatomy_file_list_obj.txt"),
+                    getClass().getResourceAsStream("/Project/anatomy/anatomy_file_list.txt"),
                     "anatomy",
                     "/Project/anatomy/BP3D_4.0_obj_99/");
         } catch (IllegalArgumentException illegalArgumentException) {LittlePopUp.showMsg("Error", "Failed to load main model. Perhaps the files were modified or moved.\nError: " + illegalArgumentException.getMessage(), "OK");}
@@ -471,6 +471,7 @@ public class WindowPresenter {
                 for (SelectionMediator_Tree_3D selectionMediatorTree3D : selectionMediatorTree3DS) selectionMediatorTree3D.reloadDicts();
                 for (TreeViewSelectionContainer treeViewSelectionContainer : treeViewSelectionContainers) treeViewSelectionContainer.setupQuickAccessMap();
                 updateTreeBotLabel();
+                addMeshviewTooltips(models.stream().filter(model -> model.getName().equals(treeViewEditor.treeViewIDOfLastExecuted())).toList().getFirst());
             }
         });
 
@@ -1297,7 +1298,7 @@ public class WindowPresenter {
         if (command instanceof TreeEditorMockCommand treeEditorMockCommand) {
             if (isModelUnsaved.containsKey(treeEditorMockCommand.getTreeViewID())) isModelUnsaved.get(treeEditorMockCommand.getTreeViewID()).set(true);
         }
-        for (String s : isModelUnsaved.keySet()) System.out.println(s + ": " + isModelUnsaved.get(s).get());
+//        for (String s : isModelUnsaved.keySet()) System.out.println(s + ": " + isModelUnsaved.get(s).get());
     }
 
     /**
