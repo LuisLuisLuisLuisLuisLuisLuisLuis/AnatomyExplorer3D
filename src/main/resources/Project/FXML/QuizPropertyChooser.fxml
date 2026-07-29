@@ -78,7 +78,7 @@
                            </font>
                         </Label>
 <!--                        <Slider fx:id="difficultySlider" majorTickUnit="100.0" max="500.0" min="100.0" minorTickCount="0" prefHeight="24.0" prefWidth="254.0" showTickMarks="true" value="300.0" />-->
-                        <Slider fx:id="howMuchDrawSlider" value="17" majorTickUnit="5" max="30" minorTickCount="50" prefHeight="24.0" prefWidth="254.0" showTickMarks="true" snapToTicks="true" />
+                        <Slider fx:id="howMuchDrawSlider" value="20" majorTickUnit="5" max="50" minorTickCount="3" prefHeight="24.0" prefWidth="254.0" showTickMarks="true" snapToTicks="true" />
                     </items>
                   </ToolBar>
                   <ToolBar fx:id="nquestionsToolbar" prefHeight="40.0" prefWidth="200.0">
