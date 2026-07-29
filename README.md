@@ -47,6 +47,22 @@ Note that building installers may require operating system specific tools, like 
 
 This software is the result of my master's thesis under supervision of Prof. Daniel Huson. It evolved out of the course 'Advanced Java for Bioinformatics (2026)', also by Prof. Daniel Huson at the University of Tübingen. Check out his lab's [GitHub](https://github.com/husonlab) for lots of useful and exciting bioinformatics software! 🧪
 
-******
+*******
+**⚖️ License information**
 
-Author: Luis Reimer
+Anatomy Explorer Copyright © 2026 Luis Reimer
+
+This project is licensed under [GPLv3](./LICENSE).
+
+Third-party components:
+
+- JavaFX
+  Copyright © Oracle and contributors
+  Licensed under [GPLv2 with the Classpath Exception](./licenses/JavaFX-GPL-2.0-CE.txt).
+
+- PDFViewFX (see the [repository](https://github.com/dlsc-software-consulting-gmbh/PDFViewFX)) Licensed under [Apache License 2.0](./licenses/Apache-2.0.txt).
+
+- BodyParts3D
+  © The Database Center for Life Science
+  Licensed under [CC BY 4.0](./licenses/CC-BY-4.0.txt).
+  https://creativecommons.org/licenses/by/4.0/
