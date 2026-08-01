@@ -1036,9 +1036,8 @@ public class WindowPresenter {
 
         //------------Menu: Help----------
         controller.getMenuGuide().setOnAction(e -> Help.showGuide());
-        controller.getMenuAbout().setOnAction(e -> LittlePopUp.showPaddedPopup(About.getAbout(), "About", 400, 100));
+        controller.getMenuAbout().setOnAction(e -> LittlePopUp.showPaddedPopup(About.getAbout(), "About", 850, 500));
         controller.getShowInfo3DButton().selectedProperty().addListener((obs, old, nw) -> info3DButton.setVisible(nw));
-
 
 
         //------------------cutting-------------------------

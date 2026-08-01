@@ -42,10 +42,12 @@ Note that building installers may require operating system specific tools, like 
 - Webpage: https://dbarchive.biosciencedbc.jp/en/bodyparts3d/desc.html
 - Data: https://dbarchive.biosciencedbc.jp/data/bodyparts3d/
 
+Read the [thesis](./additional_materials/Thesis.pdf) to understand how the database is used in this project and which modifications were made to it.
 *******
 **🗒️ Project**
 
-This software is the result of my master's thesis under supervision of Prof. Daniel Huson. It evolved out of the course 'Advanced Java for Bioinformatics (2026)', also by Prof. Daniel Huson at the University of Tübingen. Check out his lab's [GitHub](https://github.com/husonlab) for lots of useful and exciting bioinformatics software! 🧪
+This software is the result of my master's [thesis](./additional_materials/Thesis.pdf) under supervision of Prof. Daniel Huson. It evolved out of the course 'Advanced Java for Bioinformatics (2026)', also by Prof. Daniel Huson at the University of Tübingen.
+Read the thesis to understand how the project developed. Check out the [GitHub](https://github.com/husonlab) page of Prof. Huson's lab for lots of useful and exciting bioinformatics software! 🧪
 
 *******
 **⚖️ License information**

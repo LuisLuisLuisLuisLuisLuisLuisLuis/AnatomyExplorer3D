@@ -223,7 +223,7 @@
                             <Menu mnemonicParsing="false" text="Help">
                               <items>
                                   <MenuItem fx:id="menuGuide" mnemonicParsing="false" text="Guide" />
-                                <MenuItem fx:id="menuAbout" mnemonicParsing="false" text="About" />
+                                    <MenuItem fx:id="menuAbout" mnemonicParsing="false" text="About" />
                                   <CheckMenuItem fx:id="showInfo3DButton" mnemonicParsing="false" text="Show 3D Info Button" selected="true"/>
       
                               </items>

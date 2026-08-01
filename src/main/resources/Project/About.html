@@ -1,16 +1,65 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        h3 {text-align: center;}
-        p {text-align: center;}
-        div {text-align: center;}
-        li {text-align: center;}
-    </style>
-</head>
-<body>
-<div><b>AnatomyExplorer</b> by Luis Reimer. 2026.<br></div>
-<div>Contact: reimer7luis@gmail.com</div>
 
-</body>
-</html>
+<p><strong>Anatomy Explorer</strong> Copyright (C) 2026 Luis Reimer</p>
+<p>Contact: reimer7luis@gmail.com</p>
+<p>See <a href="https://github.com/LuisLuisLuisLuisLuisLuisLuisLuis/AnatomyExplorer3D">GitHub</a> for code, installers and more information.</p>
+<hr>
+<p><strong>What is this?</strong></p>
+<p>This program allows you to study human anatomy in 3D:</p>
+<ul>
+    <li>Navigate anatomy parts via a tree hierarchy</li>
+    <li>Select what you want to see and hit <code>Draw in 3D</code></li>
+    <li>Create cross-sections</li>
+    <li>Take quizzes</li>
+</ul>
+<p>Additional features:</p>
+<ul>
+    <li>load any custom tree hierarchy</li>
+    <li>edit tree hierarchies</li>
+    <li>visualize OBJ files</li>
+</ul>
+<p>For more details see the guid (<code>Help &gt; Guide</code>).</p>
+
+<hr>
+
+<p><strong>How to run project using Maven</strong></p>
+<p>In the root directory, run <code>mvn clean javafx:run@anatomyExplorer -Pwindows/mac/linux</code></p>
+<p>Requires Maven, Java 24 or later.</p>
+
+<hr>
+
+<p><strong>How to build installer for your operating system using Maven</strong></p>
+<p>You can find installers for Windows, Linux and Mac in the release. You can also build installers yourself like this:</p>
+<p>In the root directory, run <code>mvn clean package -Pwindows/linux/mac</code>.</p>
+<p>You will find the installer in <code>target/dist/</code>.</p>
+<p>Note that building installers may require operating system specific tools, like Wix on Windows or dpkg-deb on Linux to be installed on your machine.</p>
+
+<hr>
+
+<p><strong>Data</strong></p>
+<p>3D anatomy data by: BodyParts3D, (C) The Database Center for Life Science licensed under CC Attribution 4.0 International.</p>
+<ul>
+    <li>Webpage: <a href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/desc.html">https://dbarchive.biosciencedbc.jp/en/bodyparts3d/desc.html</a></li>
+    <li>Data: <a href="https://dbarchive.biosciencedbc.jp/data/bodyparts3d/">https://dbarchive.biosciencedbc.jp/data/bodyparts3d/</a></li>
+</ul>
+<p> Read the thesis (find it on <a href="https://github.com/LuisLuisLuisLuisLuisLuisLuisLuis/AnatomyExplorer3D">GitHub</a>) to understand how the database is used in this project and which modifications were made to it.</p>
+<hr>
+<p><strong>Project</strong></p>
+<p>This software is the result of my master&#39;s thesis under supervision of Prof. Daniel Huson. It evolved out of the course &#39;Advanced Java for Bioinformatics (2026)&#39;, also by Prof. Daniel Huson at the University of Tuebingen.
+    Read the thesis to understand how the project developed. Check out the <a href="https://github.com/husonlab">GitHub</a> page of Prof. Huson&#39;s lab for lots of useful and exciting bioinformatics software!</p>
+<hr>
+
+<p><strong>License Information</strong></p>
+<p>This project is licensed under <a href="https://www.gnu.org/licenses/gpl-3.0.txt">GPLv3</a>.</p>
+<p>Third-party components:</p>
+<ul>
+    <li><p>JavaFX
+        Copyright (C) Oracle and contributors
+        Licensed under <a href="https://openjdk.org/legal/gplv2+ce.html">GPLv2 with the Classpath Exception</a>.</p>
+    </li>
+    <li><p>PDFViewFX (see the <a href="https://github.com/dlsc-software-consulting-gmbh/PDFViewFX">repository</a>) Licensed under <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>.</p>
+    </li>
+    <li><p>BodyParts3D (C)The Database Center for Life Science
+        Licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+        <a href="https://creativecommons.org/licenses/by/4.0/">https://creativecommons.org/licenses/by/4.0/</a></p>
+    </li>
+</ul>
